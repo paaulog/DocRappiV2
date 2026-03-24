@@ -1,0 +1,69 @@
+{
+  "meta": {
+    "language": "pt",
+    "technology": "discounts",
+    "title": "Descontos complexos",
+    "version": "1.0"
+  },
+  "nav": [
+    {
+      "id": "root",
+      "title": "Descontos",
+      "icon": "🏷️",
+      "expanded": true,
+      "items": [
+        { "id": "overview", "title": "Visão geral" },
+        { "id": "guides", "title": "Guias" },
+        { "id": "reference", "title": "Referência" }
+      ]
+    }
+  ],
+  "pages": {
+    "overview": {
+      "id": "overview",
+      "title": "Descontos complexos — Visão geral",
+      "description": "Promoções e regras de desconto avançadas (conteúdo em expansão).",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Documentação em construção",
+          "content": "Esta área corresponde a **Complex Discounts** / integrações de descontos na documentação pública. Complete com regras de negócio e payloads aprovados."
+        },
+        {
+          "type": "cards",
+          "items": [
+            { "icon": "📐", "title": "Regras", "text": "Definição de elegibilidade, combinação de ofertas e limites." },
+            { "icon": "🧩", "title": "Catálogo e pedidos", "text": "Alinhar descontos com Open Catalog e experiência em checkout." }
+          ]
+        }
+      ]
+    },
+    "guides": {
+      "id": "guides",
+      "title": "Guias",
+      "description": "Fluxos recomendados.",
+      "sections": [
+        {
+          "type": "steps",
+          "items": [
+            { "title": "Mapear cenários", "text": "Liste tipos de promoção e restrições." },
+            { "title": "Validar no ambiente", "text": "Teste com dados representativos antes de produção." },
+            { "title": "Monitorar exceções", "text": "Trate erros de aplicação e conflitos de regra." }
+          ]
+        }
+      ]
+    },
+    "reference": {
+      "id": "reference",
+      "title": "Referência",
+      "description": "Detalhes técnicos.",
+      "sections": [
+        {
+          "type": "text",
+          "content": "Inclua endpoints, códigos de erro e exemplos conforme a especificação de descontos."
+        }
+      ]
+    }
+  }
+}

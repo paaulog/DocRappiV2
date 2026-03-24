@@ -1,0 +1,367 @@
+{
+  "meta": {
+    "language": "pt",
+    "technology": "webhook",
+    "title": "Webhooks",
+    "version": "2.0"
+  },
+  "nav": [
+    {
+      "id": "getting-started",
+      "title": "Configuração",
+      "icon": "⚙️",
+      "expanded": true,
+      "items": [
+        { "id": "overview",      "title": "O que são Webhooks" },
+        { "id": "setup",         "title": "Configurando seu Webhook" },
+        { "id": "security",      "title": "Segurança e Assinatura" },
+        { "id": "retry-policy",  "title": "Política de Retry" }
+      ]
+    },
+    {
+      "id": "events",
+      "title": "Eventos",
+      "icon": "🔔",
+      "items": [
+        { "id": "order-created",   "title": "order.created" },
+        { "id": "order-confirmed", "title": "order.confirmed" },
+        { "id": "order-cancelled", "title": "order.cancelled" },
+        { "id": "order-delivered", "title": "order.delivered" },
+        { "id": "order-expired",   "title": "order.expired" }
+      ]
+    },
+    {
+      "id": "management",
+      "title": "Gerenciamento",
+      "icon": "🛠️",
+      "items": [
+        { "id": "register-webhook",  "title": "Registrar Webhook",  "method": "POST" },
+        { "id": "list-webhooks",     "title": "Listar Webhooks",    "method": "GET" },
+        { "id": "delete-webhook",    "title": "Remover Webhook",    "method": "DELETE" },
+        { "id": "test-webhook",      "title": "Testar Webhook",     "method": "POST" }
+      ]
+    }
+  ],
+  "pages": {
+
+    "overview": {
+      "id": "overview",
+      "title": "O que são Webhooks",
+      "description": "Webhooks são callbacks HTTP que sua aplicação registra para receber notificações automáticas quando eventos ocorrem na plataforma.",
+      "sections": [
+        {
+          "type": "cards",
+          "items": [
+            { "icon": "⚡", "title": "Tempo Real",       "text": "Receba eventos imediatamente, sem necessidade de polling." },
+            { "icon": "🔐", "title": "Seguro",           "text": "Assinatura HMAC-SHA256 para verificação de autenticidade." },
+            { "icon": "🔄", "title": "Retry Automático", "text": "Sistema de retry com backoff exponencial para garantir entrega." },
+            { "icon": "📋", "title": "Log de Eventos",   "text": "Histórico completo de eventos no painel de parceiros." }
+          ]
+        },
+        {
+          "type": "text",
+          "title": "Polling vs Webhooks",
+          "content": "**Polling** requer que seu sistema consulte a API periodicamente — ineficiente e sujeito a delays. **Webhooks** notificam seu sistema instantaneamente quando um evento ocorre, reduzindo latência e consumo de rate limit.\n\nPara receber novos pedidos com latência mínima em produção, **webhooks são fortemente recomendados**."
+        }
+      ]
+    },
+
+    "setup": {
+      "id": "setup",
+      "title": "Configurando seu Webhook",
+      "description": "Siga este guia para registrar e verificar sua URL de webhook.",
+      "sections": [
+        {
+          "type": "steps",
+          "title": "Passo a Passo",
+          "items": [
+            { "title": "Prepare seu Endpoint",  "text": "Crie um endpoint HTTPS em seu servidor. Deve aceitar `POST`, responder `200 OK` em **5 segundos** e ser acessível publicamente." },
+            { "title": "Registre o Webhook",    "text": "Registre sua URL via `POST /v2/webhooks` ou no painel de parceiros. Especifique os eventos de interesse." },
+            { "title": "Verificação do Desafio","text": "Enviaremos um `GET` com `?challenge=token`. Seu servidor deve retornar o valor do token." },
+            { "title": "Valide a Assinatura",   "text": "Para cada evento recebido, valide a assinatura HMAC-SHA256 no header `X-Webhook-Signature`." },
+            { "title": "Responda 200",           "text": "Responda sempre `HTTP 200 OK` imediatamente ao receber o evento. Processe o payload de forma assíncrona." }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "warning",
+          "title": "Timeout de 5 Segundos",
+          "content": "Seu endpoint deve responder com `200 OK` em **5 segundos**. Se demorar mais, o evento será considerado falho e entrará na fila de retry. Use filas (SQS, RabbitMQ, etc.) para processamento assíncrono."
+        },
+        {
+          "type": "code",
+          "title": "Handler de Webhook (Node.js / Express)",
+          "lang": "javascript",
+          "code": "const express = require('express');\nconst crypto = require('crypto');\nconst app = express();\n\napp.use(express.json());\n\napp.post('/webhooks/orders', (req, res) => {\n  // 1. Responda 200 imediatamente\n  res.status(200).json({ received: true });\n\n  // 2. Processe de forma assíncrona\n  processEventAsync(req.body, req.headers)\n    .catch(err => console.error('Webhook processing error:', err));\n});\n\nasync function processEventAsync(payload, headers) {\n  const signature = headers['x-webhook-signature'];\n  const secret = process.env.WEBHOOK_SECRET;\n\n  // 3. Valide a assinatura\n  const isValid = validateSignature(payload, signature, secret);\n  if (!isValid) throw new Error('Invalid signature');\n\n  // 4. Verifique idempotência\n  const eventId = payload.event_id;\n  if (await isAlreadyProcessed(eventId)) return;\n\n  // 5. Processe o evento\n  if (payload.event === 'order.created') {\n    await handleNewOrder(payload.data.order);\n  }\n\n  // 6. Marque como processado\n  await markAsProcessed(eventId);\n}"
+        }
+      ]
+    },
+
+    "security": {
+      "id": "security",
+      "title": "Segurança e Assinatura",
+      "description": "Como verificar a autenticidade dos eventos recebidos via webhook.",
+      "sections": [
+        {
+          "type": "text",
+          "title": "Como Funciona a Assinatura",
+          "content": "Cada evento é assinado com HMAC-SHA256 usando seu **webhook secret** (obtido no painel de parceiros). A assinatura é enviada no header `X-Webhook-Signature` no formato `sha256=<hash>`."
+        },
+        {
+          "type": "code",
+          "title": "Validação de Assinatura (Node.js)",
+          "lang": "javascript",
+          "code": "const crypto = require('crypto');\n\nfunction validateSignature(payload, signatureHeader, secret) {\n  // Compute expected signature\n  const body = typeof payload === 'string'\n    ? payload\n    : JSON.stringify(payload);\n\n  const expected = 'sha256=' + crypto\n    .createHmac('sha256', secret)\n    .update(body)\n    .digest('hex');\n\n  // Use constant-time comparison to prevent timing attacks\n  try {\n    return crypto.timingSafeEqual(\n      Buffer.from(expected),\n      Buffer.from(signatureHeader)\n    );\n  } catch {\n    return false;\n  }\n}"
+        },
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Nunca Ignore a Assinatura",
+          "content": "Sempre valide a assinatura `X-Webhook-Signature` antes de processar qualquer evento. Ignorar esta verificação deixa seu sistema vulnerável a ataques de injeção de eventos."
+        },
+        {
+          "type": "params",
+          "title": "Headers do Webhook",
+          "rows": [
+            { "name": "X-Webhook-Signature", "type": "string",  "required": true,  "description": "Assinatura HMAC-SHA256 no formato `sha256=<hex>`. Use para verificar autenticidade." },
+            { "name": "X-Webhook-Event",     "type": "string",  "required": true,  "description": "Tipo do evento. Ex: `order.created`." },
+            { "name": "X-Webhook-EventID",   "type": "string",  "required": true,  "description": "ID único do evento. Use para garantir idempotência." },
+            { "name": "X-Webhook-Timestamp", "type": "integer", "required": true,  "description": "Timestamp Unix de quando o evento foi gerado." },
+            { "name": "X-Partner-ID",        "type": "string",  "required": true,  "description": "Identificador do parceiro destinatário." }
+          ]
+        }
+      ]
+    },
+
+    "retry-policy": {
+      "id": "retry-policy",
+      "title": "Política de Retry",
+      "description": "Como o sistema trata falhas na entrega de eventos de webhook.",
+      "sections": [
+        {
+          "type": "text",
+          "title": "Quando um Retry Ocorre",
+          "content": "Um evento é considerado **falho** quando:\n\n- Seu servidor retorna status HTTP diferente de `2xx`\n- Seu servidor não responde em **5 segundos** (timeout)\n- Conexão recusada ou erro de rede"
+        },
+        {
+          "type": "steps",
+          "title": "Tentativas de Retry",
+          "items": [
+            { "title": "1ª Retry — 1 minuto",   "text": "Primeira tentativa após falha inicial." },
+            { "title": "2ª Retry — 5 minutos",  "text": "Segunda tentativa se a 1ª falhar." },
+            { "title": "3ª Retry — 30 minutos", "text": "Terceira tentativa com backoff aumentado." },
+            { "title": "4ª Retry — 2 horas",    "text": "Quarta tentativa." },
+            { "title": "5ª Retry — 24 horas",   "text": "Última tentativa. Após esta, o evento é descartado e registrado no log de falhas." }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Log de Eventos Falhos",
+          "content": "Todos os eventos que falharam após 5 tentativas ficam registrados no painel de parceiros por **30 dias**, permitindo reprocessamento manual."
+        }
+      ]
+    },
+
+    "order-created": {
+      "id": "order-created",
+      "title": "Evento: order.created",
+      "description": "Disparado quando um novo pedido é criado e está aguardando confirmação do parceiro.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Ação Imediata Necessária",
+          "content": "Ao receber este evento, confirme o pedido em até **5 minutos** via `POST /v2/orders/{id}/confirm`. Caso contrário, o pedido será cancelado automaticamente."
+        },
+        {
+          "type": "code",
+          "title": "Payload",
+          "lang": "json",
+          "code": "{\n  \"event\": \"order.created\",\n  \"event_id\": \"evt_7a8b9c0d1e2f\",\n  \"timestamp\": \"2024-01-15T14:32:10Z\",\n  \"version\": \"2.0\",\n  \"partner_id\": \"partner_abc123\",\n  \"data\": {\n    \"order\": {\n      \"id\": \"ord_9f3a2b1c\",\n      \"status\": \"PENDING\",\n      \"created_at\": \"2024-01-15T14:32:10Z\",\n      \"expires_at\": \"2024-01-15T14:37:10Z\",\n      \"customer\": {\n        \"name\": \"João Silva\",\n        \"phone\": \"+55 11 98765-4321\"\n      },\n      \"items\": [\n        {\n          \"id\": \"item_001\",\n          \"name\": \"X-Burguer Especial\",\n          \"quantity\": 2,\n          \"unit_price\": 2990,\n          \"total_price\": 5980,\n          \"notes\": \"Sem cebola\",\n          \"category\": \"Lanches\"\n        },\n        {\n          \"id\": \"item_002\",\n          \"name\": \"Batata Frita Grande\",\n          \"quantity\": 1,\n          \"unit_price\": 1490,\n          \"total_price\": 1490,\n          \"notes\": \"\",\n          \"category\": \"Acompanhamentos\"\n        }\n      ],\n      \"subtotal\": 7470,\n      \"delivery_fee\": 0,\n      \"discount\": 0,\n      \"total_amount\": 7470,\n      \"currency\": \"BRL\",\n      \"payment\": {\n        \"method\": \"CREDIT_CARD\",\n        \"status\": \"PAID\",\n        \"brand\": \"Visa\"\n      },\n      \"delivery_address\": {\n        \"street\": \"Av. Paulista\",\n        \"number\": \"1578\",\n        \"complement\": \"Ap. 42\",\n        \"neighborhood\": \"Bela Vista\",\n        \"city\": \"São Paulo\",\n        \"state\": \"SP\",\n        \"zipcode\": \"01310-200\"\n      }\n    }\n  }\n}"
+        }
+      ]
+    },
+
+    "order-confirmed": {
+      "id": "order-confirmed",
+      "title": "Evento: order.confirmed",
+      "description": "Disparado quando o sistema confirma que um pedido foi aceito pelo parceiro.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Payload",
+          "lang": "json",
+          "code": "{\n  \"event\": \"order.confirmed\",\n  \"event_id\": \"evt_8b9c0d1e2f3a\",\n  \"timestamp\": \"2024-01-15T14:33:45Z\",\n  \"version\": \"2.0\",\n  \"data\": {\n    \"order\": {\n      \"id\": \"ord_9f3a2b1c\",\n      \"status\": \"CONFIRMED\",\n      \"confirmed_at\": \"2024-01-15T14:33:45Z\",\n      \"estimated_ready_at\": \"2024-01-15T14:58:45Z\"\n    }\n  }\n}"
+        }
+      ]
+    },
+
+    "order-cancelled": {
+      "id": "order-cancelled",
+      "title": "Evento: order.cancelled",
+      "description": "Disparado quando um pedido é cancelado — por cliente, parceiro ou sistema.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Payload",
+          "lang": "json",
+          "code": "{\n  \"event\": \"order.cancelled\",\n  \"event_id\": \"evt_9c0d1e2f3a4b\",\n  \"timestamp\": \"2024-01-15T14:40:22Z\",\n  \"version\": \"2.0\",\n  \"data\": {\n    \"order\": {\n      \"id\": \"ord_9f3a2b1c\",\n      \"status\": \"CANCELLED\",\n      \"cancelled_at\": \"2024-01-15T14:40:22Z\",\n      \"cancelled_by\": \"PARTNER\",\n      \"cancellation_reason\": \"ITEM_UNAVAILABLE\",\n      \"refund\": {\n        \"status\": \"PENDING\",\n        \"amount\": 7470,\n        \"estimated_date\": \"2024-01-20\"\n      }\n    }\n  }\n}"
+        }
+      ]
+    },
+
+    "order-delivered": {
+      "id": "order-delivered",
+      "title": "Evento: order.delivered",
+      "description": "Disparado quando a entrega do pedido é confirmada com sucesso.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Payload",
+          "lang": "json",
+          "code": "{\n  \"event\": \"order.delivered\",\n  \"event_id\": \"evt_0d1e2f3a4b5c\",\n  \"timestamp\": \"2024-01-15T15:20:00Z\",\n  \"version\": \"2.0\",\n  \"data\": {\n    \"order\": {\n      \"id\": \"ord_9f3a2b1c\",\n      \"status\": \"DELIVERED\",\n      \"delivered_at\": \"2024-01-15T15:20:00Z\",\n      \"total_amount\": 7470\n    }\n  }\n}"
+        }
+      ]
+    },
+
+    "order-expired": {
+      "id": "order-expired",
+      "title": "Evento: order.expired",
+      "description": "Disparado quando um pedido PENDING expira por não ter sido confirmado em 5 minutos.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Impacto no Parceiro",
+          "content": "Pedidos expirados resultam em **cancelamento automático** com notificação ao cliente. Taxas de expiração altas podem resultar em penalidades. Monitore este evento de perto."
+        },
+        {
+          "type": "code",
+          "title": "Payload",
+          "lang": "json",
+          "code": "{\n  \"event\": \"order.expired\",\n  \"event_id\": \"evt_1e2f3a4b5c6d\",\n  \"timestamp\": \"2024-01-15T14:37:10Z\",\n  \"version\": \"2.0\",\n  \"data\": {\n    \"order\": {\n      \"id\": \"ord_9f3a2b1c\",\n      \"status\": \"CANCELLED\",\n      \"expired_at\": \"2024-01-15T14:37:10Z\",\n      \"reason\": \"CONFIRMATION_TIMEOUT\"\n    }\n  }\n}"
+        }
+      ]
+    },
+
+    "register-webhook": {
+      "id": "register-webhook",
+      "title": "Registrar Webhook",
+      "method": "POST",
+      "endpoint": "/v2/webhooks",
+      "description": "Registra uma nova URL de webhook para receber eventos da plataforma.",
+      "sections": [
+        {
+          "type": "params",
+          "title": "Body da Requisição",
+          "rows": [
+            { "name": "url",     "type": "string",         "required": true,  "description": "URL HTTPS do seu endpoint de webhook." },
+            { "name": "events",  "type": "array<string>",  "required": true,  "description": "Lista de eventos a receber. Ex: `[\"order.created\", \"order.cancelled\"]`. Use `[\"*\"]` para todos." },
+            { "name": "secret",  "type": "string",         "required": false, "description": "Segredo para assinar os eventos (gerado automaticamente se não fornecido)." },
+            { "name": "active",  "type": "boolean",        "required": false, "description": "Se o webhook deve ser ativado imediatamente. Padrão: `true`." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Exemplo de Requisição",
+          "lang": "bash",
+          "code": "curl -X POST https://api.example.com/v2/webhooks \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"url\": \"https://seu-servidor.com/webhooks/orders\",\n    \"events\": [\"order.created\", \"order.cancelled\", \"order.delivered\"],\n    \"active\": true\n  }'"
+        },
+        {
+          "type": "code",
+          "title": "Resposta (201 Created)",
+          "lang": "json",
+          "code": "{\n  \"id\": \"wh_abc123\",\n  \"url\": \"https://seu-servidor.com/webhooks/orders\",\n  \"events\": [\"order.created\", \"order.cancelled\", \"order.delivered\"],\n  \"secret\": \"whsec_xxxxxxxxxxxxxxxxxxxxxxxx\",\n  \"active\": true,\n  \"created_at\": \"2024-01-15T10:00:00Z\",\n  \"verified\": false\n}"
+        },
+        {
+          "type": "callout",
+          "variant": "warning",
+          "title": "Guarde o Secret",
+          "content": "O `secret` é exibido apenas uma vez na resposta de criação. Armazene-o com segurança — ele é necessário para validar assinaturas de todos os eventos futuros."
+        }
+      ]
+    },
+
+    "list-webhooks": {
+      "id": "list-webhooks",
+      "title": "Listar Webhooks",
+      "method": "GET",
+      "endpoint": "/v2/webhooks",
+      "description": "Retorna todos os webhooks registrados pelo parceiro autenticado.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Exemplo de Requisição",
+          "lang": "bash",
+          "code": "curl -X GET https://api.example.com/v2/webhooks \\\n  -H \"Authorization: Bearer {access_token}\""
+        },
+        {
+          "type": "code",
+          "title": "Resposta (200 OK)",
+          "lang": "json",
+          "code": "{\n  \"data\": [\n    {\n      \"id\": \"wh_abc123\",\n      \"url\": \"https://seu-servidor.com/webhooks/orders\",\n      \"events\": [\"order.created\", \"order.cancelled\"],\n      \"active\": true,\n      \"verified\": true,\n      \"created_at\": \"2024-01-15T10:00:00Z\",\n      \"last_triggered_at\": \"2024-01-15T14:32:10Z\",\n      \"failure_rate\": 0.02\n    }\n  ]\n}"
+        }
+      ]
+    },
+
+    "delete-webhook": {
+      "id": "delete-webhook",
+      "title": "Remover Webhook",
+      "method": "DELETE",
+      "endpoint": "/v2/webhooks/{webhook_id}",
+      "description": "Remove um webhook registrado. Após a remoção, nenhum evento será mais enviado para a URL.",
+      "sections": [
+        {
+          "type": "params",
+          "title": "Parâmetros de Rota",
+          "rows": [
+            { "name": "webhook_id", "type": "string", "required": true, "description": "ID do webhook a ser removido (formato: `wh_xxxxxx`)." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Exemplo de Requisição",
+          "lang": "bash",
+          "code": "curl -X DELETE https://api.example.com/v2/webhooks/wh_abc123 \\\n  -H \"Authorization: Bearer {access_token}\""
+        }
+      ]
+    },
+
+    "test-webhook": {
+      "id": "test-webhook",
+      "title": "Testar Webhook",
+      "method": "POST",
+      "endpoint": "/v2/webhooks/{webhook_id}/test",
+      "description": "Envia um evento de teste para verificar se seu endpoint está configurado corretamente.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "success",
+          "title": "Desenvolvimento Facilitado",
+          "content": "Use este endpoint para testar sua integração sem precisar gerar pedidos reais no Sandbox."
+        },
+        {
+          "type": "params",
+          "title": "Body da Requisição",
+          "rows": [
+            { "name": "event", "type": "string", "required": false, "description": "Tipo de evento a simular. Padrão: `order.created`." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Exemplo de Requisição",
+          "lang": "bash",
+          "code": "curl -X POST https://api.example.com/v2/webhooks/wh_abc123/test \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"event\": \"order.created\"}'"
+        },
+        {
+          "type": "code",
+          "title": "Resposta (200 OK)",
+          "lang": "json",
+          "code": "{\n  \"success\": true,\n  \"event_id\": \"evt_test_xyz789\",\n  \"response_status\": 200,\n  \"response_time_ms\": 142,\n  \"message\": \"Evento de teste entregue com sucesso.\"\n}"
+        }
+      ]
+    }
+
+  }
+}

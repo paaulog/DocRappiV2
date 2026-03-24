@@ -1,0 +1,155 @@
+{
+  "meta": {
+    "language": "es",
+    "technology": "foundations",
+    "title": "Fundamentos de Integracion",
+    "version": "1.0"
+  },
+  "nav": [
+    {
+      "id": "base",
+      "title": "Comienza aqui",
+      "icon": "🧭",
+      "expanded": true,
+      "items": [
+        { "id": "overview", "title": "Vision general" },
+        { "id": "doc-map", "title": "Mapa de documentacion" }
+      ]
+    },
+    {
+      "id": "core",
+      "title": "Fundamentos tecnicos",
+      "icon": "🔐",
+      "items": [
+        { "id": "authentication", "title": "Autenticacion" },
+        { "id": "environments", "title": "Ambientes y credenciales" },
+        { "id": "errors", "title": "Modelo de errores" }
+      ]
+    },
+    {
+      "id": "recipes",
+      "title": "Recetas de integracion",
+      "icon": "🧪",
+      "items": [
+        { "id": "recipes-overview", "title": "Como usar recetas" },
+        { "id": "recipe-orders", "title": "Receta: flujo de pedidos" },
+        { "id": "recipe-catalog", "title": "Receta: catalogo e inventario" }
+      ]
+    }
+  ],
+  "pages": {
+    "overview": {
+      "id": "overview",
+      "title": "Fundamentos antes de las APIs",
+      "description": "Esta capa organiza el portal antes de entrar en Open Orders, Open Catalog, REST API o GraphQL API.",
+      "sections": [
+        {
+          "type": "cards",
+          "items": [
+            { "icon": "🏪", "title": "Integraciones de negocio", "text": "Open Orders, Open Catalog e Inventory se enfocan en objetivos de negocio." },
+            { "icon": "🔌", "title": "Canales y protocolos", "text": "REST API, GraphQL API y Webhook definen como intercambiar datos." },
+            { "icon": "🛡️", "title": "Fundamentos comunes", "text": "Autenticacion, ambientes, errores y estandares se reutilizan en todo." }
+          ]
+        }
+      ]
+    },
+    "doc-map": {
+      "id": "doc-map",
+      "title": "Mapa de documentacion",
+      "description": "Estructura para reducir ambiguedad y acelerar onboarding.",
+      "sections": [
+        {
+          "type": "steps",
+          "items": [
+            { "title": "Leer fundamentos", "text": "Autenticacion, ambientes y manejo de errores." },
+            { "title": "Elegir integracion", "text": "Open Orders, Open Catalog o Inventory por objetivo." },
+            { "title": "Definir canal", "text": "REST, GraphQL y/o Webhook segun el modelo de consumo." },
+            { "title": "Ejecutar recetas", "text": "Seguir guias por escenario y validar en sandbox." }
+          ]
+        }
+      ]
+    },
+    "authentication": {
+      "id": "authentication",
+      "title": "Autenticacion",
+      "description": "Patron unico para todas las integraciones de la plataforma.",
+      "sections": [
+        {
+          "type": "text",
+          "content": "Usa credenciales de integracion para obtener un token y enviar `Authorization: Bearer <token>` en solicitudes protegidas."
+        }
+      ]
+    },
+    "environments": {
+      "id": "environments",
+      "title": "Ambientes y credenciales",
+      "description": "Usa sandbox para pruebas y luego promueve a produccion.",
+      "sections": [
+        {
+          "type": "kv",
+          "items": [
+            { "label": "Sandbox", "value": "Pruebas funcionales y validacion de flujo" },
+            { "label": "Produccion", "value": "Operacion real con monitoreo" }
+          ]
+        }
+      ]
+    },
+    "errors": {
+      "id": "errors",
+      "title": "Modelo de errores",
+      "description": "Patron transversal para observabilidad y reintentos.",
+      "sections": [
+        {
+          "type": "errors",
+          "rows": [
+            { "code": 400, "status": "Bad Request", "description": "Payload invalido o inconsistente." },
+            { "code": 401, "status": "Unauthorized", "description": "Token ausente, invalido o expirado." },
+            { "code": 429, "status": "Too Many Requests", "description": "Limite de tasa excedido." },
+            { "code": 500, "status": "Server Error", "description": "Falla interna; aplicar retry con backoff." }
+          ]
+        }
+      ]
+    },
+    "recipes-overview": {
+      "id": "recipes-overview",
+      "title": "Como usar recetas",
+      "description": "Las recetas conectan negocio + canal + endpoint en un flujo simple.",
+      "sections": [
+        {
+          "type": "text",
+          "content": "Cada receta guia contexto, prerequisitos, llamadas, validacion y manejo de errores."
+        }
+      ]
+    },
+    "recipe-orders": {
+      "id": "recipe-orders",
+      "title": "Receta: flujo de pedidos",
+      "description": "Ruta practica para Open Orders con eventos y confirmaciones.",
+      "sections": [
+        {
+          "type": "steps",
+          "items": [
+            { "title": "Recibir pedido", "text": "Via webhook o polling segun configuracion." },
+            { "title": "Confirmar recepcion", "text": "Responder en la ventana esperada de confirmacion." },
+            { "title": "Actualizar estado", "text": "Publicar eventos de preparacion y finalizacion." }
+          ]
+        }
+      ]
+    },
+    "recipe-catalog": {
+      "id": "recipe-catalog",
+      "title": "Receta: catalogo e inventario",
+      "description": "Flujo practico para sincronizar productos, precio y disponibilidad.",
+      "sections": [
+        {
+          "type": "steps",
+          "items": [
+            { "title": "Carga inicial", "text": "Publicar categorias y productos base." },
+            { "title": "Sincronizacion incremental", "text": "Actualizar precio y stock en intervalos definidos." },
+            { "title": "Gestionar rechazos", "text": "Corregir errores de validacion e inconsistencias de SKU." }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,626 @@
+{
+  "meta": {
+    "language": "pt",
+    "technology": "rest",
+    "title": "REST API",
+    "version": "2.0"
+  },
+  "nav": [
+    {
+      "id": "getting-started",
+      "title": "Primeiros Passos",
+      "icon": "🚀",
+      "expanded": true,
+      "items": [
+        { "id": "overview",        "title": "Visão Geral" },
+        { "id": "authentication",  "title": "Autenticação" },
+        { "id": "environments",    "title": "Ambientes" },
+        { "id": "rate-limiting",   "title": "Rate Limiting" }
+      ]
+    },
+    {
+      "id": "orders",
+      "title": "Gestão de Pedidos",
+      "icon": "📦",
+      "items": [
+        { "id": "order-lifecycle",     "title": "Ciclo de Vida" },
+        { "id": "list-orders",         "title": "Listar Pedidos",        "method": "GET" },
+        { "id": "get-order",           "title": "Obter Pedido",          "method": "GET" },
+        { "id": "confirm-order",       "title": "Confirmar Pedido",      "method": "POST" },
+        { "id": "update-order-status", "title": "Atualizar Status",      "method": "PUT" },
+        { "id": "cancel-order",        "title": "Cancelar Pedido",       "method": "DELETE" }
+      ]
+    },
+    {
+      "id": "webhooks-section",
+      "title": "Webhooks",
+      "icon": "🔔",
+      "items": [
+        { "id": "webhook-intro",  "title": "Introdução aos Webhooks" },
+        { "id": "order-events",   "title": "Eventos de Pedido" }
+      ]
+    },
+    {
+      "id": "errors-section",
+      "title": "Referência de Erros",
+      "icon": "⚠️",
+      "items": [
+        { "id": "error-codes", "title": "Códigos de Erro" }
+      ]
+    }
+  ],
+  "pages": {
+
+    "overview": {
+      "id": "overview",
+      "title": "Visão Geral da API",
+      "description": "Bem-vindo à documentação oficial da API de Pedidos. Esta API permite que parceiros técnicos integrem seus sistemas diretamente com nossa plataforma de entregas.",
+      "sections": [
+        {
+          "type": "cards",
+          "items": [
+            { "icon": "⚡", "title": "Alta Performance",  "text": "Arquitetura RESTful otimizada com SLA de 99.9% de disponibilidade." },
+            { "icon": "🔐", "title": "Segurança OAuth2",  "text": "Tokens JWT de curta duração com renovação automática." },
+            { "icon": "🔔", "title": "Tempo Real",        "text": "Webhooks para notificações instantâneas de eventos de pedido." },
+            { "icon": "📊", "title": "Idempotência",      "text": "Todas as operações críticas suportam idempotency keys." }
+          ]
+        },
+        {
+          "type": "text",
+          "title": "Como Funciona",
+          "content": "A integração com a API de Pedidos segue um fluxo bem definido. Seu sistema receberá novos pedidos via **polling** ou **webhook**, deverá confirmá-los em até 5 minutos e então atualizar o status conforme o pedido avança no ciclo de preparação e entrega."
+        },
+        {
+          "type": "steps",
+          "title": "Fluxo de Integração",
+          "items": [
+            { "title": "Credenciais",   "text": "Obtenha seu `client_id` e `client_secret` no painel de parceiros." },
+            { "title": "Token OAuth2",  "text": "Troque suas credenciais por um **access_token** via endpoint de autenticação." },
+            { "title": "Receba Pedidos","text": "Configure um webhook ou faça polling periódico em `GET /v2/orders?status=PENDING`." },
+            { "title": "Confirme",      "text": "Confirme o recebimento com `POST /v2/orders/{id}/confirm` em até **5 minutos**." },
+            { "title": "Atualize",      "text": "Atualize o status do pedido conforme ele evolui: `PREPARING → READY → DISPATCHED → DELIVERED`." }
+          ]
+        },
+        {
+          "type": "kv",
+          "title": "URLs Base",
+          "items": [
+            { "label": "Sandbox",   "value": "https://sandbox-api.example.com/v2" },
+            { "label": "Produção",  "value": "https://api.example.com/v2" }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Versionamento",
+          "content": "A API usa versionamento via prefixo de URL (`/v2`). A versão anterior (`/v1`) será descontinuada em **31/12/2025**."
+        }
+      ]
+    },
+
+    "authentication": {
+      "id": "authentication",
+      "title": "Autenticação",
+      "description": "A API utiliza OAuth 2.0 com fluxo Client Credentials. Todas as requisições devem incluir um Bearer token no header Authorization.",
+      "sections": [
+        {
+          "type": "text",
+          "title": "Obtendo um Token de Acesso",
+          "content": "Faça uma requisição `POST` para o endpoint de autenticação com seu `client_id` e `client_secret`. O token retornado tem validade de **3600 segundos** (1 hora). Armazene-o e renove antes do vencimento."
+        },
+        {
+          "type": "callout",
+          "variant": "warning",
+          "title": "Segurança das Credenciais",
+          "content": "Nunca exponha seu `client_secret` no lado cliente. Mantenha-o exclusivamente no servidor. Em caso de comprometimento, revogue imediatamente no painel de parceiros."
+        },
+        {
+          "type": "code",
+          "title": "Requisição de Token",
+          "lang": "bash",
+          "code": "curl -X POST https://auth.example.com/oauth/token \\\n  -H \"Content-Type: application/x-www-form-urlencoded\" \\\n  -d \"grant_type=client_credentials\" \\\n  -d \"client_id=SEU_CLIENT_ID\" \\\n  -d \"client_secret=SEU_CLIENT_SECRET\" \\\n  -d \"scope=orders:read orders:write\""
+        },
+        {
+          "type": "code",
+          "title": "Resposta",
+          "lang": "json",
+          "code": "{\n  \"access_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"token_type\": \"Bearer\",\n  \"expires_in\": 3600,\n  \"scope\": \"orders:read orders:write\"\n}"
+        },
+        {
+          "type": "code",
+          "title": "Usando o Token nas Requisições",
+          "lang": "bash",
+          "code": "curl -X GET https://api.example.com/v2/orders \\\n  -H \"Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...\" \\\n  -H \"Content-Type: application/json\""
+        },
+        {
+          "type": "params",
+          "title": "Parâmetros de Autenticação",
+          "rows": [
+            { "name": "grant_type",    "type": "string",  "required": true,  "description": "Sempre `client_credentials` para integrações server-to-server." },
+            { "name": "client_id",     "type": "string",  "required": true,  "description": "Identificador único do seu aplicativo parceiro." },
+            { "name": "client_secret", "type": "string",  "required": true,  "description": "Chave secreta do seu aplicativo. Nunca expor no cliente." },
+            { "name": "scope",         "type": "string",  "required": false, "description": "Escopos solicitados: `orders:read`, `orders:write`, `webhooks:manage`." }
+          ]
+        },
+        {
+          "type": "errors",
+          "title": "Erros de Autenticação",
+          "rows": [
+            { "code": 401, "status": "Unauthorized",   "description": "Token inválido, expirado ou ausente." },
+            { "code": 403, "status": "Forbidden",      "description": "Token válido mas sem permissão para o recurso solicitado." },
+            { "code": 400, "status": "Bad Request",    "description": "Parâmetros de autenticação inválidos ou ausentes." }
+          ]
+        }
+      ]
+    },
+
+    "environments": {
+      "id": "environments",
+      "title": "Ambientes",
+      "description": "A API oferece dois ambientes: Sandbox para desenvolvimento/testes e Produção para operações reais.",
+      "sections": [
+        {
+          "type": "kv",
+          "title": "URLs dos Ambientes",
+          "items": [
+            { "label": "Auth Sandbox",   "value": "https://sandbox-auth.example.com" },
+            { "label": "API Sandbox",    "value": "https://sandbox-api.example.com/v2" },
+            { "label": "Auth Produção",  "value": "https://auth.example.com" },
+            { "label": "API Produção",   "value": "https://api.example.com/v2" }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "success",
+          "title": "Sandbox — Dados de Teste",
+          "content": "No ambiente Sandbox, pedidos de teste são gerados automaticamente a cada 2 minutos. Use `client_id=test_partner_001` e `client_secret=test_secret_001` para autenticação. **Nenhuma cobrança real ocorre no Sandbox.**"
+        },
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Produção — Cuidado",
+          "content": "Operações no ambiente de produção afetam pedidos reais e clientes. Certifique-se de testar exaustivamente no Sandbox antes de ir a produção."
+        },
+        {
+          "type": "text",
+          "title": "Diferenças entre Ambientes",
+          "content": "**Rate limits:** O Sandbox permite 10 req/min por endpoint; Produção permite 60 req/min.\n\n**Webhooks:** No Sandbox, use uma URL pública como [webhook.site](https://webhook.site) para receber eventos de teste.\n\n**Dados:** O Sandbox usa dados sintéticos. Nunca use dados reais de clientes em testes."
+        }
+      ]
+    },
+
+    "rate-limiting": {
+      "id": "rate-limiting",
+      "title": "Rate Limiting",
+      "description": "A API aplica limites de taxa por parceiro para garantir estabilidade e disponibilidade para todos os integradores.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "warning",
+          "title": "Limite Excedido",
+          "content": "Quando o limite é excedido, a API retorna `HTTP 429 Too Many Requests`. Aguarde o tempo indicado no header `Retry-After` antes de tentar novamente."
+        },
+        {
+          "type": "params",
+          "title": "Headers de Rate Limit na Resposta",
+          "rows": [
+            { "name": "X-RateLimit-Limit",     "type": "integer", "required": false, "description": "Número máximo de requisições permitidas no período." },
+            { "name": "X-RateLimit-Remaining", "type": "integer", "required": false, "description": "Número de requisições restantes no período atual." },
+            { "name": "X-RateLimit-Reset",     "type": "integer", "required": false, "description": "Timestamp Unix em que o limite será resetado." },
+            { "name": "Retry-After",            "type": "integer", "required": false, "description": "Segundos a aguardar antes de nova tentativa (presente no 429)." }
+          ]
+        },
+        {
+          "type": "text",
+          "title": "Limites por Plano",
+          "content": "**Sandbox:** 10 requisições/minuto por endpoint.\n\n**Produção — Starter:** 60 requisições/minuto globais.\n\n**Produção — Business:** 300 requisições/minuto globais.\n\n**Produção — Enterprise:** Limites customizados. Entre em contato com a equipe técnica."
+        },
+        {
+          "type": "code",
+          "title": "Exemplo de Resposta 429",
+          "lang": "http",
+          "code": "HTTP/1.1 429 Too Many Requests\nContent-Type: application/json\nRetry-After: 30\nX-RateLimit-Limit: 60\nX-RateLimit-Remaining: 0\nX-RateLimit-Reset: 1715000430\n\n{\n  \"error\": \"rate_limit_exceeded\",\n  \"message\": \"Limite de requisições atingido. Tente novamente em 30 segundos.\",\n  \"retry_after\": 30\n}"
+        }
+      ]
+    },
+
+    "order-lifecycle": {
+      "id": "order-lifecycle",
+      "title": "Ciclo de Vida do Pedido",
+      "description": "Entenda todos os estados possíveis de um pedido e as transições válidas entre eles.",
+      "sections": [
+        {
+          "type": "status-flow",
+          "title": "Fluxo de Status",
+          "states": ["PENDING", "CONFIRMED", "PREPARING", "READY", "DISPATCHED", "DELIVERED"]
+        },
+        {
+          "type": "errors",
+          "title": "Descrição dos Status",
+          "rows": [
+            { "code": "PENDING",     "status": "Aguardando Confirmação", "description": "Pedido recebido. Aguardando confirmação do parceiro (timeout: 5 min)." },
+            { "code": "CONFIRMED",   "status": "Confirmado",             "description": "Parceiro confirmou o recebimento. Preparação ainda não iniciada." },
+            { "code": "PREPARING",   "status": "Em Preparo",             "description": "Pedido em preparação na cozinha/operação." },
+            { "code": "READY",       "status": "Pronto",                 "description": "Pedido pronto para retirada pelo entregador." },
+            { "code": "DISPATCHED",  "status": "Despachado",             "description": "Entregador coletou o pedido. Em trânsito ao cliente." },
+            { "code": "DELIVERED",   "status": "Entregue",               "description": "Pedido entregue ao cliente com sucesso. Estado final." },
+            { "code": "CANCELLED",   "status": "Cancelado",              "description": "Pedido cancelado (por cliente, parceiro ou sistema). Estado final." }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Timeout de Confirmação",
+          "content": "Pedidos no status `PENDING` não confirmados em **5 minutos** são automaticamente cancelados pelo sistema e o cliente é notificado. Implemente polling ou webhooks para confirmação imediata."
+        },
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Transições Inválidas",
+          "content": "Tentativas de transição inválida (ex: `DELIVERED → PREPARING`) retornarão `HTTP 422 Unprocessable Entity` com detalhe do erro."
+        }
+      ]
+    },
+
+    "list-orders": {
+      "id": "list-orders",
+      "title": "Listar Pedidos",
+      "method": "GET",
+      "endpoint": "/v2/orders",
+      "description": "Retorna uma lista paginada de pedidos do parceiro autenticado, com suporte a filtros por status, data e outros critérios.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Polling Recomendado",
+          "content": "Para recebimento em tempo real, configure um **webhook** em vez de polling. Se usar polling, recomendamos intervalos de **30 a 60 segundos** para não esgotar o rate limit."
+        },
+        {
+          "type": "params",
+          "title": "Parâmetros de Query",
+          "rows": [
+            { "name": "status",     "type": "string",  "required": false, "description": "Filtra por status do pedido. Valores: `PENDING`, `CONFIRMED`, `PREPARING`, `READY`, `DISPATCHED`, `DELIVERED`, `CANCELLED`." },
+            { "name": "from",       "type": "string",  "required": false, "description": "Data inicial no formato ISO 8601. Ex: `2024-01-15T00:00:00Z`." },
+            { "name": "to",         "type": "string",  "required": false, "description": "Data final no formato ISO 8601. Ex: `2024-01-15T23:59:59Z`." },
+            { "name": "page",       "type": "integer", "required": false, "description": "Número da página (começa em 1). Padrão: `1`." },
+            { "name": "page_size",  "type": "integer", "required": false, "description": "Itens por página. Máximo: `100`. Padrão: `20`." },
+            { "name": "sort",       "type": "string",  "required": false, "description": "Ordenação: `created_at:asc` ou `created_at:desc`. Padrão: `created_at:desc`." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Exemplo de Requisição",
+          "lang": "bash",
+          "code": "curl -X GET \"https://api.example.com/v2/orders?status=PENDING&page=1&page_size=20\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -H \"X-Partner-ID: partner_abc123\""
+        },
+        {
+          "type": "code",
+          "title": "Exemplo de Resposta (200 OK)",
+          "lang": "json",
+          "code": "{\n  \"data\": [\n    {\n      \"id\": \"ord_9f3a2b1c\",\n      \"status\": \"PENDING\",\n      \"created_at\": \"2024-01-15T14:32:10Z\",\n      \"expires_at\": \"2024-01-15T14:37:10Z\",\n      \"customer\": {\n        \"name\": \"João Silva\",\n        \"phone\": \"+55 11 98765-4321\"\n      },\n      \"items\": [\n        {\n          \"id\": \"item_001\",\n          \"name\": \"X-Burguer Especial\",\n          \"quantity\": 2,\n          \"unit_price\": 2990,\n          \"notes\": \"Sem cebola\"\n        },\n        {\n          \"id\": \"item_002\",\n          \"name\": \"Batata Frita Grande\",\n          \"quantity\": 1,\n          \"unit_price\": 1490,\n          \"notes\": \"\"\n        }\n      ],\n      \"total_amount\": 7470,\n      \"currency\": \"BRL\",\n      \"delivery_address\": {\n        \"street\": \"Av. Paulista\",\n        \"number\": \"1578\",\n        \"complement\": \"Ap. 42\",\n        \"neighborhood\": \"Bela Vista\",\n        \"city\": \"São Paulo\",\n        \"state\": \"SP\",\n        \"zipcode\": \"01310-200\"\n      }\n    }\n  ],\n  \"pagination\": {\n    \"page\": 1,\n    \"page_size\": 20,\n    \"total_items\": 47,\n    \"total_pages\": 3,\n    \"has_next\": true,\n    \"has_prev\": false\n  }\n}"
+        },
+        {
+          "type": "errors",
+          "title": "Erros Possíveis",
+          "rows": [
+            { "code": 400, "status": "Bad Request",          "description": "Parâmetros de query inválidos. Verifique formato de datas e valores de status." },
+            { "code": 401, "status": "Unauthorized",         "description": "Token de acesso ausente, inválido ou expirado." },
+            { "code": 403, "status": "Forbidden",            "description": "Parceiro não possui permissão de leitura de pedidos." },
+            { "code": 429, "status": "Too Many Requests",    "description": "Rate limit atingido. Verifique o header `Retry-After`." },
+            { "code": 500, "status": "Internal Server Error","description": "Erro interno do servidor. Tente novamente em alguns instantes." }
+          ]
+        }
+      ]
+    },
+
+    "get-order": {
+      "id": "get-order",
+      "title": "Obter Pedido por ID",
+      "method": "GET",
+      "endpoint": "/v2/orders/{order_id}",
+      "description": "Retorna os detalhes completos de um pedido específico, incluindo itens, endereço de entrega e histórico de status.",
+      "sections": [
+        {
+          "type": "params",
+          "title": "Parâmetros de Rota",
+          "rows": [
+            { "name": "order_id", "type": "string", "required": true, "description": "Identificador único do pedido no formato `ord_xxxxxxxx`." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Exemplo de Requisição",
+          "lang": "bash",
+          "code": "curl -X GET \"https://api.example.com/v2/orders/ord_9f3a2b1c\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\""
+        },
+        {
+          "type": "code",
+          "title": "Exemplo de Resposta (200 OK)",
+          "lang": "json",
+          "code": "{\n  \"id\": \"ord_9f3a2b1c\",\n  \"status\": \"PREPARING\",\n  \"created_at\": \"2024-01-15T14:32:10Z\",\n  \"updated_at\": \"2024-01-15T14:36:05Z\",\n  \"confirmed_at\": \"2024-01-15T14:33:45Z\",\n  \"estimated_ready_at\": \"2024-01-15T14:55:00Z\",\n  \"customer\": {\n    \"name\": \"João Silva\",\n    \"phone\": \"+55 11 98765-4321\"\n  },\n  \"items\": [\n    {\n      \"id\": \"item_001\",\n      \"name\": \"X-Burguer Especial\",\n      \"quantity\": 2,\n      \"unit_price\": 2990,\n      \"total_price\": 5980,\n      \"notes\": \"Sem cebola\",\n      \"category\": \"Lanches\"\n    }\n  ],\n  \"total_amount\": 7470,\n  \"subtotal\": 7470,\n  \"delivery_fee\": 0,\n  \"discount\": 0,\n  \"currency\": \"BRL\",\n  \"payment\": {\n    \"method\": \"CREDIT_CARD\",\n    \"status\": \"PAID\",\n    \"brand\": \"Visa\"\n  },\n  \"delivery_address\": {\n    \"street\": \"Av. Paulista\",\n    \"number\": \"1578\",\n    \"complement\": \"Ap. 42\",\n    \"neighborhood\": \"Bela Vista\",\n    \"city\": \"São Paulo\",\n    \"state\": \"SP\",\n    \"zipcode\": \"01310-200\",\n    \"latitude\": -23.5613,\n    \"longitude\": -46.6563\n  },\n  \"status_history\": [\n    { \"status\": \"PENDING\",   \"timestamp\": \"2024-01-15T14:32:10Z\" },\n    { \"status\": \"CONFIRMED\", \"timestamp\": \"2024-01-15T14:33:45Z\" },\n    { \"status\": \"PREPARING\", \"timestamp\": \"2024-01-15T14:36:05Z\" }\n  ]\n}"
+        },
+        {
+          "type": "errors",
+          "title": "Erros Possíveis",
+          "rows": [
+            { "code": 401, "status": "Unauthorized", "description": "Token ausente ou inválido." },
+            { "code": 403, "status": "Forbidden",    "description": "Pedido não pertence ao parceiro autenticado." },
+            { "code": 404, "status": "Not Found",    "description": "Pedido com o ID fornecido não encontrado." },
+            { "code": 429, "status": "Too Many Requests", "description": "Rate limit atingido." }
+          ]
+        }
+      ]
+    },
+
+    "confirm-order": {
+      "id": "confirm-order",
+      "title": "Confirmar Pedido",
+      "method": "POST",
+      "endpoint": "/v2/orders/{order_id}/confirm",
+      "description": "Confirma o recebimento de um pedido pelo parceiro, indicando que o pedido foi aceito e a preparação irá começar. Esta ação deve ocorrer em até 5 minutos após o recebimento.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Confirmação Obrigatória",
+          "content": "Pedidos `PENDING` não confirmados em **5 minutos** são cancelados automaticamente. Implemente confirmação imediata ao receber um novo pedido via webhook ou polling."
+        },
+        {
+          "type": "params",
+          "title": "Parâmetros de Rota",
+          "rows": [
+            { "name": "order_id", "type": "string", "required": true, "description": "Identificador único do pedido." }
+          ]
+        },
+        {
+          "type": "params",
+          "title": "Body da Requisição",
+          "rows": [
+            { "name": "estimated_time",  "type": "integer", "required": true,  "description": "Tempo estimado de preparo em **minutos** (mínimo: 5, máximo: 120)." },
+            { "name": "message",         "type": "string",  "required": false, "description": "Mensagem opcional para o cliente (máx. 200 caracteres)." },
+            { "name": "idempotency_key", "type": "string",  "required": false, "description": "Chave de idempotência para evitar confirmações duplicadas (UUID v4 recomendado)." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Exemplo de Requisição",
+          "lang": "bash",
+          "code": "curl -X POST \"https://api.example.com/v2/orders/ord_9f3a2b1c/confirm\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Idempotency-Key: 7f9c2a3b-1234-4abc-8def-56789abcdef0\" \\\n  -d '{\n    \"estimated_time\": 25,\n    \"message\": \"Seu pedido está sendo preparado com carinho!\"\n  }'"
+        },
+        {
+          "type": "code",
+          "title": "Resposta de Sucesso (200 OK)",
+          "lang": "json",
+          "code": "{\n  \"id\": \"ord_9f3a2b1c\",\n  \"status\": \"CONFIRMED\",\n  \"estimated_ready_at\": \"2024-01-15T14:57:10Z\",\n  \"confirmed_at\": \"2024-01-15T14:32:10Z\",\n  \"message\": \"Pedido confirmado com sucesso.\"\n}"
+        },
+        {
+          "type": "errors",
+          "title": "Erros Possíveis",
+          "rows": [
+            { "code": 400, "status": "Bad Request",          "description": "`estimated_time` ausente ou fora do intervalo permitido (5–120 min)." },
+            { "code": 401, "status": "Unauthorized",         "description": "Token inválido ou expirado." },
+            { "code": 404, "status": "Not Found",            "description": "Pedido não encontrado." },
+            { "code": 409, "status": "Conflict",             "description": "Pedido já foi confirmado anteriormente." },
+            { "code": 422, "status": "Unprocessable Entity", "description": "Pedido não está em status `PENDING`. Transição inválida." },
+            { "code": 410, "status": "Gone",                 "description": "Pedido cancelado por timeout antes da confirmação." }
+          ]
+        }
+      ]
+    },
+
+    "update-order-status": {
+      "id": "update-order-status",
+      "title": "Atualizar Status do Pedido",
+      "method": "PUT",
+      "endpoint": "/v2/orders/{order_id}/status",
+      "description": "Atualiza o status de um pedido confirmado. Permite avançar o pedido pelo ciclo de vida: PREPARING → READY → DISPATCHED → DELIVERED.",
+      "sections": [
+        {
+          "type": "status-flow",
+          "title": "Transições Válidas",
+          "states": ["CONFIRMED", "PREPARING", "READY", "DISPATCHED", "DELIVERED"]
+        },
+        {
+          "type": "params",
+          "title": "Parâmetros de Rota",
+          "rows": [
+            { "name": "order_id", "type": "string", "required": true, "description": "Identificador único do pedido." }
+          ]
+        },
+        {
+          "type": "params",
+          "title": "Body da Requisição",
+          "rows": [
+            { "name": "status",  "type": "string", "required": true,  "description": "Novo status do pedido. Valores válidos: `PREPARING`, `READY`, `DISPATCHED`, `DELIVERED`." },
+            { "name": "notes",   "type": "string", "required": false, "description": "Observações internas sobre a transição (não visível ao cliente)." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Exemplo: Marcar como Pronto",
+          "lang": "bash",
+          "code": "curl -X PUT \"https://api.example.com/v2/orders/ord_9f3a2b1c/status\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"status\": \"READY\",\n    \"notes\": \"Pedido embalado e aguardando entregador\"\n  }'"
+        },
+        {
+          "type": "code",
+          "title": "Resposta de Sucesso (200 OK)",
+          "lang": "json",
+          "code": "{\n  \"id\": \"ord_9f3a2b1c\",\n  \"status\": \"READY\",\n  \"previous_status\": \"PREPARING\",\n  \"updated_at\": \"2024-01-15T14:52:33Z\",\n  \"message\": \"Status atualizado com sucesso.\"\n}"
+        },
+        {
+          "type": "errors",
+          "title": "Erros Possíveis",
+          "rows": [
+            { "code": 400, "status": "Bad Request",          "description": "Status inválido ou não fornecido." },
+            { "code": 401, "status": "Unauthorized",         "description": "Token inválido." },
+            { "code": 403, "status": "Forbidden",            "description": "Pedido pertence a outro parceiro." },
+            { "code": 404, "status": "Not Found",            "description": "Pedido não encontrado." },
+            { "code": 422, "status": "Unprocessable Entity", "description": "Transição de status inválida. Ex: tentar ir de `READY` para `PREPARING`." }
+          ]
+        }
+      ]
+    },
+
+    "cancel-order": {
+      "id": "cancel-order",
+      "title": "Cancelar Pedido",
+      "method": "DELETE",
+      "endpoint": "/v2/orders/{order_id}",
+      "description": "Cancela um pedido ativo. Só é possível cancelar pedidos nos status PENDING, CONFIRMED ou PREPARING. Pedidos DISPATCHED ou DELIVERED não podem ser cancelados.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Ação Irreversível",
+          "content": "O cancelamento é permanente. O cliente será notificado imediatamente e o estorno do pagamento será processado automaticamente em até 5 dias úteis."
+        },
+        {
+          "type": "params",
+          "title": "Parâmetros de Rota",
+          "rows": [
+            { "name": "order_id", "type": "string", "required": true, "description": "Identificador único do pedido a ser cancelado." }
+          ]
+        },
+        {
+          "type": "params",
+          "title": "Body da Requisição",
+          "rows": [
+            { "name": "reason",       "type": "string", "required": true,  "description": "Código do motivo. Valores: `OUT_OF_STOCK`, `STORE_CLOSED`, `ITEM_UNAVAILABLE`, `PARTNER_REQUEST`, `OTHER`." },
+            { "name": "description",  "type": "string", "required": false, "description": "Descrição adicional do motivo (máx. 500 caracteres)." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Exemplo de Requisição",
+          "lang": "bash",
+          "code": "curl -X DELETE \"https://api.example.com/v2/orders/ord_9f3a2b1c\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"reason\": \"ITEM_UNAVAILABLE\",\n    \"description\": \"X-Burguer Especial esgotado no momento.\"\n  }'"
+        },
+        {
+          "type": "code",
+          "title": "Resposta de Sucesso (200 OK)",
+          "lang": "json",
+          "code": "{\n  \"id\": \"ord_9f3a2b1c\",\n  \"status\": \"CANCELLED\",\n  \"cancelled_at\": \"2024-01-15T14:40:22Z\",\n  \"cancellation_reason\": \"ITEM_UNAVAILABLE\",\n  \"refund\": {\n    \"status\": \"PENDING\",\n    \"estimated_date\": \"2024-01-20\",\n    \"amount\": 7470\n  }\n}"
+        },
+        {
+          "type": "errors",
+          "title": "Erros Possíveis",
+          "rows": [
+            { "code": 400, "status": "Bad Request",          "description": "Motivo de cancelamento inválido ou ausente." },
+            { "code": 401, "status": "Unauthorized",         "description": "Token inválido." },
+            { "code": 404, "status": "Not Found",            "description": "Pedido não encontrado." },
+            { "code": 422, "status": "Unprocessable Entity", "description": "Pedido não pode ser cancelado no status atual (ex: já despachado)." }
+          ]
+        }
+      ]
+    },
+
+    "webhook-intro": {
+      "id": "webhook-intro",
+      "title": "Introdução aos Webhooks",
+      "description": "Webhooks permitem que você receba notificações em tempo real quando eventos ocorrem na plataforma, eliminando a necessidade de polling constante.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "success",
+          "title": "Recomendado para Produção",
+          "content": "Webhooks são mais eficientes que polling e garantem latência mínima no recebimento de novos pedidos. Em produção, **sempre prefira webhooks** ao polling."
+        },
+        {
+          "type": "text",
+          "title": "Como Configurar",
+          "content": "Registre sua URL de webhook no painel de parceiros ou via API em `POST /v2/webhooks`. Sua URL deve ser **HTTPS**, estar acessível publicamente e responder `HTTP 200` em até 5 segundos."
+        },
+        {
+          "type": "steps",
+          "title": "Processo de Verificação do Webhook",
+          "items": [
+            { "title": "Registro",     "text": "Registre sua URL de webhook com os eventos desejados." },
+            { "title": "Desafio",      "text": "Enviamos um `GET` com um parâmetro `challenge`. Seu servidor deve retornar o valor do challenge." },
+            { "title": "Verificação",  "text": "Após verificação bem-sucedida, seu webhook está ativo e receberá eventos." },
+            { "title": "Validação",    "text": "Valide a assinatura HMAC-SHA256 no header `X-Webhook-Signature` de cada payload." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Validação da Assinatura (Node.js)",
+          "lang": "javascript",
+          "code": "const crypto = require('crypto');\n\nfunction validateWebhook(payload, signature, secret) {\n  const expected = crypto\n    .createHmac('sha256', secret)\n    .update(JSON.stringify(payload))\n    .digest('hex');\n\n  const received = signature.replace('sha256=', '');\n\n  return crypto.timingSafeEqual(\n    Buffer.from(expected, 'hex'),\n    Buffer.from(received, 'hex')\n  );\n}"
+        },
+        {
+          "type": "callout",
+          "variant": "warning",
+          "title": "Retry Policy",
+          "content": "Em caso de falha (seu servidor retornar status diferente de 2xx ou timeout), tentamos reenviar o evento com backoff exponencial: após 1min, 5min, 30min, 2h e 24h. Após 5 tentativas, o evento é descartado."
+        }
+      ]
+    },
+
+    "order-events": {
+      "id": "order-events",
+      "title": "Eventos de Pedido",
+      "description": "Lista de todos os eventos de pedido que podem ser enviados via webhook.",
+      "sections": [
+        {
+          "type": "errors",
+          "title": "Tipos de Evento",
+          "rows": [
+            { "code": "order.created",   "status": "Pedido Criado",            "description": "Novo pedido disponível para confirmação. Principal evento para integrações." },
+            { "code": "order.expired",   "status": "Pedido Expirado",          "description": "Pedido cancelado por timeout de confirmação." },
+            { "code": "order.cancelled", "status": "Pedido Cancelado",         "description": "Pedido cancelado por cliente, parceiro ou sistema." },
+            { "code": "order.delivered", "status": "Pedido Entregue",          "description": "Entrega confirmada com sucesso." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Payload — order.created",
+          "lang": "json",
+          "code": "{\n  \"event\": \"order.created\",\n  \"event_id\": \"evt_7a8b9c0d\",\n  \"timestamp\": \"2024-01-15T14:32:10Z\",\n  \"version\": \"2.0\",\n  \"data\": {\n    \"order\": {\n      \"id\": \"ord_9f3a2b1c\",\n      \"status\": \"PENDING\",\n      \"created_at\": \"2024-01-15T14:32:10Z\",\n      \"expires_at\": \"2024-01-15T14:37:10Z\",\n      \"customer\": {\n        \"name\": \"João Silva\",\n        \"phone\": \"+55 11 98765-4321\"\n      },\n      \"items\": [\n        {\n          \"id\": \"item_001\",\n          \"name\": \"X-Burguer Especial\",\n          \"quantity\": 2,\n          \"unit_price\": 2990,\n          \"notes\": \"Sem cebola\"\n        }\n      ],\n      \"total_amount\": 5980,\n      \"currency\": \"BRL\"\n    }\n  }\n}"
+        },
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Idempotência de Eventos",
+          "content": "Cada evento possui um `event_id` único. Use-o para garantir idempotência — seu sistema deve ignorar eventos já processados com o mesmo `event_id`."
+        }
+      ]
+    },
+
+    "error-codes": {
+      "id": "error-codes",
+      "title": "Códigos de Erro",
+      "description": "Referência completa dos códigos de erro retornados pela API e como tratá-los.",
+      "sections": [
+        {
+          "type": "text",
+          "title": "Formato Padrão de Erro",
+          "content": "Todos os erros retornam um JSON estruturado com `error` (código de máquina), `message` (descrição legível) e `details` (informações adicionais opcionais)."
+        },
+        {
+          "type": "code",
+          "title": "Estrutura de Resposta de Erro",
+          "lang": "json",
+          "code": "{\n  \"error\": \"validation_error\",\n  \"message\": \"Um ou mais campos são inválidos.\",\n  \"details\": [\n    {\n      \"field\": \"estimated_time\",\n      \"code\": \"out_of_range\",\n      \"message\": \"O tempo estimado deve estar entre 5 e 120 minutos.\"\n    }\n  ],\n  \"request_id\": \"req_abc123xyz\",\n  \"timestamp\": \"2024-01-15T14:32:10Z\"\n}"
+        },
+        {
+          "type": "errors",
+          "title": "Códigos HTTP",
+          "rows": [
+            { "code": 200, "status": "OK",                    "description": "Requisição bem-sucedida." },
+            { "code": 201, "status": "Created",               "description": "Recurso criado com sucesso." },
+            { "code": 400, "status": "Bad Request",           "description": "Parâmetros inválidos. Verifique os `details` no corpo da resposta." },
+            { "code": 401, "status": "Unauthorized",          "description": "Token ausente, inválido ou expirado. Renove o access_token." },
+            { "code": 403, "status": "Forbidden",             "description": "Sem permissão para este recurso. Verifique os escopos do token." },
+            { "code": 404, "status": "Not Found",             "description": "Recurso não encontrado." },
+            { "code": 409, "status": "Conflict",              "description": "Conflito com o estado atual do recurso (ex: confirmar pedido já confirmado)." },
+            { "code": 410, "status": "Gone",                  "description": "Recurso não existe mais (ex: pedido expirado por timeout)." },
+            { "code": 422, "status": "Unprocessable Entity",  "description": "Entidade válida, mas regra de negócio violada (ex: transição de status inválida)." },
+            { "code": 429, "status": "Too Many Requests",     "description": "Rate limit atingido. Aguarde o tempo indicado em `Retry-After`." },
+            { "code": 500, "status": "Internal Server Error", "description": "Erro interno. Inclua o `request_id` ao reportar para o suporte." },
+            { "code": 503, "status": "Service Unavailable",   "description": "Serviço temporariamente indisponível. Implemente retry com backoff exponencial." }
+          ]
+        }
+      ]
+    }
+
+  }
+}

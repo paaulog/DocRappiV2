@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "language": "en",
+    "technology": "payless",
+    "title": "Payless API",
+    "version": "1.0"
+  },
+  "nav": [
+    {
+      "id": "root",
+      "title": "Payless",
+      "icon": "💳",
+      "expanded": true,
+      "items": [
+        { "id": "overview", "title": "Overview" },
+        { "id": "guides", "title": "Guides and flows" },
+        { "id": "reference", "title": "Quick reference" }
+      ]
+    }
+  ],
+  "pages": {
+    "overview": {
+      "id": "overview",
+      "title": "Payless — Overview",
+      "description": "Payments and conciliation integration (content expanding).",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Work in progress",
+          "content": "This section mirrors the **Payless API** area of the public docs. Extend with official guides approved by your integrations team."
+        }
+      ]
+    },
+    "guides": {
+      "id": "guides",
+      "title": "Guides and flows",
+      "description": "High-level Payless integration guidance.",
+      "sections": [
+        {
+          "type": "steps",
+          "items": [
+            { "title": "Credentials", "text": "Obtain endpoints and keys with your Integrations Specialist." },
+            { "title": "Authorization flow", "text": "Implement capture and confirmation per product contract." },
+            { "title": "Monitoring", "text": "Track webhooks and reconciliation via API reports." }
+          ]
+        }
+      ]
+    },
+    "reference": {
+      "id": "reference",
+      "title": "Quick reference",
+      "description": "Technical entry points.",
+      "sections": [
+        {
+          "type": "text",
+          "content": "See the official **Payless API** documentation for full endpoint lists and payloads."
+        }
+      ]
+    }
+  }
+}

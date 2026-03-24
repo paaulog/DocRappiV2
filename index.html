@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Rappi Open APIs — Portal de Integração para Varejistas">
+  <title>Rappi Open APIs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- Mobile top bar -->
+    <header id="mobile-header">
+      <button id="sidebar-toggle" aria-label="Abrir menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <div class="logo-small">
+        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+          <rect width="32" height="32" rx="8" fill="#FF441A"/>
+          <path d="M9 10h14M9 16h9M9 22h12" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>Rappi Open APIs</span>
+      </div>
+    </header>
+
+    <!-- Sidebar overlay (mobile) -->
+    <div id="sidebar-overlay"></div>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside id="sidebar">
+      <div class="sidebar-inner">
+
+        <!-- Logo -->
+        <div class="sidebar-logo">
+          <svg width="34" height="34" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="8" fill="#FF441A"/>
+            <path d="M9 10h14M9 16h9M9 22h12" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <div>
+            <div class="logo-title">Rappi Open APIs</div>
+            <div class="logo-subtitle">Retail Integration Hub</div>
+          </div>
+        </div>
+
+        <!-- Selectors: Language + Technology -->
+        <div class="sidebar-selectors">
+
+          <!-- Language -->
+          <div class="selector-group">
+            <label class="selector-label">Idioma / Language</label>
+            <div class="custom-select" id="lang-selector">
+              <button class="select-btn" id="lang-btn" aria-haspopup="listbox">
+                <span id="lang-display">🇧🇷 Português</span>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" class="chevron-icon">
+                  <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <div class="select-dropdown" id="lang-dropdown" role="listbox">
+                <div class="select-option" data-value="pt" role="option">🇧🇷 Português</div>
+                <div class="select-option" data-value="en" role="option">🇺🇸 English</div>
+                <div class="select-option" data-value="es" role="option">🇪🇸 Español</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Technology -->
+          <div class="selector-group">
+            <label class="selector-label">Arquitetura da documentacao</label>
+            <div class="tech-filter-wrap">
+              <input type="text" id="tech-filter-input" placeholder="Buscar integração ou fundamento..." autocomplete="off" spellcheck="false">
+            </div>
+            <div class="tech-pills" id="tech-pills" role="tablist" aria-label="Filtro de tecnologias">
+            </div>
+          </div>
+        </div>
+
+        <!-- Search -->
+        <div class="sidebar-search">
+          <div class="search-input-wrap">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input type="text" id="search-input" placeholder="Buscar endpoint..." autocomplete="off" spellcheck="false">
+            <button id="search-clear" class="search-clear-btn" style="display:none" aria-label="Limpar busca">✕</button>
+          </div>
+          <div id="search-results" class="search-results" role="list"></div>
+        </div>
+
+        <!-- Navigation tree -->
+        <nav id="nav-tree" class="nav-tree" role="navigation" aria-label="Navegação de endpoints"></nav>
+
+        <!-- Sidebar footer -->
+        <div class="sidebar-footer">
+          <span>v2.0.0</span>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main id="main">
+      <div id="breadcrumb" class="breadcrumb" role="navigation" aria-label="Breadcrumb">
+        <div id="breadcrumb-items"></div>
+        <div class="breadcrumb-actions">
+          <button id="edit-content-btn" class="editor-btn" type="button">Modo editor</button>
+          <button id="theme-toggle" class="theme-btn" type="button">Tema: Claro</button>
+        </div>
+      </div>
+      <div id="content-view" class="content-view">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Carregando documentação...</p>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <div id="editor-modal" class="editor-modal" aria-hidden="true">
+    <div class="editor-panel">
+      <div class="editor-header">
+        <h3 id="editor-title">Editor de Conteúdo</h3>
+        <button id="editor-close-btn" class="editor-close-btn" aria-label="Fechar editor">✕</button>
+      </div>
+
+      <div id="editor-login-view" class="editor-section">
+        <p class="editor-help">Acesso rápido para edição local no navegador.</p>
+        <div class="editor-grid">
+          <label>Usuário<input id="editor-username" value="admin"></label>
+          <label>Senha<input id="editor-password" type="password" value="rappi123"></label>
+        </div>
+        <div class="editor-actions">
+          <button id="editor-login-btn" class="editor-primary-btn">Entrar</button>
+        </div>
+        <p id="editor-login-error" class="editor-error"></p>
+      </div>
+
+      <div id="editor-content-view" class="editor-section" style="display:none">
+        <p class="editor-help">Edição local para a tecnologia e idioma atuais. Salve, exporte ou importe um JSON.</p>
+        <textarea id="editor-json-input" spellcheck="false"></textarea>
+        <div class="editor-actions">
+          <button id="editor-save-btn" class="editor-primary-btn">Salvar local</button>
+          <button id="editor-export-btn">Exportar JSON</button>
+          <label class="editor-import-label">
+            Importar JSON
+            <input id="editor-import-input" type="file" accept="application/json">
+          </label>
+          <button id="editor-reset-btn" class="editor-danger-btn">Remover override</button>
+        </div>
+        <p id="editor-content-error" class="editor-error"></p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

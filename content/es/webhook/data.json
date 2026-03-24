@@ -1,0 +1,226 @@
+{
+  "meta": { "language": "es", "technology": "webhook", "title": "Webhooks", "version": "2.0" },
+  "nav": [
+    {
+      "id": "getting-started", "title": "Configuración", "icon": "⚙️", "expanded": true,
+      "items": [
+        { "id": "overview",     "title": "Qué son los Webhooks" },
+        { "id": "setup",        "title": "Guía de Configuración" },
+        { "id": "security",     "title": "Seguridad y Firmas" },
+        { "id": "retry-policy", "title": "Política de Reintento" }
+      ]
+    },
+    {
+      "id": "events", "title": "Eventos", "icon": "🔔",
+      "items": [
+        { "id": "order-created",   "title": "order.created" },
+        { "id": "order-cancelled", "title": "order.cancelled" },
+        { "id": "order-delivered", "title": "order.delivered" },
+        { "id": "order-expired",   "title": "order.expired" }
+      ]
+    },
+    {
+      "id": "management", "title": "Gestión", "icon": "🛠️",
+      "items": [
+        { "id": "register-webhook", "title": "Registrar Webhook", "method": "POST" },
+        { "id": "list-webhooks",    "title": "Listar Webhooks",   "method": "GET" },
+        { "id": "test-webhook",     "title": "Probar Webhook",    "method": "POST" }
+      ]
+    }
+  ],
+  "pages": {
+    "overview": {
+      "id": "overview",
+      "title": "Qué son los Webhooks",
+      "description": "Los webhooks son callbacks HTTP que tu aplicación registra para recibir notificaciones automáticas cuando ocurren eventos en la plataforma.",
+      "sections": [
+        {
+          "type": "cards",
+          "items": [
+            { "icon": "⚡", "title": "Tiempo Real",       "text": "Recibe eventos de inmediato, sin necesidad de polling." },
+            { "icon": "🔐", "title": "Seguro",            "text": "Firma HMAC-SHA256 para verificación de autenticidad." },
+            { "icon": "🔄", "title": "Reintento Auto.",   "text": "Sistema de reintento con backoff exponencial." },
+            { "icon": "📋", "title": "Registro de Eventos","text": "Historial completo en el panel de socios." }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "success",
+          "title": "Recomendado para Producción",
+          "content": "Los webhooks son más eficientes que el polling. En producción, **siempre prefiere webhooks** para recibir nuevos pedidos."
+        }
+      ]
+    },
+    "setup": {
+      "id": "setup",
+      "title": "Guía de Configuración",
+      "description": "Sigue esta guía para registrar y verificar tu URL de webhook.",
+      "sections": [
+        {
+          "type": "steps",
+          "title": "Paso a Paso",
+          "items": [
+            { "title": "Prepara tu Endpoint",    "text": "Crea un endpoint HTTPS. Debe aceptar `POST`, responder `200 OK` en **5 segundos** y ser accesible públicamente." },
+            { "title": "Registra el Webhook",    "text": "Registra tu URL via `POST /v2/webhooks`. Especifica los eventos que deseas." },
+            { "title": "Verificación",           "text": "Enviamos un `GET` con `?challenge=token`. Tu servidor debe retornar el valor del token." },
+            { "title": "Valida la Firma",        "text": "Para cada evento recibido, valida la firma HMAC-SHA256 en `X-Webhook-Signature`." },
+            { "title": "Responde 200",           "text": "Siempre responde `HTTP 200 OK` inmediatamente. Procesa el payload de forma asíncrona." }
+          ]
+        }
+      ]
+    },
+    "security": {
+      "id": "security",
+      "title": "Seguridad y Firmas",
+      "description": "Cómo verificar la autenticidad de los eventos webhook recibidos.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Nunca Omitas la Validación",
+          "content": "Siempre valida `X-Webhook-Signature` antes de procesar cualquier evento. Omitir esto deja tu sistema vulnerable a ataques de inyección de eventos."
+        },
+        {
+          "type": "params",
+          "title": "Headers del Webhook",
+          "rows": [
+            { "name": "X-Webhook-Signature", "type": "string",  "required": true, "description": "Firma HMAC-SHA256 como `sha256=<hex>`." },
+            { "name": "X-Webhook-Event",     "type": "string",  "required": true, "description": "Tipo de evento. Ej: `order.created`." },
+            { "name": "X-Webhook-EventID",   "type": "string",  "required": true, "description": "ID único del evento. Usa para idempotencia." },
+            { "name": "X-Webhook-Timestamp", "type": "integer", "required": true, "description": "Timestamp Unix de cuando se generó el evento." }
+          ]
+        }
+      ]
+    },
+    "retry-policy": {
+      "id": "retry-policy",
+      "title": "Política de Reintento",
+      "description": "Cómo el sistema maneja los fallos en la entrega de webhooks.",
+      "sections": [
+        {
+          "type": "steps",
+          "title": "Calendario de Reintentos",
+          "items": [
+            { "title": "1er Reintento — 1 minuto",   "text": "Primer intento tras el fallo inicial." },
+            { "title": "2do Reintento — 5 minutos",  "text": "Segundo intento si el 1ro falla." },
+            { "title": "3er Reintento — 30 minutos", "text": "Tercer intento con mayor backoff." },
+            { "title": "4to Reintento — 2 horas",    "text": "Cuarto intento." },
+            { "title": "5to Reintento — 24 horas",   "text": "Último intento. El evento se descarta y queda en el log." }
+          ]
+        }
+      ]
+    },
+    "order-created": {
+      "id": "order-created",
+      "title": "Evento: order.created",
+      "description": "Disparado cuando se crea un nuevo pedido y está esperando confirmación del socio.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Acción Inmediata Requerida",
+          "content": "Confirma el pedido en **5 minutos** via `POST /v2/orders/{id}/confirm`. De lo contrario, se cancela automáticamente."
+        },
+        {
+          "type": "code",
+          "title": "Payload",
+          "lang": "json",
+          "code": "{\n  \"event\": \"order.created\",\n  \"event_id\": \"evt_7a8b9c0d1e2f\",\n  \"timestamp\": \"2024-01-15T14:32:10Z\",\n  \"data\": {\n    \"order\": {\n      \"id\": \"ord_9f3a2b1c\",\n      \"status\": \"PENDING\",\n      \"expires_at\": \"2024-01-15T14:37:10Z\",\n      \"total_amount\": 4990,\n      \"currency\": \"MXN\"\n    }\n  }\n}"
+        }
+      ]
+    },
+    "order-cancelled": {
+      "id": "order-cancelled",
+      "title": "Evento: order.cancelled",
+      "description": "Disparado cuando un pedido es cancelado.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Payload",
+          "lang": "json",
+          "code": "{\n  \"event\": \"order.cancelled\",\n  \"event_id\": \"evt_9c0d1e2f3a4b\",\n  \"timestamp\": \"2024-01-15T14:40:22Z\",\n  \"data\": {\n    \"order\": { \"id\": \"ord_9f3a2b1c\", \"status\": \"CANCELLED\", \"cancellation_reason\": \"ITEM_UNAVAILABLE\" }\n  }\n}"
+        }
+      ]
+    },
+    "order-delivered": {
+      "id": "order-delivered",
+      "title": "Evento: order.delivered",
+      "description": "Disparado cuando la entrega del pedido es confirmada exitosamente.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Payload",
+          "lang": "json",
+          "code": "{\n  \"event\": \"order.delivered\",\n  \"event_id\": \"evt_0d1e2f3a4b5c\",\n  \"timestamp\": \"2024-01-15T15:20:00Z\",\n  \"data\": {\n    \"order\": { \"id\": \"ord_9f3a2b1c\", \"status\": \"DELIVERED\", \"delivered_at\": \"2024-01-15T15:20:00Z\" }\n  }\n}"
+        }
+      ]
+    },
+    "order-expired": {
+      "id": "order-expired",
+      "title": "Evento: order.expired",
+      "description": "Disparado cuando un pedido PENDING expira por timeout de confirmación.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Payload",
+          "lang": "json",
+          "code": "{\n  \"event\": \"order.expired\",\n  \"event_id\": \"evt_1e2f3a4b5c6d\",\n  \"timestamp\": \"2024-01-15T14:37:10Z\",\n  \"data\": {\n    \"order\": { \"id\": \"ord_9f3a2b1c\", \"status\": \"CANCELLED\", \"reason\": \"CONFIRMATION_TIMEOUT\" }\n  }\n}"
+        }
+      ]
+    },
+    "register-webhook": {
+      "id": "register-webhook",
+      "title": "Registrar Webhook",
+      "method": "POST",
+      "endpoint": "/v2/webhooks",
+      "description": "Registra una nueva URL de webhook para recibir eventos de la plataforma.",
+      "sections": [
+        {
+          "type": "params",
+          "title": "Cuerpo de la Solicitud",
+          "rows": [
+            { "name": "url",    "type": "string",        "required": true,  "description": "URL HTTPS de tu endpoint de webhook." },
+            { "name": "events", "type": "array<string>", "required": true,  "description": "Lista de eventos. Usa `[\"*\"]` para todos." },
+            { "name": "active", "type": "boolean",       "required": false, "description": "Si activar inmediatamente. Por defecto: `true`." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Ejemplo de Solicitud",
+          "lang": "bash",
+          "code": "curl -X POST https://api.example.com/v2/webhooks \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"url\": \"https://tu-servidor.com/webhooks\", \"events\": [\"order.created\"]}'"
+        }
+      ]
+    },
+    "list-webhooks": {
+      "id": "list-webhooks",
+      "title": "Listar Webhooks",
+      "method": "GET",
+      "endpoint": "/v2/webhooks",
+      "description": "Retorna todos los webhooks registrados por el socio autenticado.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Ejemplo de Solicitud",
+          "lang": "bash",
+          "code": "curl -X GET https://api.example.com/v2/webhooks \\\n  -H \"Authorization: Bearer {access_token}\""
+        }
+      ]
+    },
+    "test-webhook": {
+      "id": "test-webhook",
+      "title": "Probar Webhook",
+      "method": "POST",
+      "endpoint": "/v2/webhooks/{webhook_id}/test",
+      "description": "Envía un evento de prueba para verificar que tu endpoint está correctamente configurado.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Ejemplo de Solicitud",
+          "lang": "bash",
+          "code": "curl -X POST https://api.example.com/v2/webhooks/wh_abc123/test \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"event\": \"order.created\"}'"
+        }
+      ]
+    }
+  }
+}

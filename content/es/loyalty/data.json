@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "language": "es",
+    "technology": "loyalty",
+    "title": "Loyalty",
+    "version": "1.0"
+  },
+  "nav": [
+    {
+      "id": "root",
+      "title": "Loyalty",
+      "icon": "⭐",
+      "expanded": true,
+      "items": [
+        { "id": "overview", "title": "Visión general" },
+        { "id": "guides", "title": "Guías" },
+        { "id": "reference", "title": "Referencia" }
+      ]
+    }
+  ],
+  "pages": {
+    "overview": {
+      "id": "overview",
+      "title": "Loyalty — Visión general",
+      "description": "Programa de fidelización (contenido en expansión).",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "En construcción",
+          "content": "Alinea con la documentación pública de **loyalty**."
+        }
+      ]
+    },
+    "guides": {
+      "id": "guides",
+      "title": "Guías",
+      "sections": [
+        { "type": "text", "content": "Sigue la guía oficial de Loyalty." }
+      ]
+    },
+    "reference": {
+      "id": "reference",
+      "title": "Referencia",
+      "sections": [
+        { "type": "text", "content": "Añade endpoints y ejemplos según la especificación." }
+      ]
+    }
+  }
+}

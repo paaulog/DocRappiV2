@@ -1,0 +1,238 @@
+{
+  "meta": { "language": "en", "technology": "webhook", "title": "Webhooks", "version": "2.0" },
+  "nav": [
+    {
+      "id": "getting-started", "title": "Getting Started", "icon": "⚙️", "expanded": true,
+      "items": [
+        { "id": "overview",     "title": "What are Webhooks" },
+        { "id": "setup",        "title": "Setup Guide" },
+        { "id": "security",     "title": "Security & Signatures" },
+        { "id": "retry-policy", "title": "Retry Policy" }
+      ]
+    },
+    {
+      "id": "events", "title": "Events", "icon": "🔔",
+      "items": [
+        { "id": "order-created",   "title": "order.created" },
+        { "id": "order-cancelled", "title": "order.cancelled" },
+        { "id": "order-delivered", "title": "order.delivered" },
+        { "id": "order-expired",   "title": "order.expired" }
+      ]
+    },
+    {
+      "id": "management", "title": "Management", "icon": "🛠️",
+      "items": [
+        { "id": "register-webhook", "title": "Register Webhook", "method": "POST" },
+        { "id": "list-webhooks",    "title": "List Webhooks",    "method": "GET" },
+        { "id": "test-webhook",     "title": "Test Webhook",     "method": "POST" }
+      ]
+    }
+  ],
+  "pages": {
+    "overview": {
+      "id": "overview",
+      "title": "What are Webhooks",
+      "description": "Webhooks are HTTP callbacks that your application registers to receive automatic notifications when events occur on the platform.",
+      "sections": [
+        {
+          "type": "cards",
+          "items": [
+            { "icon": "⚡", "title": "Real-time",   "text": "Receive events immediately, no polling required." },
+            { "icon": "🔐", "title": "Secure",      "text": "HMAC-SHA256 signature for authenticity verification." },
+            { "icon": "🔄", "title": "Auto Retry",  "text": "Exponential backoff retry for guaranteed delivery." },
+            { "icon": "📋", "title": "Event Logs",  "text": "Complete event history in the partner dashboard." }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "success",
+          "title": "Recommended for Production",
+          "content": "Webhooks are significantly more efficient than polling. In production, **always prefer webhooks** for receiving new orders."
+        }
+      ]
+    },
+    "setup": {
+      "id": "setup",
+      "title": "Setup Guide",
+      "description": "Follow this guide to register and verify your webhook URL.",
+      "sections": [
+        {
+          "type": "steps",
+          "title": "Step by Step",
+          "items": [
+            { "title": "Prepare your Endpoint",  "text": "Create an HTTPS endpoint. Must accept `POST`, respond `200 OK` in **5 seconds**, be publicly accessible." },
+            { "title": "Register the Webhook",   "text": "Register your URL via `POST /v2/webhooks`. Specify the events you want." },
+            { "title": "Challenge Verification", "text": "We send a `GET` with `?challenge=token`. Your server must return the token value." },
+            { "title": "Validate Signatures",    "text": "For each received event, validate the HMAC-SHA256 signature in `X-Webhook-Signature`." },
+            { "title": "Respond 200",            "text": "Always respond `HTTP 200 OK` immediately. Process the payload asynchronously." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Webhook Handler (Node.js)",
+          "lang": "javascript",
+          "code": "const express = require('express');\nconst crypto  = require('crypto');\nconst app = express();\napp.use(express.json());\n\napp.post('/webhooks/orders', (req, res) => {\n  res.status(200).json({ received: true }); // respond immediately\n  processEvent(req.body, req.headers).catch(console.error);\n});\n\nasync function processEvent(payload, headers) {\n  const sig    = headers['x-webhook-signature'];\n  const secret = process.env.WEBHOOK_SECRET;\n  const body   = JSON.stringify(payload);\n  const hash   = 'sha256=' + crypto.createHmac('sha256', secret).update(body).digest('hex');\n\n  if (!crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(sig))) {\n    throw new Error('Invalid signature');\n  }\n  if (await isAlreadyProcessed(payload.event_id)) return;\n\n  switch (payload.event) {\n    case 'order.created':   await handleNewOrder(payload.data.order); break;\n    case 'order.cancelled': await handleCancellation(payload.data.order); break;\n  }\n\n  await markAsProcessed(payload.event_id);\n}"
+        }
+      ]
+    },
+    "security": {
+      "id": "security",
+      "title": "Security & Signatures",
+      "description": "How to verify the authenticity of received webhook events.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Never Skip Signature Validation",
+          "content": "Always validate `X-Webhook-Signature` before processing any event. Skipping this leaves your system vulnerable to event injection attacks."
+        },
+        {
+          "type": "params",
+          "title": "Webhook Headers",
+          "rows": [
+            { "name": "X-Webhook-Signature", "type": "string",  "required": true, "description": "HMAC-SHA256 signature as `sha256=<hex>`." },
+            { "name": "X-Webhook-Event",     "type": "string",  "required": true, "description": "Event type. E.g.: `order.created`." },
+            { "name": "X-Webhook-EventID",   "type": "string",  "required": true, "description": "Unique event ID. Use for idempotency checks." },
+            { "name": "X-Webhook-Timestamp", "type": "integer", "required": true, "description": "Unix timestamp of when the event was generated." }
+          ]
+        }
+      ]
+    },
+    "retry-policy": {
+      "id": "retry-policy",
+      "title": "Retry Policy",
+      "description": "How the system handles webhook delivery failures.",
+      "sections": [
+        {
+          "type": "steps",
+          "title": "Retry Schedule",
+          "items": [
+            { "title": "1st Retry — 1 minute",   "text": "First attempt after initial failure." },
+            { "title": "2nd Retry — 5 minutes",  "text": "Second attempt if 1st fails." },
+            { "title": "3rd Retry — 30 minutes", "text": "Third attempt with increased backoff." },
+            { "title": "4th Retry — 2 hours",    "text": "Fourth attempt." },
+            { "title": "5th Retry — 24 hours",   "text": "Final attempt. Event is discarded and logged after this." }
+          ]
+        }
+      ]
+    },
+    "order-created": {
+      "id": "order-created",
+      "title": "Event: order.created",
+      "description": "Triggered when a new order is created and awaiting partner confirmation.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Immediate Action Required",
+          "content": "Confirm the order within **5 minutes** via `POST /v2/orders/{id}/confirm`. Otherwise the order is automatically cancelled."
+        },
+        {
+          "type": "code",
+          "title": "Payload",
+          "lang": "json",
+          "code": "{\n  \"event\": \"order.created\",\n  \"event_id\": \"evt_7a8b9c0d1e2f\",\n  \"timestamp\": \"2024-01-15T14:32:10Z\",\n  \"version\": \"2.0\",\n  \"data\": {\n    \"order\": {\n      \"id\": \"ord_9f3a2b1c\",\n      \"status\": \"PENDING\",\n      \"expires_at\": \"2024-01-15T14:37:10Z\",\n      \"customer\": { \"name\": \"John Smith\", \"phone\": \"+1 555 123-4567\" },\n      \"items\": [{ \"name\": \"Special Burger\", \"quantity\": 2, \"unit_price\": 1299 }],\n      \"total_amount\": 2598,\n      \"currency\": \"USD\"\n    }\n  }\n}"
+        }
+      ]
+    },
+    "order-cancelled": {
+      "id": "order-cancelled",
+      "title": "Event: order.cancelled",
+      "description": "Triggered when an order is cancelled.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Payload",
+          "lang": "json",
+          "code": "{\n  \"event\": \"order.cancelled\",\n  \"event_id\": \"evt_9c0d1e2f3a4b\",\n  \"timestamp\": \"2024-01-15T14:40:22Z\",\n  \"data\": {\n    \"order\": {\n      \"id\": \"ord_9f3a2b1c\",\n      \"status\": \"CANCELLED\",\n      \"cancelled_by\": \"PARTNER\",\n      \"cancellation_reason\": \"ITEM_UNAVAILABLE\"\n    }\n  }\n}"
+        }
+      ]
+    },
+    "order-delivered": {
+      "id": "order-delivered",
+      "title": "Event: order.delivered",
+      "description": "Triggered when order delivery is successfully confirmed.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Payload",
+          "lang": "json",
+          "code": "{\n  \"event\": \"order.delivered\",\n  \"event_id\": \"evt_0d1e2f3a4b5c\",\n  \"timestamp\": \"2024-01-15T15:20:00Z\",\n  \"data\": {\n    \"order\": { \"id\": \"ord_9f3a2b1c\", \"status\": \"DELIVERED\", \"delivered_at\": \"2024-01-15T15:20:00Z\" }\n  }\n}"
+        }
+      ]
+    },
+    "order-expired": {
+      "id": "order-expired",
+      "title": "Event: order.expired",
+      "description": "Triggered when a PENDING order expires due to confirmation timeout.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Monitor This Event",
+          "content": "High expiration rates may result in partner penalties. Monitor this event closely and optimize your confirmation flow."
+        },
+        {
+          "type": "code",
+          "title": "Payload",
+          "lang": "json",
+          "code": "{\n  \"event\": \"order.expired\",\n  \"event_id\": \"evt_1e2f3a4b5c6d\",\n  \"timestamp\": \"2024-01-15T14:37:10Z\",\n  \"data\": {\n    \"order\": { \"id\": \"ord_9f3a2b1c\", \"status\": \"CANCELLED\", \"reason\": \"CONFIRMATION_TIMEOUT\" }\n  }\n}"
+        }
+      ]
+    },
+    "register-webhook": {
+      "id": "register-webhook",
+      "title": "Register Webhook",
+      "method": "POST",
+      "endpoint": "/v2/webhooks",
+      "description": "Registers a new webhook URL to receive platform events.",
+      "sections": [
+        {
+          "type": "params",
+          "title": "Request Body",
+          "rows": [
+            { "name": "url",    "type": "string",        "required": true,  "description": "HTTPS URL of your webhook endpoint." },
+            { "name": "events", "type": "array<string>", "required": true,  "description": "List of events to subscribe to. Use `[\"*\"]` for all events." },
+            { "name": "active", "type": "boolean",       "required": false, "description": "Whether to activate immediately. Default: `true`." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Request Example",
+          "lang": "bash",
+          "code": "curl -X POST https://api.example.com/v2/webhooks \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"url\": \"https://your-server.com/webhooks\", \"events\": [\"order.created\", \"order.cancelled\"]}'"
+        }
+      ]
+    },
+    "list-webhooks": {
+      "id": "list-webhooks",
+      "title": "List Webhooks",
+      "method": "GET",
+      "endpoint": "/v2/webhooks",
+      "description": "Returns all webhooks registered by the authenticated partner.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Request Example",
+          "lang": "bash",
+          "code": "curl -X GET https://api.example.com/v2/webhooks \\\n  -H \"Authorization: Bearer {access_token}\""
+        }
+      ]
+    },
+    "test-webhook": {
+      "id": "test-webhook",
+      "title": "Test Webhook",
+      "method": "POST",
+      "endpoint": "/v2/webhooks/{webhook_id}/test",
+      "description": "Sends a test event to verify your endpoint is configured correctly.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Request Example",
+          "lang": "bash",
+          "code": "curl -X POST https://api.example.com/v2/webhooks/wh_abc123/test \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"event\": \"order.created\"}'"
+        }
+      ]
+    }
+  }
+}

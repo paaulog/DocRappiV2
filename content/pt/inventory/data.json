@@ -1,0 +1,227 @@
+{
+  "meta": { "language": "pt", "technology": "inventory", "title": "Inventory Integration", "version": "1.0" },
+  "nav": [
+    {
+      "id": "introducao", "title": "Introdução", "icon": "📊", "expanded": true,
+      "items": [
+        { "id": "overview",     "title": "Visão Geral" },
+        { "id": "autenticacao", "title": "Autenticação" },
+        { "id": "metodos",      "title": "Métodos de Integração" }
+      ]
+    },
+    {
+      "id": "api", "title": "Integração via API", "icon": "🔌",
+      "items": [
+        { "id": "update-stock", "title": "Atualizar Estoque", "method": "PUT" },
+        { "id": "update-price", "title": "Atualizar Preço",   "method": "PUT" },
+        { "id": "bulk-update",  "title": "Atualização em Lote","method": "POST" }
+      ]
+    },
+    {
+      "id": "sftp", "title": "Integração via SFTP", "icon": "📁",
+      "items": [
+        { "id": "sftp-overview", "title": "Visão Geral SFTP" },
+        { "id": "sftp-format",   "title": "Formato do Arquivo" },
+        { "id": "sftp-schedule", "title": "Agendamento" }
+      ]
+    }
+  ],
+  "pages": {
+    "overview": {
+      "id": "overview",
+      "title": "Inventory Integration — Visão Geral",
+      "description": "A Integração de Inventário mantém estoque e preços atualizados automaticamente entre seu ERP/WMS e o catálogo Rappi, prevenindo rupturas e inconsistências de preço.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Pré-requisito para Open Orders",
+          "content": "A Integração de Inventário é **obrigatória** antes de implementar o Open Orders. Sem ela, o estoque exibido na plataforma pode não refletir a realidade, gerando cancelamentos por falta de produto."
+        },
+        {
+          "type": "cards",
+          "items": [
+            { "icon": "🔌", "title": "Via API",  "text": "Atualizações em tempo real via chamadas REST. Ideal para sistemas com capacidade de integração HTTP." },
+            { "icon": "📁", "title": "Via SFTP", "text": "Upload de arquivos CSV/JSON em intervalos programados. Ideal para ERPs com suporte a SFTP." }
+          ]
+        },
+        {
+          "type": "text",
+          "title": "Qual método escolher?",
+          "content": "Use **API** quando:\n- Seu sistema tem capacidade de fazer chamadas HTTP em tempo real\n- Você precisa de atualizações instantâneas de estoque\n- Você tem recursos técnicos para integração REST\n\nUse **SFTP** quando:\n- Seu ERP gera arquivos de exportação mas não suporta chamadas HTTP\n- Atualizações periódicas (ex: a cada hora) são suficientes para sua operação\n- Você prefere uma abordagem de arquivo sobre integração em tempo real"
+        }
+      ]
+    },
+    "autenticacao": {
+      "id": "autenticacao",
+      "title": "Autenticação",
+      "description": "A API de Inventário usa o mesmo sistema OAuth 2.0 das demais APIs Rappi.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Mesmas credenciais",
+          "content": "Use as mesmas credenciais `client_id` e `client_secret`. Consulte a seção **Autenticação** no Open Orders para o processo completo de obtenção do token."
+        }
+      ]
+    },
+    "metodos": {
+      "id": "metodos",
+      "title": "Métodos de Integração",
+      "description": "Escolha entre integração via API (tempo real) ou SFTP (arquivos periódicos).",
+      "sections": [
+        {
+          "type": "errors",
+          "title": "Comparativo",
+          "rows": [
+            { "code": "Critério",       "status": "API REST",           "description": "SFTP" },
+            { "code": "Latência",       "status": "Tempo real",         "description": "Periódica (min. 15 min)" },
+            { "code": "Complexidade",   "status": "Média",              "description": "Baixa" },
+            { "code": "Volume",         "status": "Item a item",        "description": "Lote (até 50.000 SKUs)" },
+            { "code": "Requisito",      "status": "Suporte HTTP",       "description": "Suporte SFTP" }
+          ]
+        }
+      ]
+    },
+    "update-stock": {
+      "id": "update-stock",
+      "title": "Atualizar Estoque",
+      "method": "PUT",
+      "endpoint": "/api/rocket-retailer/v1/restaurants/{store_id}/products/{product_id}/stock",
+      "description": "Atualiza a disponibilidade e quantidade em estoque de um produto específico.",
+      "sections": [
+        {
+          "type": "params",
+          "title": "Body da Requisição",
+          "rows": [
+            { "name": "available", "type": "boolean", "required": true,  "description": "Se o produto está disponível para venda." },
+            { "name": "quantity",  "type": "integer", "required": false, "description": "Quantidade em estoque. Se 0, `available` é automaticamente `false`." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Exemplo de Requisição",
+          "lang": "bash",
+          "code": "curl -X PUT \\\n  \"https://microservices.rappi.com/api/rocket-retailer/v1/restaurants/store_abc123/products/prod_001/stock\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"available\": true, \"quantity\": 45}'"
+        }
+      ]
+    },
+    "update-price": {
+      "id": "update-price",
+      "title": "Atualizar Preço",
+      "method": "PUT",
+      "endpoint": "/api/rocket-retailer/v1/restaurants/{store_id}/products/{product_id}/price",
+      "description": "Atualiza o preço de venda de um produto.",
+      "sections": [
+        {
+          "type": "params",
+          "title": "Body da Requisição",
+          "rows": [
+            { "name": "price",           "type": "integer", "required": true,  "description": "Novo preço em centavos." },
+            { "name": "promotional_price","type":"integer", "required": false, "description": "Preço promocional em centavos (deve ser menor que `price`)." },
+            { "name": "promo_start",     "type": "string",  "required": false, "description": "Início da promoção (ISO 8601)." },
+            { "name": "promo_end",       "type": "string",  "required": false, "description": "Fim da promoção (ISO 8601)." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Exemplo de Requisição",
+          "lang": "bash",
+          "code": "curl -X PUT \\\n  \"https://microservices.rappi.com/api/rocket-retailer/v1/restaurants/store_abc123/products/prod_001/price\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"price\": 490,\n    \"promotional_price\": 420,\n    \"promo_start\": \"2024-03-15T00:00:00Z\",\n    \"promo_end\": \"2024-03-22T23:59:59Z\"\n  }'"
+        }
+      ]
+    },
+    "bulk-update": {
+      "id": "bulk-update",
+      "title": "Atualização em Lote",
+      "method": "POST",
+      "endpoint": "/api/rocket-retailer/v1/restaurants/{store_id}/inventory/bulk",
+      "description": "Atualiza estoque e preços de múltiplos produtos em uma única requisição. Suporta até 500 itens por chamada.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "success",
+          "title": "Recomendado para sincronização periódica",
+          "content": "Use o endpoint de lote para sincronizações em horários de pico (ex: abertura da loja, reposição de estoque)."
+        },
+        {
+          "type": "code",
+          "title": "Exemplo de Requisição",
+          "lang": "bash",
+          "code": "curl -X POST \\\n  \"https://microservices.rappi.com/api/rocket-retailer/v1/restaurants/store_abc123/inventory/bulk\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"items\": [\n      { \"sku\": \"7891000100103\", \"available\": true, \"quantity\": 45, \"price\": 490 },\n      { \"sku\": \"7891910000197\", \"available\": false, \"quantity\": 0, \"price\": 1890 },\n      { \"sku\": \"7894900011517\", \"available\": true, \"quantity\": 12, \"price\": 780 }\n    ]\n  }'"
+        },
+        {
+          "type": "code",
+          "title": "Resposta (200 OK)",
+          "lang": "json",
+          "code": "{\n  \"processed\": 3,\n  \"succeeded\": 2,\n  \"failed\": 1,\n  \"errors\": [\n    {\n      \"sku\": \"7891910000197\",\n      \"error\": \"product_not_found\",\n      \"message\": \"Product with SKU 7891910000197 not found in catalog.\"\n    }\n  ]\n}"
+        }
+      ]
+    },
+    "sftp-overview": {
+      "id": "sftp-overview",
+      "title": "Visão Geral SFTP",
+      "description": "A integração SFTP permite que sistemas ERP que não suportam chamadas HTTP sincronizem inventário via upload de arquivos.",
+      "sections": [
+        {
+          "type": "kv",
+          "title": "Configurações SFTP",
+          "items": [
+            { "label": "Host",      "value": "sftp.rappi.com" },
+            { "label": "Porta",     "value": "22" },
+            { "label": "Diretório", "value": "/inventory/{partner_id}/" },
+            { "label": "Formato",   "value": "CSV ou JSON" }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Credenciais SFTP",
+          "content": "As credenciais de acesso SFTP são fornecidas separadamente das credenciais OAuth. Solicite ao seu Integrations Specialist durante o onboarding."
+        }
+      ]
+    },
+    "sftp-format": {
+      "id": "sftp-format",
+      "title": "Formato do Arquivo SFTP",
+      "description": "Especificação do formato dos arquivos de inventário aceitos via SFTP.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Formato CSV",
+          "lang": "bash",
+          "code": "sku,available,quantity,price,promotional_price\n7891000100103,true,45,490,\n7891910000197,false,0,1890,\n7894900011517,true,12,780,650"
+        },
+        {
+          "type": "params",
+          "title": "Colunas do CSV",
+          "rows": [
+            { "name": "sku",               "type": "string",  "required": true,  "description": "SKU único do produto." },
+            { "name": "available",         "type": "boolean", "required": true,  "description": "`true` ou `false`." },
+            { "name": "quantity",          "type": "integer", "required": false, "description": "Quantidade em estoque." },
+            { "name": "price",             "type": "integer", "required": true,  "description": "Preço em centavos." },
+            { "name": "promotional_price", "type": "integer", "required": false, "description": "Preço promocional em centavos (deixar vazio se não houver)." }
+          ]
+        }
+      ]
+    },
+    "sftp-schedule": {
+      "id": "sftp-schedule",
+      "title": "Agendamento SFTP",
+      "description": "Configuração da frequência de processamento dos arquivos SFTP.",
+      "sections": [
+        {
+          "type": "text",
+          "title": "Frequência de Processamento",
+          "content": "Os arquivos depositados no SFTP são processados a cada **15 minutos**. Para atualizações mais frequentes, utilize a integração via API.\n\nO arquivo deve ser nomeado no formato `inventory_{YYYYMMDD_HHMMSS}.csv` para facilitar rastreamento."
+        },
+        {
+          "type": "callout",
+          "variant": "warning",
+          "title": "Arquivo completo vs Delta",
+          "content": "Envie sempre o **arquivo completo** com todos os SKUs da loja, não apenas as alterações (delta). Itens ausentes no arquivo não são alterados automaticamente."
+        }
+      ]
+    }
+  }
+}

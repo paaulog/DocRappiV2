@@ -1,0 +1,155 @@
+{
+  "meta": {
+    "language": "en",
+    "technology": "foundations",
+    "title": "Integration Foundations",
+    "version": "1.0"
+  },
+  "nav": [
+    {
+      "id": "base",
+      "title": "Start here",
+      "icon": "🧭",
+      "expanded": true,
+      "items": [
+        { "id": "overview", "title": "Overview" },
+        { "id": "doc-map", "title": "Documentation map" }
+      ]
+    },
+    {
+      "id": "core",
+      "title": "Technical foundations",
+      "icon": "🔐",
+      "items": [
+        { "id": "authentication", "title": "Authentication" },
+        { "id": "environments", "title": "Environments and credentials" },
+        { "id": "errors", "title": "Error model" }
+      ]
+    },
+    {
+      "id": "recipes",
+      "title": "Integration recipes",
+      "icon": "🧪",
+      "items": [
+        { "id": "recipes-overview", "title": "How to use recipes" },
+        { "id": "recipe-orders", "title": "Recipe: orders flow" },
+        { "id": "recipe-catalog", "title": "Recipe: catalog and inventory" }
+      ]
+    }
+  ],
+  "pages": {
+    "overview": {
+      "id": "overview",
+      "title": "Foundations before APIs",
+      "description": "This layer organizes the portal before entering Open Orders, Open Catalog, REST API or GraphQL API.",
+      "sections": [
+        {
+          "type": "cards",
+          "items": [
+            { "icon": "🏪", "title": "Business integrations", "text": "Open Orders, Open Catalog and Inventory focus on business outcomes." },
+            { "icon": "🔌", "title": "Channels and protocols", "text": "REST API, GraphQL API and Webhook define how data is exchanged." },
+            { "icon": "🛡️", "title": "Shared foundations", "text": "Authentication, environments, errors and standards are reused everywhere." }
+          ]
+        }
+      ]
+    },
+    "doc-map": {
+      "id": "doc-map",
+      "title": "Documentation map",
+      "description": "Structure to reduce ambiguity and speed up onboarding.",
+      "sections": [
+        {
+          "type": "steps",
+          "items": [
+            { "title": "Read foundations", "text": "Authentication, environments and error handling." },
+            { "title": "Pick integration", "text": "Open Orders, Open Catalog or Inventory by business goal." },
+            { "title": "Choose channel", "text": "REST, GraphQL and/or Webhook depending on consumption model." },
+            { "title": "Run recipes", "text": "Follow scenario-based guides and validate in sandbox." }
+          ]
+        }
+      ]
+    },
+    "authentication": {
+      "id": "authentication",
+      "title": "Authentication",
+      "description": "Single pattern for all platform integrations.",
+      "sections": [
+        {
+          "type": "text",
+          "content": "Use integration credentials to obtain a token and send `Authorization: Bearer <token>` on protected requests."
+        }
+      ]
+    },
+    "environments": {
+      "id": "environments",
+      "title": "Environments and credentials",
+      "description": "Use sandbox for tests, then promote to production.",
+      "sections": [
+        {
+          "type": "kv",
+          "items": [
+            { "label": "Sandbox", "value": "Functional testing and flow validation" },
+            { "label": "Production", "value": "Live operations with monitoring" }
+          ]
+        }
+      ]
+    },
+    "errors": {
+      "id": "errors",
+      "title": "Error model",
+      "description": "Cross-cutting pattern for observability and retries.",
+      "sections": [
+        {
+          "type": "errors",
+          "rows": [
+            { "code": 400, "status": "Bad Request", "description": "Invalid or inconsistent payload." },
+            { "code": 401, "status": "Unauthorized", "description": "Missing, invalid or expired token." },
+            { "code": 429, "status": "Too Many Requests", "description": "Rate limit exceeded." },
+            { "code": 500, "status": "Server Error", "description": "Internal failure; apply retry with backoff." }
+          ]
+        }
+      ]
+    },
+    "recipes-overview": {
+      "id": "recipes-overview",
+      "title": "How to use recipes",
+      "description": "Recipes connect business + channel + endpoint in a simple flow.",
+      "sections": [
+        {
+          "type": "text",
+          "content": "Each recipe guides end-to-end context, prerequisites, calls, validation and error handling."
+        }
+      ]
+    },
+    "recipe-orders": {
+      "id": "recipe-orders",
+      "title": "Recipe: orders flow",
+      "description": "Practical path for Open Orders with events and acknowledgments.",
+      "sections": [
+        {
+          "type": "steps",
+          "items": [
+            { "title": "Receive order", "text": "Use webhook or polling depending on setup." },
+            { "title": "Acknowledge order", "text": "Reply in the expected acknowledgement window." },
+            { "title": "Update status", "text": "Publish preparation, picking and completion events." }
+          ]
+        }
+      ]
+    },
+    "recipe-catalog": {
+      "id": "recipe-catalog",
+      "title": "Recipe: catalog and inventory",
+      "description": "Practical flow for products, pricing and availability sync.",
+      "sections": [
+        {
+          "type": "steps",
+          "items": [
+            { "title": "Initial load", "text": "Publish base categories and products." },
+            { "title": "Incremental sync", "text": "Update price and stock in defined intervals." },
+            { "title": "Handle rejections", "text": "Fix validation errors and SKU inconsistencies." }
+          ]
+        }
+      ]
+    }
+  }
+}

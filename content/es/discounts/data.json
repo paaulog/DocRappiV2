@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "language": "es",
+    "technology": "discounts",
+    "title": "Descuentos complejos",
+    "version": "1.0"
+  },
+  "nav": [
+    {
+      "id": "root",
+      "title": "Descuentos",
+      "icon": "🏷️",
+      "expanded": true,
+      "items": [
+        { "id": "overview", "title": "Visión general" },
+        { "id": "guides", "title": "Guías" },
+        { "id": "reference", "title": "Referencia" }
+      ]
+    }
+  ],
+  "pages": {
+    "overview": {
+      "id": "overview",
+      "title": "Descuentos complejos — Visión general",
+      "description": "Promociones avanzadas (contenido en expansión).",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "En construcción",
+          "content": "Corresponde a **Complex Discounts** en la documentación pública."
+        }
+      ]
+    },
+    "guides": {
+      "id": "guides",
+      "title": "Guías",
+      "sections": [
+        { "type": "text", "content": "Define escenarios y valida en el entorno acordado." }
+      ]
+    },
+    "reference": {
+      "id": "reference",
+      "title": "Referencia",
+      "sections": [
+        { "type": "text", "content": "Añade endpoints y ejemplos según especificación." }
+      ]
+    }
+  }
+}

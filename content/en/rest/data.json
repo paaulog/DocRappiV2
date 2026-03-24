@@ -1,0 +1,513 @@
+{
+  "meta": {
+    "language": "en",
+    "technology": "rest",
+    "title": "REST API",
+    "version": "2.0"
+  },
+  "nav": [
+    {
+      "id": "getting-started",
+      "title": "Getting Started",
+      "icon": "🚀",
+      "expanded": true,
+      "items": [
+        { "id": "overview",       "title": "Overview" },
+        { "id": "authentication", "title": "Authentication" },
+        { "id": "environments",   "title": "Environments" },
+        { "id": "rate-limiting",  "title": "Rate Limiting" }
+      ]
+    },
+    {
+      "id": "orders",
+      "title": "Order Management",
+      "icon": "📦",
+      "items": [
+        { "id": "order-lifecycle",     "title": "Order Lifecycle" },
+        { "id": "list-orders",         "title": "List Orders",         "method": "GET" },
+        { "id": "get-order",           "title": "Get Order",           "method": "GET" },
+        { "id": "confirm-order",       "title": "Confirm Order",       "method": "POST" },
+        { "id": "update-order-status", "title": "Update Order Status", "method": "PUT" },
+        { "id": "cancel-order",        "title": "Cancel Order",        "method": "DELETE" }
+      ]
+    },
+    {
+      "id": "webhooks-section",
+      "title": "Webhooks",
+      "icon": "🔔",
+      "items": [
+        { "id": "webhook-intro", "title": "Webhook Introduction" },
+        { "id": "order-events",  "title": "Order Events" }
+      ]
+    },
+    {
+      "id": "errors-section",
+      "title": "Error Reference",
+      "icon": "⚠️",
+      "items": [
+        { "id": "error-codes", "title": "Error Codes" }
+      ]
+    }
+  ],
+  "pages": {
+
+    "overview": {
+      "id": "overview",
+      "title": "API Overview",
+      "description": "Welcome to the official Orders API documentation. This API allows technical partners to integrate their systems directly with our delivery platform.",
+      "sections": [
+        {
+          "type": "cards",
+          "items": [
+            { "icon": "⚡", "title": "High Performance",  "text": "Optimized RESTful architecture with a 99.9% uptime SLA." },
+            { "icon": "🔐", "title": "OAuth2 Security",   "text": "Short-lived JWT tokens with automatic renewal." },
+            { "icon": "🔔", "title": "Real-time Events",  "text": "Webhooks for instant order event notifications." },
+            { "icon": "📊", "title": "Idempotency",       "text": "All critical operations support idempotency keys." }
+          ]
+        },
+        {
+          "type": "steps",
+          "title": "Integration Flow",
+          "items": [
+            { "title": "Credentials",    "text": "Obtain your `client_id` and `client_secret` from the partner dashboard." },
+            { "title": "OAuth2 Token",   "text": "Exchange your credentials for an **access_token** via the auth endpoint." },
+            { "title": "Receive Orders", "text": "Set up a webhook or poll `GET /v2/orders?status=PENDING` periodically." },
+            { "title": "Confirm",        "text": "Confirm receipt with `POST /v2/orders/{id}/confirm` within **5 minutes**." },
+            { "title": "Update",         "text": "Update order status as it progresses: `PREPARING → READY → DISPATCHED → DELIVERED`." }
+          ]
+        },
+        {
+          "type": "kv",
+          "title": "Base URLs",
+          "items": [
+            { "label": "Sandbox",    "value": "https://sandbox-api.example.com/v2" },
+            { "label": "Production", "value": "https://api.example.com/v2" }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "API Versioning",
+          "content": "The API uses URL prefix versioning (`/v2`). The previous version (`/v1`) will be deprecated on **Dec 31, 2025**."
+        }
+      ]
+    },
+
+    "authentication": {
+      "id": "authentication",
+      "title": "Authentication",
+      "description": "The API uses OAuth 2.0 with the Client Credentials flow. All requests must include a Bearer token in the Authorization header.",
+      "sections": [
+        {
+          "type": "text",
+          "title": "Obtaining an Access Token",
+          "content": "Make a `POST` request to the auth endpoint with your `client_id` and `client_secret`. The returned token is valid for **3600 seconds** (1 hour). Store it and renew before expiry."
+        },
+        {
+          "type": "callout",
+          "variant": "warning",
+          "title": "Credential Security",
+          "content": "Never expose your `client_secret` on the client side. Keep it exclusively on your server. If compromised, revoke it immediately from the partner dashboard."
+        },
+        {
+          "type": "code",
+          "title": "Token Request",
+          "lang": "bash",
+          "code": "curl -X POST https://auth.example.com/oauth/token \\\n  -H \"Content-Type: application/x-www-form-urlencoded\" \\\n  -d \"grant_type=client_credentials\" \\\n  -d \"client_id=YOUR_CLIENT_ID\" \\\n  -d \"client_secret=YOUR_CLIENT_SECRET\" \\\n  -d \"scope=orders:read orders:write\""
+        },
+        {
+          "type": "code",
+          "title": "Token Response",
+          "lang": "json",
+          "code": "{\n  \"access_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"token_type\": \"Bearer\",\n  \"expires_in\": 3600,\n  \"scope\": \"orders:read orders:write\"\n}"
+        },
+        {
+          "type": "code",
+          "title": "Using the Token",
+          "lang": "bash",
+          "code": "curl -X GET https://api.example.com/v2/orders \\\n  -H \"Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...\" \\\n  -H \"Content-Type: application/json\""
+        },
+        {
+          "type": "errors",
+          "title": "Authentication Errors",
+          "rows": [
+            { "code": 401, "status": "Unauthorized", "description": "Invalid, expired, or missing token." },
+            { "code": 403, "status": "Forbidden",    "description": "Valid token but insufficient permissions for the requested resource." },
+            { "code": 400, "status": "Bad Request",  "description": "Invalid or missing authentication parameters." }
+          ]
+        }
+      ]
+    },
+
+    "environments": {
+      "id": "environments",
+      "title": "Environments",
+      "description": "The API provides two environments: Sandbox for development/testing and Production for live operations.",
+      "sections": [
+        {
+          "type": "kv",
+          "title": "Environment URLs",
+          "items": [
+            { "label": "Auth Sandbox",   "value": "https://sandbox-auth.example.com" },
+            { "label": "API Sandbox",    "value": "https://sandbox-api.example.com/v2" },
+            { "label": "Auth Prod",      "value": "https://auth.example.com" },
+            { "label": "API Prod",       "value": "https://api.example.com/v2" }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "success",
+          "title": "Sandbox — Test Data",
+          "content": "In the Sandbox, test orders are generated automatically every 2 minutes. Use `client_id=test_partner_001` and `client_secret=test_secret_001` for authentication. **No real charges occur in Sandbox.**"
+        },
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Production — Caution",
+          "content": "Operations in production affect real orders and customers. Test thoroughly in Sandbox before going live."
+        }
+      ]
+    },
+
+    "rate-limiting": {
+      "id": "rate-limiting",
+      "title": "Rate Limiting",
+      "description": "The API enforces per-partner rate limits to ensure stability and availability for all integrators.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "warning",
+          "title": "Limit Exceeded",
+          "content": "When the limit is exceeded, the API returns `HTTP 429 Too Many Requests`. Wait the time indicated in the `Retry-After` header before retrying."
+        },
+        {
+          "type": "params",
+          "title": "Rate Limit Response Headers",
+          "rows": [
+            { "name": "X-RateLimit-Limit",     "type": "integer", "required": false, "description": "Maximum requests allowed in the current period." },
+            { "name": "X-RateLimit-Remaining", "type": "integer", "required": false, "description": "Remaining requests in the current period." },
+            { "name": "X-RateLimit-Reset",     "type": "integer", "required": false, "description": "Unix timestamp when the limit resets." },
+            { "name": "Retry-After",            "type": "integer", "required": false, "description": "Seconds to wait before retrying (present on 429 responses)." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "429 Response Example",
+          "lang": "http",
+          "code": "HTTP/1.1 429 Too Many Requests\nContent-Type: application/json\nRetry-After: 30\nX-RateLimit-Limit: 60\nX-RateLimit-Remaining: 0\nX-RateLimit-Reset: 1715000430\n\n{\n  \"error\": \"rate_limit_exceeded\",\n  \"message\": \"Rate limit reached. Please retry in 30 seconds.\",\n  \"retry_after\": 30\n}"
+        }
+      ]
+    },
+
+    "order-lifecycle": {
+      "id": "order-lifecycle",
+      "title": "Order Lifecycle",
+      "description": "Understand all possible order states and valid transitions between them.",
+      "sections": [
+        {
+          "type": "status-flow",
+          "title": "Status Flow",
+          "states": ["PENDING", "CONFIRMED", "PREPARING", "READY", "DISPATCHED", "DELIVERED"]
+        },
+        {
+          "type": "errors",
+          "title": "Status Descriptions",
+          "rows": [
+            { "code": "PENDING",    "status": "Awaiting Confirmation", "description": "Order received. Awaiting partner confirmation (timeout: 5 min)." },
+            { "code": "CONFIRMED",  "status": "Confirmed",             "description": "Partner confirmed receipt. Preparation not yet started." },
+            { "code": "PREPARING",  "status": "Preparing",             "description": "Order is being prepared." },
+            { "code": "READY",      "status": "Ready",                 "description": "Order is ready for courier pickup." },
+            { "code": "DISPATCHED", "status": "Dispatched",            "description": "Courier collected the order. In transit to customer." },
+            { "code": "DELIVERED",  "status": "Delivered",             "description": "Order successfully delivered. Final state." },
+            { "code": "CANCELLED",  "status": "Cancelled",             "description": "Order cancelled by customer, partner, or system. Final state." }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Confirmation Timeout",
+          "content": "`PENDING` orders not confirmed within **5 minutes** are automatically cancelled. Implement webhooks or polling for immediate confirmation."
+        }
+      ]
+    },
+
+    "list-orders": {
+      "id": "list-orders",
+      "title": "List Orders",
+      "method": "GET",
+      "endpoint": "/v2/orders",
+      "description": "Returns a paginated list of orders for the authenticated partner, with support for filtering by status, date, and other criteria.",
+      "sections": [
+        {
+          "type": "params",
+          "title": "Query Parameters",
+          "rows": [
+            { "name": "status",    "type": "string",  "required": false, "description": "Filter by order status: `PENDING`, `CONFIRMED`, `PREPARING`, `READY`, `DISPATCHED`, `DELIVERED`, `CANCELLED`." },
+            { "name": "from",      "type": "string",  "required": false, "description": "Start date in ISO 8601 format. E.g.: `2024-01-15T00:00:00Z`." },
+            { "name": "to",        "type": "string",  "required": false, "description": "End date in ISO 8601 format. E.g.: `2024-01-15T23:59:59Z`." },
+            { "name": "page",      "type": "integer", "required": false, "description": "Page number (starts at 1). Default: `1`." },
+            { "name": "page_size", "type": "integer", "required": false, "description": "Items per page. Max: `100`. Default: `20`." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Request Example",
+          "lang": "bash",
+          "code": "curl -X GET \"https://api.example.com/v2/orders?status=PENDING&page=1&page_size=20\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\""
+        },
+        {
+          "type": "code",
+          "title": "Response Example (200 OK)",
+          "lang": "json",
+          "code": "{\n  \"data\": [\n    {\n      \"id\": \"ord_9f3a2b1c\",\n      \"status\": \"PENDING\",\n      \"created_at\": \"2024-01-15T14:32:10Z\",\n      \"expires_at\": \"2024-01-15T14:37:10Z\",\n      \"customer\": {\n        \"name\": \"John Smith\",\n        \"phone\": \"+1 555 123-4567\"\n      },\n      \"items\": [\n        {\n          \"id\": \"item_001\",\n          \"name\": \"Special Burger\",\n          \"quantity\": 2,\n          \"unit_price\": 1299,\n          \"notes\": \"No onions\"\n        }\n      ],\n      \"total_amount\": 2598,\n      \"currency\": \"USD\"\n    }\n  ],\n  \"pagination\": {\n    \"page\": 1,\n    \"page_size\": 20,\n    \"total_items\": 47,\n    \"total_pages\": 3,\n    \"has_next\": true,\n    \"has_prev\": false\n  }\n}"
+        },
+        {
+          "type": "errors",
+          "title": "Possible Errors",
+          "rows": [
+            { "code": 400, "status": "Bad Request",       "description": "Invalid query parameters." },
+            { "code": 401, "status": "Unauthorized",      "description": "Missing, invalid or expired access token." },
+            { "code": 403, "status": "Forbidden",         "description": "Partner lacks read permissions for orders." },
+            { "code": 429, "status": "Too Many Requests", "description": "Rate limit reached. Check `Retry-After` header." },
+            { "code": 500, "status": "Internal Server Error", "description": "Internal server error. Retry after a moment." }
+          ]
+        }
+      ]
+    },
+
+    "get-order": {
+      "id": "get-order",
+      "title": "Get Order by ID",
+      "method": "GET",
+      "endpoint": "/v2/orders/{order_id}",
+      "description": "Returns the complete details of a specific order, including items, delivery address, and status history.",
+      "sections": [
+        {
+          "type": "params",
+          "title": "Path Parameters",
+          "rows": [
+            { "name": "order_id", "type": "string", "required": true, "description": "Unique order identifier in the format `ord_xxxxxxxx`." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Request Example",
+          "lang": "bash",
+          "code": "curl -X GET \"https://api.example.com/v2/orders/ord_9f3a2b1c\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\""
+        },
+        {
+          "type": "errors",
+          "title": "Possible Errors",
+          "rows": [
+            { "code": 401, "status": "Unauthorized", "description": "Missing or invalid token." },
+            { "code": 403, "status": "Forbidden",    "description": "Order belongs to a different partner." },
+            { "code": 404, "status": "Not Found",    "description": "Order with the given ID not found." }
+          ]
+        }
+      ]
+    },
+
+    "confirm-order": {
+      "id": "confirm-order",
+      "title": "Confirm Order",
+      "method": "POST",
+      "endpoint": "/v2/orders/{order_id}/confirm",
+      "description": "Confirms receipt of an order by the partner. Must be called within 5 minutes of order creation.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Mandatory Confirmation",
+          "content": "`PENDING` orders not confirmed in **5 minutes** are automatically cancelled. Confirm immediately upon receiving a new order."
+        },
+        {
+          "type": "params",
+          "title": "Request Body",
+          "rows": [
+            { "name": "estimated_time",  "type": "integer", "required": true,  "description": "Estimated preparation time in **minutes** (min: 5, max: 120)." },
+            { "name": "message",         "type": "string",  "required": false, "description": "Optional message for the customer (max 200 characters)." },
+            { "name": "idempotency_key", "type": "string",  "required": false, "description": "Idempotency key to prevent duplicate confirmations (UUID v4 recommended)." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Request Example",
+          "lang": "bash",
+          "code": "curl -X POST \"https://api.example.com/v2/orders/ord_9f3a2b1c/confirm\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Idempotency-Key: 7f9c2a3b-1234-4abc-8def-56789abcdef0\" \\\n  -d '{\n    \"estimated_time\": 25,\n    \"message\": \"Your order is being prepared!\"\n  }'"
+        },
+        {
+          "type": "errors",
+          "title": "Possible Errors",
+          "rows": [
+            { "code": 400, "status": "Bad Request",          "description": "`estimated_time` missing or out of range (5–120 min)." },
+            { "code": 409, "status": "Conflict",             "description": "Order was already confirmed." },
+            { "code": 422, "status": "Unprocessable Entity", "description": "Order is not in `PENDING` status." },
+            { "code": 410, "status": "Gone",                 "description": "Order expired before confirmation." }
+          ]
+        }
+      ]
+    },
+
+    "update-order-status": {
+      "id": "update-order-status",
+      "title": "Update Order Status",
+      "method": "PUT",
+      "endpoint": "/v2/orders/{order_id}/status",
+      "description": "Updates the status of a confirmed order through the lifecycle: PREPARING → READY → DISPATCHED → DELIVERED.",
+      "sections": [
+        {
+          "type": "status-flow",
+          "title": "Valid Transitions",
+          "states": ["CONFIRMED", "PREPARING", "READY", "DISPATCHED", "DELIVERED"]
+        },
+        {
+          "type": "params",
+          "title": "Request Body",
+          "rows": [
+            { "name": "status", "type": "string", "required": true,  "description": "New order status: `PREPARING`, `READY`, `DISPATCHED`, `DELIVERED`." },
+            { "name": "notes",  "type": "string", "required": false, "description": "Internal notes about the transition (not visible to customer)." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Request Example",
+          "lang": "bash",
+          "code": "curl -X PUT \"https://api.example.com/v2/orders/ord_9f3a2b1c/status\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"status\": \"READY\",\n    \"notes\": \"Order packaged and awaiting courier\"\n  }'"
+        },
+        {
+          "type": "errors",
+          "title": "Possible Errors",
+          "rows": [
+            { "code": 400, "status": "Bad Request",          "description": "Invalid or missing status." },
+            { "code": 404, "status": "Not Found",            "description": "Order not found." },
+            { "code": 422, "status": "Unprocessable Entity", "description": "Invalid status transition." }
+          ]
+        }
+      ]
+    },
+
+    "cancel-order": {
+      "id": "cancel-order",
+      "title": "Cancel Order",
+      "method": "DELETE",
+      "endpoint": "/v2/orders/{order_id}",
+      "description": "Cancels an active order. Only possible for orders in PENDING, CONFIRMED, or PREPARING status.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Irreversible Action",
+          "content": "Cancellation is permanent. The customer is notified immediately and a refund is processed automatically within 5 business days."
+        },
+        {
+          "type": "params",
+          "title": "Request Body",
+          "rows": [
+            { "name": "reason",      "type": "string", "required": true,  "description": "Reason code: `OUT_OF_STOCK`, `STORE_CLOSED`, `ITEM_UNAVAILABLE`, `PARTNER_REQUEST`, `OTHER`." },
+            { "name": "description", "type": "string", "required": false, "description": "Additional description (max 500 characters)." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Request Example",
+          "lang": "bash",
+          "code": "curl -X DELETE \"https://api.example.com/v2/orders/ord_9f3a2b1c\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"reason\": \"ITEM_UNAVAILABLE\",\n    \"description\": \"Special Burger is currently out of stock.\"\n  }'"
+        },
+        {
+          "type": "errors",
+          "title": "Possible Errors",
+          "rows": [
+            { "code": 400, "status": "Bad Request",          "description": "Invalid or missing cancellation reason." },
+            { "code": 404, "status": "Not Found",            "description": "Order not found." },
+            { "code": 422, "status": "Unprocessable Entity", "description": "Order cannot be cancelled in its current status." }
+          ]
+        }
+      ]
+    },
+
+    "webhook-intro": {
+      "id": "webhook-intro",
+      "title": "Webhook Introduction",
+      "description": "Webhooks allow you to receive real-time notifications when events occur on the platform, eliminating the need for constant polling.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "success",
+          "title": "Recommended for Production",
+          "content": "Webhooks are more efficient than polling and guarantee minimal latency for receiving new orders. In production, **always prefer webhooks** over polling."
+        },
+        {
+          "type": "steps",
+          "title": "Webhook Verification Process",
+          "items": [
+            { "title": "Registration",  "text": "Register your webhook URL with the desired events." },
+            { "title": "Challenge",     "text": "We send a `GET` with a `challenge` parameter. Your server must return the challenge value." },
+            { "title": "Verification",  "text": "After successful verification, your webhook is active and will receive events." },
+            { "title": "Validation",    "text": "Validate the HMAC-SHA256 signature in the `X-Webhook-Signature` header on each payload." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Signature Validation (Node.js)",
+          "lang": "javascript",
+          "code": "const crypto = require('crypto');\n\nfunction validateWebhook(payload, signature, secret) {\n  const expected = crypto\n    .createHmac('sha256', secret)\n    .update(JSON.stringify(payload))\n    .digest('hex');\n\n  const received = signature.replace('sha256=', '');\n\n  return crypto.timingSafeEqual(\n    Buffer.from(expected, 'hex'),\n    Buffer.from(received, 'hex')\n  );\n}"
+        }
+      ]
+    },
+
+    "order-events": {
+      "id": "order-events",
+      "title": "Order Events",
+      "description": "List of all order events that can be sent via webhook.",
+      "sections": [
+        {
+          "type": "errors",
+          "title": "Event Types",
+          "rows": [
+            { "code": "order.created",   "status": "Order Created",   "description": "New order available for confirmation. Main event for integrations." },
+            { "code": "order.expired",   "status": "Order Expired",   "description": "Order cancelled due to confirmation timeout." },
+            { "code": "order.cancelled", "status": "Order Cancelled", "description": "Order cancelled by customer, partner, or system." },
+            { "code": "order.delivered", "status": "Order Delivered", "description": "Delivery successfully confirmed." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Payload — order.created",
+          "lang": "json",
+          "code": "{\n  \"event\": \"order.created\",\n  \"event_id\": \"evt_7a8b9c0d\",\n  \"timestamp\": \"2024-01-15T14:32:10Z\",\n  \"version\": \"2.0\",\n  \"data\": {\n    \"order\": {\n      \"id\": \"ord_9f3a2b1c\",\n      \"status\": \"PENDING\",\n      \"created_at\": \"2024-01-15T14:32:10Z\",\n      \"expires_at\": \"2024-01-15T14:37:10Z\",\n      \"customer\": {\n        \"name\": \"John Smith\",\n        \"phone\": \"+1 555 123-4567\"\n      },\n      \"items\": [\n        {\n          \"id\": \"item_001\",\n          \"name\": \"Special Burger\",\n          \"quantity\": 2,\n          \"unit_price\": 1299,\n          \"notes\": \"No onions\"\n        }\n      ],\n      \"total_amount\": 2598,\n      \"currency\": \"USD\"\n    }\n  }\n}"
+        }
+      ]
+    },
+
+    "error-codes": {
+      "id": "error-codes",
+      "title": "Error Codes",
+      "description": "Complete reference of error codes returned by the API and how to handle them.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Error Response Structure",
+          "lang": "json",
+          "code": "{\n  \"error\": \"validation_error\",\n  \"message\": \"One or more fields are invalid.\",\n  \"details\": [\n    {\n      \"field\": \"estimated_time\",\n      \"code\": \"out_of_range\",\n      \"message\": \"Estimated time must be between 5 and 120 minutes.\"\n    }\n  ],\n  \"request_id\": \"req_abc123xyz\",\n  \"timestamp\": \"2024-01-15T14:32:10Z\"\n}"
+        },
+        {
+          "type": "errors",
+          "title": "HTTP Status Codes",
+          "rows": [
+            { "code": 200, "status": "OK",                    "description": "Successful request." },
+            { "code": 201, "status": "Created",               "description": "Resource created successfully." },
+            { "code": 400, "status": "Bad Request",           "description": "Invalid parameters. Check `details` in the response body." },
+            { "code": 401, "status": "Unauthorized",          "description": "Missing, invalid or expired token. Refresh the access_token." },
+            { "code": 403, "status": "Forbidden",             "description": "No permission for this resource. Check token scopes." },
+            { "code": 404, "status": "Not Found",             "description": "Resource not found." },
+            { "code": 409, "status": "Conflict",              "description": "Conflict with current resource state." },
+            { "code": 422, "status": "Unprocessable Entity",  "description": "Valid entity but business rule violated (e.g., invalid status transition)." },
+            { "code": 429, "status": "Too Many Requests",     "description": "Rate limit reached. Wait the time in `Retry-After`." },
+            { "code": 500, "status": "Internal Server Error", "description": "Internal error. Include `request_id` when reporting to support." },
+            { "code": 503, "status": "Service Unavailable",   "description": "Service temporarily unavailable. Implement retry with exponential backoff." }
+          ]
+        }
+      ]
+    }
+  }
+}

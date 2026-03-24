@@ -1,0 +1,58 @@
+{
+  "meta": {
+    "language": "en",
+    "technology": "loyalty",
+    "title": "Loyalty",
+    "version": "1.0"
+  },
+  "nav": [
+    {
+      "id": "root",
+      "title": "Loyalty",
+      "icon": "⭐",
+      "expanded": true,
+      "items": [
+        { "id": "overview", "title": "Overview" },
+        { "id": "guides", "title": "Guides" },
+        { "id": "reference", "title": "Reference" }
+      ]
+    }
+  ],
+  "pages": {
+    "overview": {
+      "id": "overview",
+      "title": "Loyalty — Overview",
+      "description": "Customer loyalty and benefits (content expanding).",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Work in progress",
+          "content": "Align this section with the public **loyalty** pages (integration guide, differentiated discounts, user validation, registration)."
+        }
+      ]
+    },
+    "guides": {
+      "id": "guides",
+      "title": "Guides",
+      "description": "Suggested integration paths.",
+      "sections": [
+        {
+          "type": "text",
+          "content": "Follow the official Loyalty integration guide for points, rewards, and business rules."
+        }
+      ]
+    },
+    "reference": {
+      "id": "reference",
+      "title": "Reference",
+      "description": "Technical notes.",
+      "sections": [
+        {
+          "type": "text",
+          "content": "Add endpoints, errors, and examples per current specification."
+        }
+      ]
+    }
+  }
+}

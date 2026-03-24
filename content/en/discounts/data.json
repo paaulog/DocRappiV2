@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "language": "en",
+    "technology": "discounts",
+    "title": "Complex discounts",
+    "version": "1.0"
+  },
+  "nav": [
+    {
+      "id": "root",
+      "title": "Discounts",
+      "icon": "🏷️",
+      "expanded": true,
+      "items": [
+        { "id": "overview", "title": "Overview" },
+        { "id": "guides", "title": "Guides" },
+        { "id": "reference", "title": "Reference" }
+      ]
+    }
+  ],
+  "pages": {
+    "overview": {
+      "id": "overview",
+      "title": "Complex discounts — Overview",
+      "description": "Advanced promotion rules (content expanding).",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Work in progress",
+          "content": "Maps to **Complex Discounts** in the public docs. Add approved business rules and payloads."
+        }
+      ]
+    },
+    "guides": {
+      "id": "guides",
+      "title": "Guides",
+      "sections": [
+        {
+          "type": "steps",
+          "items": [
+            { "title": "Map scenarios", "text": "List promotion types and constraints." },
+            { "title": "Validate", "text": "Test with representative data before production." }
+          ]
+        }
+      ]
+    },
+    "reference": {
+      "id": "reference",
+      "title": "Reference",
+      "sections": [
+        {
+          "type": "text",
+          "content": "Add endpoints, errors, and examples per discount specification."
+        }
+      ]
+    }
+  }
+}

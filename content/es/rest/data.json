@@ -1,0 +1,424 @@
+{
+  "meta": {
+    "language": "es",
+    "technology": "rest",
+    "title": "REST API",
+    "version": "2.0"
+  },
+  "nav": [
+    {
+      "id": "getting-started",
+      "title": "Primeros Pasos",
+      "icon": "🚀",
+      "expanded": true,
+      "items": [
+        { "id": "overview",       "title": "Descripción General" },
+        { "id": "authentication", "title": "Autenticación" },
+        { "id": "environments",   "title": "Entornos" },
+        { "id": "rate-limiting",  "title": "Límites de Tasa" }
+      ]
+    },
+    {
+      "id": "orders",
+      "title": "Gestión de Pedidos",
+      "icon": "📦",
+      "items": [
+        { "id": "order-lifecycle",     "title": "Ciclo de Vida",        "method": "" },
+        { "id": "list-orders",         "title": "Listar Pedidos",       "method": "GET" },
+        { "id": "get-order",           "title": "Obtener Pedido",       "method": "GET" },
+        { "id": "confirm-order",       "title": "Confirmar Pedido",     "method": "POST" },
+        { "id": "update-order-status", "title": "Actualizar Estado",    "method": "PUT" },
+        { "id": "cancel-order",        "title": "Cancelar Pedido",      "method": "DELETE" }
+      ]
+    },
+    {
+      "id": "webhooks-section",
+      "title": "Webhooks",
+      "icon": "🔔",
+      "items": [
+        { "id": "webhook-intro", "title": "Introducción a Webhooks" },
+        { "id": "order-events",  "title": "Eventos de Pedido" }
+      ]
+    },
+    {
+      "id": "errors-section",
+      "title": "Referencia de Errores",
+      "icon": "⚠️",
+      "items": [
+        { "id": "error-codes", "title": "Códigos de Error" }
+      ]
+    }
+  ],
+  "pages": {
+
+    "overview": {
+      "id": "overview",
+      "title": "Descripción General de la API",
+      "description": "Bienvenido a la documentación oficial de la API de Pedidos. Esta API permite a los socios técnicos integrar sus sistemas directamente con nuestra plataforma de entregas.",
+      "sections": [
+        {
+          "type": "cards",
+          "items": [
+            { "icon": "⚡", "title": "Alto Rendimiento",  "text": "Arquitectura RESTful optimizada con SLA de 99.9% de disponibilidad." },
+            { "icon": "🔐", "title": "Seguridad OAuth2",  "text": "Tokens JWT de corta duración con renovación automática." },
+            { "icon": "🔔", "title": "Tiempo Real",       "text": "Webhooks para notificaciones instantáneas de eventos de pedido." },
+            { "icon": "📊", "title": "Idempotencia",      "text": "Todas las operaciones críticas admiten idempotency keys." }
+          ]
+        },
+        {
+          "type": "steps",
+          "title": "Flujo de Integración",
+          "items": [
+            { "title": "Credenciales",     "text": "Obtén tu `client_id` y `client_secret` desde el panel de socios." },
+            { "title": "Token OAuth2",     "text": "Intercambia tus credenciales por un **access_token** vía el endpoint de autenticación." },
+            { "title": "Recibir Pedidos",  "text": "Configura un webhook o realiza polling en `GET /v2/orders?status=PENDING`." },
+            { "title": "Confirmar",        "text": "Confirma la recepción con `POST /v2/orders/{id}/confirm` en **5 minutos**." },
+            { "title": "Actualizar",       "text": "Actualiza el estado del pedido: `PREPARING → READY → DISPATCHED → DELIVERED`." }
+          ]
+        },
+        {
+          "type": "kv",
+          "title": "URLs Base",
+          "items": [
+            { "label": "Sandbox",    "value": "https://sandbox-api.example.com/v2" },
+            { "label": "Producción", "value": "https://api.example.com/v2" }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Versionado",
+          "content": "La API usa versionado por prefijo de URL (`/v2`). La versión anterior (`/v1`) será descontinuada el **31/12/2025**."
+        }
+      ]
+    },
+
+    "authentication": {
+      "id": "authentication",
+      "title": "Autenticación",
+      "description": "La API utiliza OAuth 2.0 con flujo Client Credentials. Todas las solicitudes deben incluir un Bearer token en el header Authorization.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "warning",
+          "title": "Seguridad de Credenciales",
+          "content": "Nunca expongas tu `client_secret` en el lado cliente. Mantenlo exclusivamente en el servidor. Si se compromete, revócalo inmediatamente desde el panel de socios."
+        },
+        {
+          "type": "code",
+          "title": "Solicitud de Token",
+          "lang": "bash",
+          "code": "curl -X POST https://auth.example.com/oauth/token \\\n  -H \"Content-Type: application/x-www-form-urlencoded\" \\\n  -d \"grant_type=client_credentials\" \\\n  -d \"client_id=TU_CLIENT_ID\" \\\n  -d \"client_secret=TU_CLIENT_SECRET\" \\\n  -d \"scope=orders:read orders:write\""
+        },
+        {
+          "type": "code",
+          "title": "Respuesta del Token",
+          "lang": "json",
+          "code": "{\n  \"access_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"token_type\": \"Bearer\",\n  \"expires_in\": 3600,\n  \"scope\": \"orders:read orders:write\"\n}"
+        },
+        {
+          "type": "errors",
+          "title": "Errores de Autenticación",
+          "rows": [
+            { "code": 401, "status": "Unauthorized", "description": "Token inválido, expirado o ausente." },
+            { "code": 403, "status": "Forbidden",    "description": "Token válido pero sin permisos para el recurso solicitado." },
+            { "code": 400, "status": "Bad Request",  "description": "Parámetros de autenticación inválidos o ausentes." }
+          ]
+        }
+      ]
+    },
+
+    "environments": {
+      "id": "environments",
+      "title": "Entornos",
+      "description": "La API ofrece dos entornos: Sandbox para desarrollo/pruebas y Producción para operaciones reales.",
+      "sections": [
+        {
+          "type": "kv",
+          "title": "URLs de los Entornos",
+          "items": [
+            { "label": "Auth Sandbox",   "value": "https://sandbox-auth.example.com" },
+            { "label": "API Sandbox",    "value": "https://sandbox-api.example.com/v2" },
+            { "label": "Auth Prod",      "value": "https://auth.example.com" },
+            { "label": "API Prod",       "value": "https://api.example.com/v2" }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "success",
+          "title": "Sandbox — Datos de Prueba",
+          "content": "En Sandbox, los pedidos de prueba se generan automáticamente cada 2 minutos. Usa `client_id=test_partner_001` y `client_secret=test_secret_001`. **No se realizan cobros reales en Sandbox.**"
+        }
+      ]
+    },
+
+    "rate-limiting": {
+      "id": "rate-limiting",
+      "title": "Límites de Tasa",
+      "description": "La API aplica límites de tasa por socio para garantizar la estabilidad y disponibilidad para todos los integradores.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "warning",
+          "title": "Límite Superado",
+          "content": "Cuando se supera el límite, la API retorna `HTTP 429 Too Many Requests`. Espera el tiempo indicado en el header `Retry-After`."
+        },
+        {
+          "type": "params",
+          "title": "Headers de Rate Limit en la Respuesta",
+          "rows": [
+            { "name": "X-RateLimit-Limit",     "type": "integer", "required": false, "description": "Número máximo de solicitudes permitidas en el período." },
+            { "name": "X-RateLimit-Remaining", "type": "integer", "required": false, "description": "Solicitudes restantes en el período actual." },
+            { "name": "X-RateLimit-Reset",     "type": "integer", "required": false, "description": "Timestamp Unix de cuándo se resetea el límite." },
+            { "name": "Retry-After",            "type": "integer", "required": false, "description": "Segundos a esperar antes de reintentar (presente en respuestas 429)." }
+          ]
+        }
+      ]
+    },
+
+    "order-lifecycle": {
+      "id": "order-lifecycle",
+      "title": "Ciclo de Vida del Pedido",
+      "description": "Comprende todos los estados posibles de un pedido y las transiciones válidas entre ellos.",
+      "sections": [
+        {
+          "type": "status-flow",
+          "title": "Flujo de Estados",
+          "states": ["PENDING", "CONFIRMED", "PREPARING", "READY", "DISPATCHED", "DELIVERED"]
+        },
+        {
+          "type": "errors",
+          "title": "Descripción de Estados",
+          "rows": [
+            { "code": "PENDING",    "status": "Esperando Confirmación", "description": "Pedido recibido. Esperando confirmación del socio (timeout: 5 min)." },
+            { "code": "CONFIRMED",  "status": "Confirmado",             "description": "Socio confirmó recepción. Preparación aún no iniciada." },
+            { "code": "PREPARING",  "status": "En Preparación",         "description": "Pedido en preparación." },
+            { "code": "READY",      "status": "Listo",                  "description": "Pedido listo para ser recogido por el repartidor." },
+            { "code": "DISPATCHED", "status": "Despachado",             "description": "Repartidor recogió el pedido. En tránsito al cliente." },
+            { "code": "DELIVERED",  "status": "Entregado",              "description": "Pedido entregado exitosamente. Estado final." },
+            { "code": "CANCELLED",  "status": "Cancelado",              "description": "Pedido cancelado. Estado final." }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Timeout de Confirmación",
+          "content": "Pedidos `PENDING` no confirmados en **5 minutos** son cancelados automáticamente. Implementa webhooks o polling para confirmación inmediata."
+        }
+      ]
+    },
+
+    "list-orders": {
+      "id": "list-orders",
+      "title": "Listar Pedidos",
+      "method": "GET",
+      "endpoint": "/v2/orders",
+      "description": "Retorna una lista paginada de pedidos del socio autenticado, con soporte de filtros por estado, fecha y otros criterios.",
+      "sections": [
+        {
+          "type": "params",
+          "title": "Parámetros de Query",
+          "rows": [
+            { "name": "status",    "type": "string",  "required": false, "description": "Filtra por estado: `PENDING`, `CONFIRMED`, `PREPARING`, `READY`, `DISPATCHED`, `DELIVERED`, `CANCELLED`." },
+            { "name": "from",      "type": "string",  "required": false, "description": "Fecha inicial en formato ISO 8601." },
+            { "name": "to",        "type": "string",  "required": false, "description": "Fecha final en formato ISO 8601." },
+            { "name": "page",      "type": "integer", "required": false, "description": "Número de página (comienza en 1). Por defecto: `1`." },
+            { "name": "page_size", "type": "integer", "required": false, "description": "Ítems por página. Máximo: `100`. Por defecto: `20`." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Ejemplo de Solicitud",
+          "lang": "bash",
+          "code": "curl -X GET \"https://api.example.com/v2/orders?status=PENDING&page=1&page_size=20\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\""
+        },
+        {
+          "type": "errors",
+          "title": "Errores Posibles",
+          "rows": [
+            { "code": 400, "status": "Bad Request",       "description": "Parámetros de query inválidos." },
+            { "code": 401, "status": "Unauthorized",      "description": "Token ausente, inválido o expirado." },
+            { "code": 429, "status": "Too Many Requests", "description": "Límite de tasa alcanzado." },
+            { "code": 500, "status": "Internal Server Error", "description": "Error interno del servidor." }
+          ]
+        }
+      ]
+    },
+
+    "get-order": {
+      "id": "get-order",
+      "title": "Obtener Pedido por ID",
+      "method": "GET",
+      "endpoint": "/v2/orders/{order_id}",
+      "description": "Retorna los detalles completos de un pedido específico.",
+      "sections": [
+        {
+          "type": "params",
+          "title": "Parámetros de Ruta",
+          "rows": [
+            { "name": "order_id", "type": "string", "required": true, "description": "Identificador único del pedido en el formato `ord_xxxxxxxx`." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Ejemplo de Solicitud",
+          "lang": "bash",
+          "code": "curl -X GET \"https://api.example.com/v2/orders/ord_9f3a2b1c\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\""
+        }
+      ]
+    },
+
+    "confirm-order": {
+      "id": "confirm-order",
+      "title": "Confirmar Pedido",
+      "method": "POST",
+      "endpoint": "/v2/orders/{order_id}/confirm",
+      "description": "Confirma la recepción de un pedido. Debe realizarse en menos de 5 minutos.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Confirmación Obligatoria",
+          "content": "Los pedidos `PENDING` no confirmados en **5 minutos** se cancelan automáticamente."
+        },
+        {
+          "type": "params",
+          "title": "Cuerpo de la Solicitud",
+          "rows": [
+            { "name": "estimated_time", "type": "integer", "required": true,  "description": "Tiempo estimado de preparación en minutos (mín: 5, máx: 120)." },
+            { "name": "message",        "type": "string",  "required": false, "description": "Mensaje opcional para el cliente (máx. 200 caracteres)." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Ejemplo de Solicitud",
+          "lang": "bash",
+          "code": "curl -X POST \"https://api.example.com/v2/orders/ord_9f3a2b1c/confirm\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"estimated_time\": 25, \"message\": \"¡Tu pedido está siendo preparado!\"}'"
+        }
+      ]
+    },
+
+    "update-order-status": {
+      "id": "update-order-status",
+      "title": "Actualizar Estado del Pedido",
+      "method": "PUT",
+      "endpoint": "/v2/orders/{order_id}/status",
+      "description": "Actualiza el estado de un pedido confirmado a través del ciclo de vida.",
+      "sections": [
+        {
+          "type": "status-flow",
+          "title": "Transiciones Válidas",
+          "states": ["CONFIRMED", "PREPARING", "READY", "DISPATCHED", "DELIVERED"]
+        },
+        {
+          "type": "params",
+          "title": "Cuerpo de la Solicitud",
+          "rows": [
+            { "name": "status", "type": "string", "required": true,  "description": "Nuevo estado: `PREPARING`, `READY`, `DISPATCHED`, `DELIVERED`." },
+            { "name": "notes",  "type": "string", "required": false, "description": "Notas internas sobre la transición." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Ejemplo de Solicitud",
+          "lang": "bash",
+          "code": "curl -X PUT \"https://api.example.com/v2/orders/ord_9f3a2b1c/status\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"status\": \"READY\"}'"
+        }
+      ]
+    },
+
+    "cancel-order": {
+      "id": "cancel-order",
+      "title": "Cancelar Pedido",
+      "method": "DELETE",
+      "endpoint": "/v2/orders/{order_id}",
+      "description": "Cancela un pedido activo en los estados PENDING, CONFIRMED o PREPARING.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Acción Irreversible",
+          "content": "La cancelación es permanente. El cliente será notificado inmediatamente."
+        },
+        {
+          "type": "params",
+          "title": "Cuerpo de la Solicitud",
+          "rows": [
+            { "name": "reason",      "type": "string", "required": true,  "description": "Código de motivo: `OUT_OF_STOCK`, `STORE_CLOSED`, `ITEM_UNAVAILABLE`, `PARTNER_REQUEST`, `OTHER`." },
+            { "name": "description", "type": "string", "required": false, "description": "Descripción adicional (máx. 500 caracteres)." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Ejemplo de Solicitud",
+          "lang": "bash",
+          "code": "curl -X DELETE \"https://api.example.com/v2/orders/ord_9f3a2b1c\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"reason\": \"ITEM_UNAVAILABLE\"}'"
+        }
+      ]
+    },
+
+    "webhook-intro": {
+      "id": "webhook-intro",
+      "title": "Introducción a Webhooks",
+      "description": "Los webhooks permiten recibir notificaciones en tiempo real cuando ocurren eventos en la plataforma.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "success",
+          "title": "Recomendado para Producción",
+          "content": "Los webhooks son más eficientes que el polling. En producción, **siempre prefiere webhooks** sobre el polling."
+        },
+        {
+          "type": "steps",
+          "title": "Proceso de Verificación",
+          "items": [
+            { "title": "Registro",      "text": "Registra tu URL de webhook con los eventos deseados." },
+            { "title": "Desafío",       "text": "Enviamos un `GET` con un parámetro `challenge`. Tu servidor debe retornar el valor." },
+            { "title": "Verificación",  "text": "Tras la verificación, tu webhook está activo." },
+            { "title": "Validación",    "text": "Valida la firma HMAC-SHA256 en el header `X-Webhook-Signature`." }
+          ]
+        }
+      ]
+    },
+
+    "order-events": {
+      "id": "order-events",
+      "title": "Eventos de Pedido",
+      "description": "Lista de todos los eventos de pedido que pueden enviarse vía webhook.",
+      "sections": [
+        {
+          "type": "errors",
+          "title": "Tipos de Evento",
+          "rows": [
+            { "code": "order.created",   "status": "Pedido Creado",     "description": "Nuevo pedido disponible para confirmación." },
+            { "code": "order.expired",   "status": "Pedido Expirado",   "description": "Pedido cancelado por timeout de confirmación." },
+            { "code": "order.cancelled", "status": "Pedido Cancelado",  "description": "Pedido cancelado por cliente, socio o sistema." },
+            { "code": "order.delivered", "status": "Pedido Entregado",  "description": "Entrega confirmada exitosamente." }
+          ]
+        }
+      ]
+    },
+
+    "error-codes": {
+      "id": "error-codes",
+      "title": "Códigos de Error",
+      "description": "Referencia completa de los códigos de error retornados por la API.",
+      "sections": [
+        {
+          "type": "errors",
+          "title": "Códigos HTTP",
+          "rows": [
+            { "code": 200, "status": "OK",                    "description": "Solicitud exitosa." },
+            { "code": 400, "status": "Bad Request",           "description": "Parámetros inválidos." },
+            { "code": 401, "status": "Unauthorized",          "description": "Token ausente, inválido o expirado." },
+            { "code": 403, "status": "Forbidden",             "description": "Sin permisos para este recurso." },
+            { "code": 404, "status": "Not Found",             "description": "Recurso no encontrado." },
+            { "code": 422, "status": "Unprocessable Entity",  "description": "Regla de negocio violada." },
+            { "code": 429, "status": "Too Many Requests",     "description": "Límite de tasa alcanzado." },
+            { "code": 500, "status": "Internal Server Error", "description": "Error interno. Incluye `request_id` al reportar." }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,621 @@
+{
+  "meta": {
+    "language": "es",
+    "technology": "orders",
+    "title": "Open Orders",
+    "version": "1.0"
+  },
+  "nav": [
+    {
+      "id": "introduccion",
+      "title": "Introducción",
+      "icon": "🏠",
+      "expanded": true,
+      "items": [
+        { "id": "intro",             "title": "Descripción de Integraciones" },
+        { "id": "open-orders-intro", "title": "¿Qué es Open Orders?" },
+        { "id": "modos-operacao",    "title": "Modos de Operación" },
+        { "id": "autenticacao",      "title": "Autenticación" }
+      ]
+    },
+    {
+      "id": "ciclo-pedido",
+      "title": "Ciclo de Vida del Pedido",
+      "icon": "🔄",
+      "items": [
+        { "id": "lifecycle",         "title": "Entendiendo el Ciclo de Vida" },
+        { "id": "status-pedido",     "title": "Estado del Pedido" },
+        { "id": "eventos-rappi",     "title": "Eventos Rappi" },
+        { "id": "eventos-varejista", "title": "Eventos del Retailer" }
+      ]
+    },
+    {
+      "id": "lite-full",
+      "title": "Orders Lite y Full",
+      "icon": "⚖️",
+      "expanded": true,
+      "items": [
+        { "id": "modos-operacao", "title": "Comparar modos" },
+        { "id": "lite-fluxo", "title": "Orders Lite — flujo" },
+        { "id": "full-fluxo", "title": "Orders Full — flujo" }
+      ]
+    },
+    {
+      "id": "recebimento-datos",
+      "title": "Recepción de datos",
+      "icon": "📡",
+      "expanded": true,
+      "items": [
+        { "id": "recebimento-visao-geral", "title": "Webhook, polling y modo (Lite/Full)" },
+        { "id": "via-webhook",        "title": "Via Webhook" },
+        { "id": "via-polling",        "title": "Via Polling",          "method": "GET" },
+        { "id": "acusar-recebimento", "title": "Confirmar Recepción",  "method": "POST" }
+      ]
+    },
+    {
+      "id": "acciones-retailer",
+      "title": "Acciones del Retailer",
+      "icon": "🏪",
+      "items": [
+        { "id": "iniciar-separacao", "title": "Iniciar Picking",       "method": "POST" },
+        { "id": "informar-invoice",  "title": "Reportar Invoice",      "method": "POST" },
+        { "id": "solicitar-courier", "title": "Solicitar Courier",     "method": "POST" },
+        { "id": "cancelamento",      "title": "Cancelar Pedido",       "method": "POST" }
+      ]
+    },
+    {
+      "id": "referencia",
+      "title": "Referencia",
+      "icon": "📖",
+      "items": [
+        { "id": "substituicoes", "title": "Sustituciones de Ítems" },
+        { "id": "erros",         "title": "Códigos de Error" }
+      ]
+    }
+  ],
+  "pages": {
+
+    "intro": {
+      "id": "intro",
+      "title": "Bienvenido a Rappi Open APIs",
+      "description": "Documentación oficial para integradores del ecosistema Rappi. Aquí encuentras todo lo que necesitas para conectar tu sistema de gestión a la plataforma Rappi.",
+      "sections": [
+        {
+          "type": "cards",
+          "items": [
+            {
+              "icon": "📦",
+              "title": "Open Orders",
+              "text": "Recibe y gestiona pedidos realizados por clientes en la plataforma Rappi usando tu propia infraestructura de picking y logística."
+            },
+            {
+              "icon": "🗂️",
+              "title": "Open Catalog",
+              "text": "Gestiona el catálogo de productos de tu tienda en Rappi — creación, actualización y organización de productos y categorías."
+            },
+            {
+              "icon": "📊",
+              "title": "Inventory Integration",
+              "text": "Mantén el stock y los precios sincronizados automáticamente entre tu ERP/WMS y el catálogo Rappi."
+            }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Requisito obligatorio",
+          "content": "Para usar **Open Orders**, tu tienda ya debe tener una **Integración de Inventario** funcional con Rappi. Esto garantiza que el stock mostrado en la plataforma refleje la realidad de la tienda."
+        },
+        {
+          "type": "steps",
+          "title": "Hoja de Ruta de Integración Recomendada",
+          "items": [
+            { "title": "Integración de Inventario", "text": "Configura la sincronización de stock y precios via SFTP o API antes de cualquier otra integración." },
+            { "title": "Autenticación",             "text": "Obtén tus credenciales de socio y configura el flujo OAuth 2.0 para autenticar llamadas a la API." },
+            { "title": "Open Orders",               "text": "Implementa la recepción de pedidos via webhook o polling y configura los eventos del ciclo de vida." },
+            { "title": "Open Catalog (opcional)",   "text": "Centraliza la gestión del catálogo directamente desde tu sistema, sin acceder al panel Rappi." }
+          ]
+        }
+      ]
+    },
+
+    "open-orders-intro": {
+      "id": "open-orders-intro",
+      "title": "¿Qué es Open Orders?",
+      "description": "Open Orders permite a los retailers recibir pedidos realizados por clientes en la plataforma Rappi y gestionar el fulfillment usando su propia infraestructura de picking y logística.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "warning",
+          "title": "Compromiso de Implementación",
+          "content": "Cada nueva funcionalidad lanzada por el equipo Open Orders mejora la experiencia del usuario en las tiendas integradas. Como retailer Open Orders, **debes comprometerte a implementar nuevas funcionalidades en un plazo de 8 semanas** tras el lanzamiento."
+        },
+        {
+          "type": "steps",
+          "title": "Checklist de Elegibilidad",
+          "items": [
+            { "title": "Integración de Inventario activa",       "text": "Ya tienes una integración funcional de stock/precios con Rappi." },
+            { "title": "Gestión de stock robusta",              "text": "Tu sistema previene rupturas de stock que causarían cancelaciones de pedidos." },
+            { "title": "ERP/TPV con capacidad multicanal",      "text": "Tu sistema de gestión puede absorber pedidos de canales externos." },
+            { "title": "Equipo entrenado para fulfillment ágil","text": "Tu equipo está preparado para atender pedidos con SLA estricto." },
+            { "title": "Recursos de desarrollo disponibles",    "text": "Tienes acceso a un equipo técnico o proveedor de integración." }
+          ]
+        },
+        {
+          "type": "steps",
+          "title": "Checklist de Implementación",
+          "items": [
+            { "title": "Entiende el ciclo de vida del pedido",   "text": "Mapea todos los eventos y estados posibles." },
+            { "title": "Mapea eventos internos a Rappi",         "text": "Identifica cómo los eventos de tu OMS/ERP corresponden a los eventos de Rappi." },
+            { "title": "Identifica limitaciones del sistema",    "text": "Evalúa si tu ERP tiene restricciones que impactan algún evento." },
+            { "title": "Desarrolla los webhooks",                "text": "Implementa los endpoints para recibir eventos de pedido de Rappi." },
+            { "title": "Notifica todos los eventos",             "text": "Garantiza que **todos** los eventos de fulfillment sean notificados a Rappi en tiempo real." }
+          ]
+        }
+      ]
+    },
+
+    "modos-operacao": {
+      "id": "modos-operacao",
+      "title": "Modos de Operación",
+      "description": "Open Orders ofrece dos modos de integración. La elección depende de quién controla el proceso de picking y quién inicia las actualizaciones de estado.",
+      "sections": [
+        {
+          "type": "cards",
+          "items": [
+            {
+              "icon": "🟡",
+              "title": "Orders Lite",
+              "text": "Implementa solo los Eventos Rappi. Las actualizaciones de estado son iniciadas por Rappi. Compatible con las soluciones de picking de Rappi."
+            },
+            {
+              "icon": "🟢",
+              "title": "Orders Full",
+              "text": "Implementa tanto Eventos Rappi como Eventos del Retailer. El retailer inicia las actualizaciones de estado. Incompatible con las soluciones de picking de Rappi."
+            }
+          ]
+        },
+        {
+          "type": "errors",
+          "title": "Comparativa de Modos",
+          "rows": [
+            { "code": "Evento",           "status": "Orders Lite",              "description": "Orders Full" },
+            { "code": "order_created",    "status": "✅ Recibe",                "description": "✅ Recibe" },
+            { "code": "start_picking",    "status": "⬅️ Iniciado por Rappi",    "description": "➡️ Iniciado por retailer" },
+            { "code": "report_invoice",   "status": "⬅️ Iniciado por Rappi",    "description": "➡️ Iniciado por retailer" },
+            { "code": "request_courier",  "status": "⬅️ Iniciado por Rappi",    "description": "➡️ Iniciado por retailer" },
+            { "code": "courier_assigned", "status": "✅ Recibe",                "description": "✅ Recibe" },
+            { "code": "order_finished",   "status": "✅ Recibe",                "description": "✅ Recibe" },
+            { "code": "Picking Rappi",    "status": "✅ Compatible",            "description": "❌ Incompatible" }
+          ]
+        }
+      ]
+    },
+
+    "lite-fluxo": {
+      "id": "lite-fluxo",
+      "title": "Orders Lite — flujo",
+      "description": "Modo Lite centrado en eventos Rappi y compatible con picking Rappi.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Resumen",
+          "content": "Consulta **Recepción de datos → Webhook, polling y modo** para alinear canales de entrada."
+        },
+        {
+          "type": "steps",
+          "items": [
+            { "title": "Pedido creado", "text": "Tu sistema recibe notificaciones (p. ej. webhook)." },
+            { "title": "Eventos Rappi", "text": "Consumes los eventos según el acuerdo de integración." },
+            { "title": "Cierre", "text": "Sigue el ciclo de vida documentado en **Ciclo de Vida del Pedido**." }
+          ]
+        }
+      ]
+    },
+
+    "full-fluxo": {
+      "id": "full-fluxo",
+      "title": "Orders Full — flujo",
+      "description": "Modo Full con eventos del retailer; incompatible con picking Rappi.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "warning",
+          "title": "Incompatibilidad",
+          "content": "**Orders Full** requiere que tu sistema inicie y notifique eventos de fulfillment."
+        },
+        {
+          "type": "steps",
+          "items": [
+            { "title": "Recibir eventos Rappi", "text": "order_created, courier_assigned, etc." },
+            { "title": "Publicar eventos retailer", "text": "start_picking, invoice, request_courier hacia la API." },
+            { "title": "Coherencia operativa", "text": "Cada paso debe reflejarse en los eventos esperados." }
+          ]
+        }
+      ]
+    },
+
+    "recebimento-visao-geral": {
+      "id": "recebimento-visao-geral",
+      "title": "Webhook, polling y modo (Lite/Full)",
+      "description": "Cómo llegan los datos de pedido a tu sistema.",
+      "sections": [
+        {
+          "type": "text",
+          "content": "Puedes combinar **webhook** (push) y **polling** (pull) según diseño técnico y modo acordado."
+        },
+        {
+          "type": "cards",
+          "items": [
+            { "icon": "🔔", "title": "Webhook", "text": "La plataforma envía callbacks HTTP a tus endpoints." },
+            { "icon": "🔁", "title": "Polling", "text": "Tu sistema consulta la API de forma periódica." }
+          ]
+        }
+      ]
+    },
+
+    "autenticacao": {
+      "id": "autenticacao",
+      "title": "Autenticación",
+      "description": "Todas las llamadas a la API Rappi requieren autenticación via OAuth 2.0 con flujo Client Credentials.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "warning",
+          "title": "Credenciales de Socio",
+          "content": "El `client_id` y `client_secret` son proporcionados por el equipo de integraciones Rappi durante el onboarding. Nunca compartas estas credenciales ni las expongas en código cliente."
+        },
+        {
+          "type": "kv",
+          "title": "Endpoints de Autenticación",
+          "items": [
+            { "label": "Sandbox",    "value": "https://microservices.dev.rappi.com/api/rocket-retailer/oauth/token" },
+            { "label": "Producción", "value": "https://microservices.rappi.com/api/rocket-retailer/oauth/token" }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Obteniendo el Access Token",
+          "lang": "bash",
+          "code": "curl -X POST https://microservices.rappi.com/api/rocket-retailer/oauth/token \\\n  -H \"Content-Type: application/x-www-form-urlencoded\" \\\n  -d \"grant_type=client_credentials\" \\\n  -d \"client_id=TU_CLIENT_ID\" \\\n  -d \"client_secret=TU_CLIENT_SECRET\""
+        },
+        {
+          "type": "code",
+          "title": "Respuesta",
+          "lang": "json",
+          "code": "{\n  \"access_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"token_type\": \"bearer\",\n  \"expires_in\": 3600,\n  \"scope\": \"read write\"\n}"
+        }
+      ]
+    },
+
+    "lifecycle": {
+      "id": "lifecycle",
+      "title": "Entendiendo el Ciclo de Vida del Pedido",
+      "description": "Los pedidos fluyen a través de una secuencia de eventos. El sistema reconoce dos tipos: Eventos Rappi (generados por la plataforma) y Eventos del Retailer (generados por el OMS).",
+      "sections": [
+        {
+          "type": "status-flow",
+          "title": "Flujo Completo — Orders Full",
+          "states": ["order_created", "start_picking", "report_invoice", "request_courier", "courier_assigned", "order_finished"]
+        },
+        {
+          "type": "errors",
+          "title": "Todos los Eventos del Ciclo de Vida",
+          "rows": [
+            { "code": "order_created",    "status": "Evento Rappi",        "description": "Pedido creado por el cliente. Primera notificación enviada al retailer." },
+            { "code": "start_picking",    "status": "Retailer (Full)",     "description": "Retailer notifica que el equipo inició el picking de ítems." },
+            { "code": "report_invoice",   "status": "Retailer (Full)",     "description": "Picking completado. Retailer envía la lista final de ítems y el monto de la factura." },
+            { "code": "request_courier",  "status": "Retailer (Full)",     "description": "Retailer solicita a Rappi despachar un repartidor para recoger el pedido." },
+            { "code": "courier_assigned", "status": "Evento Rappi",        "description": "Rappi confirma que un repartidor fue asignado y está en camino a la tienda." },
+            { "code": "order_finished",   "status": "Evento Rappi",        "description": "Pedido entregado al cliente. Evento final del ciclo. Incluye timestamp `delivered_at`." }
+          ]
+        }
+      ]
+    },
+
+    "status-pedido": {
+      "id": "status-pedido",
+      "title": "Estado del Pedido",
+      "description": "Los estados representan la situación actual de un pedido en el sistema Rappi.",
+      "sections": [
+        {
+          "type": "errors",
+          "title": "Tabla de Estados",
+          "rows": [
+            { "code": "created",          "status": "Activo — esperando picking", "description": "Pedido recibido y confirmado. Listo para iniciar el picking." },
+            { "code": "invoice_reported", "status": "Picking completado",          "description": "Retailer reportó la factura. Cesta final confirmada, esperando repartidor." },
+            { "code": "finished",         "status": "Entregado al cliente",        "description": "Pedido entregado exitosamente. Estado final del ciclo normal." },
+            { "code": "canceled",         "status": "Cancelado",                   "description": "Cancelado por Rappi, retailer o timeout. Estado final." }
+          ]
+        }
+      ]
+    },
+
+    "eventos-rappi": {
+      "id": "eventos-rappi",
+      "title": "Eventos Rappi",
+      "description": "Eventos generados por la plataforma Rappi y enviados al sistema del retailer.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Aplica a ambos modos",
+          "content": "Todos los Eventos Rappi deben implementarse tanto en modo **Lite** como en modo **Full**."
+        },
+        {
+          "type": "code",
+          "title": "Payload — order_created",
+          "lang": "json",
+          "code": "{\n  \"event_type\": \"order_created\",\n  \"order_id\": \"RAP-123456789\",\n  \"store_id\": \"store_abc123\",\n  \"created_at\": \"2024-03-15T14:32:10Z\",\n  \"customer\": {\n    \"name\": \"Carlos Gómez\",\n    \"phone\": \"+52 55 1234-5678\"\n  },\n  \"items\": [\n    { \"sku\": \"7501000000001\", \"name\": \"Leche Entera 1L\", \"quantity\": 3, \"unit_price\": 28 },\n    { \"sku\": \"7501000000002\", \"name\": \"Café Soluble 200g\", \"quantity\": 1, \"unit_price\": 85 }\n  ],\n  \"total_amount\": 169,\n  \"currency\": \"MXN\"\n}"
+        },
+        {
+          "type": "code",
+          "title": "Payload — courier_assigned",
+          "lang": "json",
+          "code": "{\n  \"event_type\": \"courier_assigned\",\n  \"order_id\": \"RAP-123456789\",\n  \"courier\": {\n    \"name\": \"Luis Martínez\",\n    \"phone\": \"+52 55 9876-5432\",\n    \"vehicle\": \"bike\"\n  },\n  \"estimated_arrival\": \"2024-03-15T15:10:00Z\"\n}"
+        },
+        {
+          "type": "code",
+          "title": "Payload — order_finished",
+          "lang": "json",
+          "code": "{\n  \"event_type\": \"order_finished\",\n  \"order_id\": \"RAP-123456789\",\n  \"status\": \"finished\",\n  \"delivered_at\": \"2024-03-15T15:28:45Z\"\n}"
+        }
+      ]
+    },
+
+    "eventos-varejista": {
+      "id": "eventos-varejista",
+      "title": "Eventos del Retailer",
+      "description": "Eventos iniciados por el sistema del retailer y enviados a la API Rappi. Aplica solo al modo Orders Full.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "warning",
+          "title": "Solo Orders Full",
+          "content": "Los eventos del retailer solo se implementan en modo **Orders Full**. En modo Lite, estos eventos son gestionados automáticamente por Rappi."
+        },
+        {
+          "type": "errors",
+          "title": "Resumen de Eventos del Retailer",
+          "rows": [
+            { "code": "start_picking",   "status": "POST /orders/{id}/start-picking",   "description": "Notifica que el equipo de tienda inició el picking." },
+            { "code": "report_invoice",  "status": "POST /orders/{id}/invoice",         "description": "Envía la lista final de ítems y el monto de la factura." },
+            { "code": "request_courier", "status": "POST /orders/{id}/request-courier", "description": "Solicita el despacho de un repartidor para recoger el pedido." }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Orden de ejecución",
+          "content": "Los eventos del retailer deben enviarse **en el orden correcto**: `start_picking` → `report_invoice` → `request_courier`. Enviarlos fuera de orden retornará error `422`."
+        }
+      ]
+    },
+
+    "via-webhook": {
+      "id": "via-webhook",
+      "title": "Recibiendo Pedidos via Webhook",
+      "description": "El método recomendado. Rappi hace una solicitud POST a tu endpoint registrado inmediatamente después de crear un pedido.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "success",
+          "title": "Método Recomendado",
+          "content": "Usa webhooks para garantizar la **menor latencia posible** en la recepción de pedidos. Combina con polling como fallback de seguridad."
+        },
+        {
+          "type": "steps",
+          "title": "Configuración del Webhook",
+          "items": [
+            { "title": "Crea tu endpoint",             "text": "Implementa un endpoint HTTPS que acepte `POST`. Debe responder `HTTP 200` en **5 segundos**." },
+            { "title": "Registra la URL",              "text": "Proporciona la URL a Rappi durante el onboarding. Debe ser accesible públicamente." },
+            { "title": "Procesa de forma asíncrona",   "text": "Al recibir el webhook, retorna `200` inmediatamente y procesa en background." },
+            { "title": "Implementa idempotencia",      "text": "Usa el `order_id` como clave de idempotencia para evitar procesamiento duplicado." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Handler de Webhook (Node.js)",
+          "lang": "javascript",
+          "code": "const express = require('express');\nconst app = express();\napp.use(express.json());\n\napp.post('/rappi/webhook', async (req, res) => {\n  res.status(200).json({ received: true }); // responder inmediatamente\n\n  const { event_type, order_id } = req.body;\n\n  try {\n    switch (event_type) {\n      case 'order_created':\n        await handleNuevoPedido(req.body);\n        break;\n      case 'courier_assigned':\n        await handleCourierAsignado(req.body);\n        break;\n      case 'order_finished':\n        await handlePedidoFinalizado(req.body);\n        break;\n    }\n  } catch (err) {\n    console.error(`Error procesando ${order_id}:`, err);\n  }\n});\n\nasync function handleNuevoPedido(payload) {\n  if (await db.pedidoExiste(payload.order_id)) return; // idempotencia\n  await db.guardarPedido(payload);\n  await erpClient.crearPedido(payload);\n  await notificarEquipoPicking(payload.order_id);\n}"
+        }
+      ]
+    },
+
+    "via-polling": {
+      "id": "via-polling",
+      "title": "Recibiendo Pedidos via Polling",
+      "method": "GET",
+      "endpoint": "/api/rocket-retailer/v2/restaurants/{store_id}/orders",
+      "description": "Método alternativo o complementario al webhook. Tu sistema consulta periódicamente el endpoint para recuperar eventos de pedidos no confirmados.",
+      "sections": [
+        {
+          "type": "kv",
+          "title": "Límites de Tasa",
+          "items": [
+            { "label": "Límite por defecto",    "value": "100 solicitudes por minuto" },
+            { "label": "Intervalo recomendado", "value": "30 a 60 segundos" }
+          ]
+        },
+        {
+          "type": "params",
+          "title": "Parámetros de Query",
+          "rows": [
+            { "name": "store_id",  "type": "string",  "required": true,  "description": "ID de tienda Rappi. Proporcionado en el onboarding." },
+            { "name": "status",    "type": "string",  "required": false, "description": "Filtra por estado: `created`, `invoice_reported`, `finished`, `canceled`." },
+            { "name": "from_date", "type": "string",  "required": false, "description": "Fecha inicial ISO 8601." },
+            { "name": "page_size", "type": "integer", "required": false, "description": "Ítems por página. Máximo: `50`. Por defecto: `20`." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Ejemplo de Solicitud",
+          "lang": "bash",
+          "code": "curl -X GET \\\n  \"https://microservices.rappi.com/api/rocket-retailer/v2/restaurants/store_abc123/orders?status=created\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\""
+        }
+      ]
+    },
+
+    "acusar-recebimento": {
+      "id": "acusar-recebimento",
+      "title": "Confirmar Recepción del Pedido",
+      "method": "POST",
+      "endpoint": "/api/rocket-retailer/v2/restaurants/{store_id}/orders/{order_id}/acknowledge",
+      "description": "Confirma al sistema Rappi que el pedido fue recibido por el retailer. Este paso es obligatorio para que el pedido avance en el ciclo de vida.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Confirma de inmediato",
+          "content": "Los pedidos no confirmados dentro del SLA pueden cancelarse automáticamente. Implementa el acknowledge como **primera acción** tras recibir `order_created`."
+        },
+        {
+          "type": "code",
+          "title": "Ejemplo de Solicitud",
+          "lang": "bash",
+          "code": "curl -X POST \\\n  \"https://microservices.rappi.com/api/rocket-retailer/v2/restaurants/store_abc123/orders/RAP-123456789/acknowledge\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"acknowledged_at\": \"2024-03-15T14:32:45Z\"}'"
+        }
+      ]
+    },
+
+    "iniciar-separacao": {
+      "id": "iniciar-separacao",
+      "title": "Iniciar Picking",
+      "method": "POST",
+      "endpoint": "/api/rocket-retailer/v2/restaurants/{store_id}/orders/{order_id}/start-picking",
+      "description": "Notifica a Rappi que el equipo de la tienda inició el picking de los ítems del pedido. Solo Orders Full.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "warning",
+          "title": "Solo Orders Full",
+          "content": "Este endpoint es exclusivo del modo **Orders Full**."
+        },
+        {
+          "type": "code",
+          "title": "Ejemplo de Solicitud",
+          "lang": "bash",
+          "code": "curl -X POST \\\n  \"https://microservices.rappi.com/api/rocket-retailer/v2/restaurants/store_abc123/orders/RAP-123456789/start-picking\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"started_at\": \"2024-03-15T14:35:00Z\", \"picker_id\": \"empleado_42\"}'"
+        }
+      ]
+    },
+
+    "informar-invoice": {
+      "id": "informar-invoice",
+      "title": "Reportar Invoice",
+      "method": "POST",
+      "endpoint": "/api/rocket-retailer/v2/restaurants/{store_id}/orders/{order_id}/invoice",
+      "description": "Notifica a Rappi que el picking fue completado. Envía la lista final de ítems efectivamente separados y el monto de la factura.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Cesta final vs pedido original",
+          "content": "El `report_invoice` representa la **cesta final real** separada. Si un ítem no estaba disponible o fue sustituido, informa aquí. El cliente será notificado de las diferencias."
+        },
+        {
+          "type": "code",
+          "title": "Ejemplo de Solicitud",
+          "lang": "bash",
+          "code": "curl -X POST \\\n  \"https://microservices.rappi.com/api/rocket-retailer/v2/restaurants/store_abc123/orders/RAP-123456789/invoice\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"invoice_value\": 169,\n    \"items\": [\n      { \"sku\": \"7501000000001\", \"quantity\": 3, \"unit_price\": 28 },\n      { \"sku\": \"7501000000003\", \"quantity\": 1, \"unit_price\": 79, \"replaced_sku\": \"7501000000002\" }\n    ]\n  }'"
+        }
+      ]
+    },
+
+    "solicitar-courier": {
+      "id": "solicitar-courier",
+      "title": "Solicitar Courier",
+      "method": "POST",
+      "endpoint": "/api/rocket-retailer/v2/restaurants/{store_id}/orders/{order_id}/request-courier",
+      "description": "Solicita a Rappi que despache un repartidor para recoger el pedido en la tienda.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Prerequisito",
+          "content": "`request_courier` debe llamarse **solo después** de `report_invoice`. El pedido debe estar en estado `invoice_reported`."
+        },
+        {
+          "type": "code",
+          "title": "Ejemplo de Solicitud",
+          "lang": "bash",
+          "code": "curl -X POST \\\n  \"https://microservices.rappi.com/api/rocket-retailer/v2/restaurants/store_abc123/orders/RAP-123456789/request-courier\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"ready_at\": \"2024-03-15T15:05:00Z\", \"pickup_notes\": \"Pedido en anaquel B, bolsa roja\"}'"
+        }
+      ]
+    },
+
+    "cancelamento": {
+      "id": "cancelamento",
+      "title": "Cancelar Pedido",
+      "method": "POST",
+      "endpoint": "/api/rocket-retailer/v2/restaurants/{store_id}/orders/{order_id}/cancel",
+      "description": "Cancela un pedido activo. Posible en los estados created e invoice_reported.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Impacto en el cliente",
+          "content": "Las cancelaciones impactan directamente la experiencia del cliente. **Evita cancelaciones** — invierte en gestión precisa de stock. Una tasa alta de cancelaciones puede resultar en penalizaciones contractuales."
+        },
+        {
+          "type": "params",
+          "title": "Cuerpo de la Solicitud",
+          "rows": [
+            { "name": "reason",      "type": "string", "required": true,  "description": "Código de motivo: `OUT_OF_STOCK`, `STORE_CLOSED`, `ITEM_NOT_FOUND`, `TECHNICAL_ISSUE`, `OTHER`." },
+            { "name": "description", "type": "string", "required": false, "description": "Descripción detallada (máx. 500 caracteres)." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Ejemplo de Solicitud",
+          "lang": "bash",
+          "code": "curl -X POST \\\n  \"https://microservices.rappi.com/api/rocket-retailer/v2/restaurants/store_abc123/orders/RAP-123456789/cancel\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"reason\": \"OUT_OF_STOCK\", \"description\": \"Leche Entera sin stock.\"}'"
+        }
+      ]
+    },
+
+    "substituicoes": {
+      "id": "substituicoes",
+      "title": "Sustituciones de Ítems",
+      "description": "Cuando un ítem del pedido no está disponible, el retailer puede informar un producto sustituto en el report_invoice, en vez de cancelar el pedido.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "success",
+          "title": "Prefiere sustituciones a cancelaciones",
+          "content": "Las sustituciones preservan la experiencia del cliente y evitan cancelaciones. Siempre que sea posible, ofrece un producto equivalente."
+        },
+        {
+          "type": "code",
+          "title": "Sustitución en report_invoice",
+          "lang": "json",
+          "code": "{\n  \"invoice_value\": 163,\n  \"items\": [\n    { \"sku\": \"7501000000001\", \"quantity\": 3, \"unit_price\": 28 },\n    {\n      \"sku\": \"7501000000003\",\n      \"quantity\": 1,\n      \"unit_price\": 79,\n      \"replaced_sku\": \"7501000000002\",\n      \"substitution_reason\": \"Ítem original sin stock. Producto equivalente de la misma categoría.\"\n    }\n  ]\n}"
+        }
+      ]
+    },
+
+    "erros": {
+      "id": "erros",
+      "title": "Códigos de Error",
+      "description": "Referencia completa de errores retornados por la API Open Orders.",
+      "sections": [
+        {
+          "type": "errors",
+          "title": "Códigos HTTP",
+          "rows": [
+            { "code": 200, "status": "OK",                    "description": "Solicitud procesada exitosamente." },
+            { "code": 400, "status": "Bad Request",           "description": "Parámetros inválidos." },
+            { "code": 401, "status": "Unauthorized",          "description": "Token ausente, inválido o expirado." },
+            { "code": 403, "status": "Forbidden",             "description": "Sin permiso para esta tienda u operación." },
+            { "code": 404, "status": "Not Found",             "description": "Pedido o tienda no encontrados." },
+            { "code": 409, "status": "Conflict",              "description": "Evento ya procesado anteriormente (duplicado)." },
+            { "code": 422, "status": "Unprocessable Entity",  "description": "Transición de estado inválida o regla de negocio violada." },
+            { "code": 429, "status": "Too Many Requests",     "description": "Límite de tasa alcanzado (100 req/min)." },
+            { "code": 500, "status": "Internal Server Error", "description": "Error interno Rappi. Incluye `request_id` al reportar." }
+          ]
+        }
+      ]
+    }
+  }
+}

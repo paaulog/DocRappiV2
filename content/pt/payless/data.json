@@ -1,0 +1,69 @@
+{
+  "meta": {
+    "language": "pt",
+    "technology": "payless",
+    "title": "Payless API",
+    "version": "1.0"
+  },
+  "nav": [
+    {
+      "id": "root",
+      "title": "Payless",
+      "icon": "💳",
+      "expanded": true,
+      "items": [
+        { "id": "overview", "title": "Visão geral" },
+        { "id": "guides", "title": "Guias e fluxos" },
+        { "id": "reference", "title": "Referência rápida" }
+      ]
+    }
+  ],
+  "pages": {
+    "overview": {
+      "id": "overview",
+      "title": "Payless — Visão geral",
+      "description": "Integração de pagamentos e conciliação no ecossistema Rappi (conteúdo em expansão).",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Documentação em construção",
+          "content": "Esta seção espelha a área **Payless API** da documentação pública. Amplie com os guias oficiais e exemplos aprovados pelo time de integrações."
+        },
+        {
+          "type": "cards",
+          "items": [
+            { "icon": "🔐", "title": "Autenticação", "text": "Reutilize os fundamentos de credenciais e tokens descritos em **Fundamentos**." },
+            { "icon": "📒", "title": "Conciliação", "text": "Fluxos de listagem, estorno e validação seguem as páginas de referência Payless no portal oficial." }
+          ]
+        }
+      ]
+    },
+    "guides": {
+      "id": "guides",
+      "title": "Guias e fluxos",
+      "description": "Orientações de alto nível para integração Payless.",
+      "sections": [
+        {
+          "type": "steps",
+          "items": [
+            { "title": "Ambiente e credenciais", "text": "Obtenha credenciais e endpoints junto ao Integrations Specialist." },
+            { "title": "Fluxo de autorização", "text": "Implemente captura e confirmação conforme o contrato do produto." },
+            { "title": "Monitoramento", "text": "Acompanhe webhooks e conciliação com os relatórios expostos na API." }
+          ]
+        }
+      ]
+    },
+    "reference": {
+      "id": "reference",
+      "title": "Referência rápida",
+      "description": "Pontos de entrada para consulta técnica.",
+      "sections": [
+        {
+          "type": "text",
+          "content": "Consulte a documentação oficial **Payless API** para lista completa de endpoints, códigos de erro e payloads."
+        }
+      ]
+    }
+  }
+}

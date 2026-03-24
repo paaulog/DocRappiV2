@@ -1,0 +1,222 @@
+{
+  "meta": { "language": "pt", "technology": "catalog", "title": "Open Catalog", "version": "1.0" },
+  "nav": [
+    {
+      "id": "introducao", "title": "Introdução", "icon": "🗂️", "expanded": true,
+      "items": [
+        { "id": "overview",      "title": "Visão Geral" },
+        { "id": "autenticacao",  "title": "Autenticação" }
+      ]
+    },
+    {
+      "id": "products", "title": "Produtos", "icon": "📦",
+      "items": [
+        { "id": "list-products",   "title": "Listar Produtos",  "method": "GET" },
+        { "id": "create-product",  "title": "Criar Produto",    "method": "POST" },
+        { "id": "update-product",  "title": "Atualizar Produto","method": "PUT" },
+        { "id": "delete-product",  "title": "Remover Produto",  "method": "DELETE" }
+      ]
+    },
+    {
+      "id": "categories", "title": "Categorias", "icon": "🏷️",
+      "items": [
+        { "id": "list-categories",  "title": "Listar Categorias", "method": "GET" },
+        { "id": "create-category",  "title": "Criar Categoria",   "method": "POST" }
+      ]
+    },
+    {
+      "id": "stores", "title": "Lojas", "icon": "🏪",
+      "items": [
+        { "id": "list-stores", "title": "Listar Lojas", "method": "GET" }
+      ]
+    }
+  ],
+  "pages": {
+    "overview": {
+      "id": "overview",
+      "title": "Open Catalog — Visão Geral",
+      "description": "O Open Catalog permite que varejistas gerenciem o catálogo de produtos da sua loja no Rappi diretamente via API, sem precisar acessar o painel administrativo.",
+      "sections": [
+        {
+          "type": "cards",
+          "items": [
+            { "icon": "📦", "title": "Produtos",   "text": "Crie, atualize e remova produtos do catálogo da loja na plataforma Rappi." },
+            { "icon": "🏷️", "title": "Categorias", "text": "Organize produtos em categorias para facilitar a navegação dos clientes." },
+            { "icon": "🏪", "title": "Lojas",      "text": "Consulte e gerencie as configurações das lojas vinculadas ao seu parceiro." },
+            { "icon": "📊", "title": "Inventário", "text": "Mantenha estoque e preços atualizados para cada produto em cada loja." }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Base URL",
+          "content": "Todas as requisições da API de Catálogo usam o prefixo:\n\n**Sandbox:** `https://microservices.dev.rappi.com/api/rocket-retailer/v1`\n\n**Produção:** `https://microservices.rappi.com/api/rocket-retailer/v1`"
+        },
+        {
+          "type": "callout",
+          "variant": "warning",
+          "title": "Documentação em construção",
+          "content": "Esta seção está sendo expandida. Consulte o seu Integrations Specialist da Rappi para documentação completa dos endpoints de catálogo."
+        }
+      ]
+    },
+    "autenticacao": {
+      "id": "autenticacao",
+      "title": "Autenticação",
+      "description": "A API Open Catalog usa o mesmo sistema OAuth 2.0 do Open Orders.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Mesmas credenciais",
+          "content": "Use as mesmas credenciais `client_id` e `client_secret` do Open Orders. Consulte a seção **Autenticação** no Open Orders para o processo completo."
+        }
+      ]
+    },
+    "list-products": {
+      "id": "list-products",
+      "title": "Listar Produtos",
+      "method": "GET",
+      "endpoint": "/api/rocket-retailer/v1/restaurants/{store_id}/products",
+      "description": "Retorna todos os produtos cadastrados no catálogo da loja especificada.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Exemplo de Requisição",
+          "lang": "bash",
+          "code": "curl -X GET \\\n  \"https://microservices.rappi.com/api/rocket-retailer/v1/restaurants/store_abc123/products\" \\\n  -H \"Authorization: Bearer {access_token}\""
+        },
+        {
+          "type": "code",
+          "title": "Resposta (200 OK)",
+          "lang": "json",
+          "code": "{\n  \"data\": [\n    {\n      \"id\": \"prod_001\",\n      \"sku\": \"7891000100103\",\n      \"name\": \"Leite Integral 1L\",\n      \"description\": \"Leite integral pasteurizado tipo A\",\n      \"price\": 490,\n      \"category_id\": \"cat_001\",\n      \"available\": true,\n      \"image_url\": \"https://cdn.rappi.com/products/leite.jpg\"\n    }\n  ],\n  \"total\": 1\n}"
+        }
+      ]
+    },
+    "create-product": {
+      "id": "create-product",
+      "title": "Criar Produto",
+      "method": "POST",
+      "endpoint": "/api/rocket-retailer/v1/restaurants/{store_id}/products",
+      "description": "Adiciona um novo produto ao catálogo da loja.",
+      "sections": [
+        {
+          "type": "params",
+          "title": "Body da Requisição",
+          "rows": [
+            { "name": "sku",         "type": "string",  "required": true,  "description": "Código SKU único do produto." },
+            { "name": "name",        "type": "string",  "required": true,  "description": "Nome do produto (máx. 100 caracteres)." },
+            { "name": "description", "type": "string",  "required": false, "description": "Descrição detalhada do produto." },
+            { "name": "price",       "type": "integer", "required": true,  "description": "Preço em centavos." },
+            { "name": "category_id", "type": "string",  "required": true,  "description": "ID da categoria do produto." },
+            { "name": "image_url",   "type": "string",  "required": false, "description": "URL da imagem do produto (HTTPS, mín. 500x500px)." },
+            { "name": "available",   "type": "boolean", "required": false, "description": "Disponibilidade do produto. Padrão: `true`." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Exemplo de Requisição",
+          "lang": "bash",
+          "code": "curl -X POST \\\n  \"https://microservices.rappi.com/api/rocket-retailer/v1/restaurants/store_abc123/products\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"sku\": \"7891000100103\",\n    \"name\": \"Leite Integral 1L\",\n    \"price\": 490,\n    \"category_id\": \"cat_001\",\n    \"available\": true\n  }'"
+        }
+      ]
+    },
+    "update-product": {
+      "id": "update-product",
+      "title": "Atualizar Produto",
+      "method": "PUT",
+      "endpoint": "/api/rocket-retailer/v1/restaurants/{store_id}/products/{product_id}",
+      "description": "Atualiza os dados de um produto existente no catálogo.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Exemplo de Requisição",
+          "lang": "bash",
+          "code": "curl -X PUT \\\n  \"https://microservices.rappi.com/api/rocket-retailer/v1/restaurants/store_abc123/products/prod_001\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"price\": 520, \"available\": false}'"
+        }
+      ]
+    },
+    "delete-product": {
+      "id": "delete-product",
+      "title": "Remover Produto",
+      "method": "DELETE",
+      "endpoint": "/api/rocket-retailer/v1/restaurants/{store_id}/products/{product_id}",
+      "description": "Remove um produto do catálogo da loja.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "danger",
+          "title": "Ação irreversível",
+          "content": "A remoção de um produto é permanente. Considere usar `available: false` para ocultá-lo temporariamente."
+        },
+        {
+          "type": "code",
+          "title": "Exemplo de Requisição",
+          "lang": "bash",
+          "code": "curl -X DELETE \\\n  \"https://microservices.rappi.com/api/rocket-retailer/v1/restaurants/store_abc123/products/prod_001\" \\\n  -H \"Authorization: Bearer {access_token}\""
+        }
+      ]
+    },
+    "list-categories": {
+      "id": "list-categories",
+      "title": "Listar Categorias",
+      "method": "GET",
+      "endpoint": "/api/rocket-retailer/v1/restaurants/{store_id}/categories",
+      "description": "Retorna todas as categorias do catálogo da loja.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Exemplo de Requisição",
+          "lang": "bash",
+          "code": "curl -X GET \\\n  \"https://microservices.rappi.com/api/rocket-retailer/v1/restaurants/store_abc123/categories\" \\\n  -H \"Authorization: Bearer {access_token}\""
+        }
+      ]
+    },
+    "create-category": {
+      "id": "create-category",
+      "title": "Criar Categoria",
+      "method": "POST",
+      "endpoint": "/api/rocket-retailer/v1/restaurants/{store_id}/categories",
+      "description": "Cria uma nova categoria no catálogo da loja.",
+      "sections": [
+        {
+          "type": "params",
+          "title": "Body da Requisição",
+          "rows": [
+            { "name": "name",        "type": "string", "required": true,  "description": "Nome da categoria." },
+            { "name": "description", "type": "string", "required": false, "description": "Descrição da categoria." },
+            { "name": "sort_order",  "type": "integer","required": false, "description": "Posição da categoria na listagem (menor = primeiro)." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Exemplo de Requisição",
+          "lang": "bash",
+          "code": "curl -X POST \\\n  \"https://microservices.rappi.com/api/rocket-retailer/v1/restaurants/store_abc123/categories\" \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"name\": \"Laticínios\", \"sort_order\": 1}'"
+        }
+      ]
+    },
+    "list-stores": {
+      "id": "list-stores",
+      "title": "Listar Lojas",
+      "method": "GET",
+      "endpoint": "/api/rocket-retailer/v1/restaurants",
+      "description": "Retorna todas as lojas vinculadas ao parceiro autenticado.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Exemplo de Requisição",
+          "lang": "bash",
+          "code": "curl -X GET \\\n  \"https://microservices.rappi.com/api/rocket-retailer/v1/restaurants\" \\\n  -H \"Authorization: Bearer {access_token}\""
+        },
+        {
+          "type": "code",
+          "title": "Resposta (200 OK)",
+          "lang": "json",
+          "code": "{\n  \"data\": [\n    {\n      \"id\": \"store_abc123\",\n      \"name\": \"Supermercado Central — Paulista\",\n      \"city\": \"São Paulo\",\n      \"state\": \"SP\",\n      \"status\": \"active\"\n    }\n  ]\n}"
+        }
+      ]
+    }
+  }
+}

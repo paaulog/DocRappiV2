@@ -1,0 +1,65 @@
+{
+  "meta": {
+    "language": "pt",
+    "technology": "loyalty",
+    "title": "Loyalty",
+    "version": "1.0"
+  },
+  "nav": [
+    {
+      "id": "root",
+      "title": "Loyalty",
+      "icon": "⭐",
+      "expanded": true,
+      "items": [
+        { "id": "overview", "title": "Visão geral" },
+        { "id": "guides", "title": "Guias" },
+        { "id": "reference", "title": "Referência" }
+      ]
+    }
+  ],
+  "pages": {
+    "overview": {
+      "id": "overview",
+      "title": "Loyalty — Visão geral",
+      "description": "Programa de fidelidade e benefícios para clientes (conteúdo em expansão).",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Documentação em construção",
+          "content": "Alinhe esta área às páginas **loyalty** da documentação pública Rappi (guia de integração, descontos diferenciados, validação de usuário, etc.)."
+        },
+        {
+          "type": "cards",
+          "items": [
+            { "icon": "🎯", "title": "Casos de uso", "text": "Cadastro de novos usuários, validação e campanhas de fidelidade." },
+            { "icon": "🔗", "title": "Integração", "text": "Combine com Open Catalog e Open Orders quando aplicável." }
+          ]
+        }
+      ]
+    },
+    "guides": {
+      "id": "guides",
+      "title": "Guias",
+      "description": "Trilhas sugeridas de integração.",
+      "sections": [
+        {
+          "type": "text",
+          "content": "Siga o guia oficial de Loyalty para fluxos de pontos, benefícios e regras de negócio aprovadas."
+        }
+      ]
+    },
+    "reference": {
+      "id": "reference",
+      "title": "Referência",
+      "description": "Pontos técnicos.",
+      "sections": [
+        {
+          "type": "text",
+          "content": "Inclua aqui endpoints, erros e exemplos conforme a especificação vigente."
+        }
+      ]
+    }
+  }
+}

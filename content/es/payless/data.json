@@ -1,0 +1,61 @@
+{
+  "meta": {
+    "language": "es",
+    "technology": "payless",
+    "title": "Payless API",
+    "version": "1.0"
+  },
+  "nav": [
+    {
+      "id": "root",
+      "title": "Payless",
+      "icon": "💳",
+      "expanded": true,
+      "items": [
+        { "id": "overview", "title": "Visión general" },
+        { "id": "guides", "title": "Guías y flujos" },
+        { "id": "reference", "title": "Referencia rápida" }
+      ]
+    }
+  ],
+  "pages": {
+    "overview": {
+      "id": "overview",
+      "title": "Payless — Visión general",
+      "description": "Integración de pagos y conciliación (contenido en expansión).",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "En construcción",
+          "content": "Esta sección refleja el área **Payless API** de la documentación pública."
+        }
+      ]
+    },
+    "guides": {
+      "id": "guides",
+      "title": "Guías y flujos",
+      "description": "Orientación de alto nivel.",
+      "sections": [
+        {
+          "type": "steps",
+          "items": [
+            { "title": "Credenciales", "text": "Obtén endpoints y claves con Integrations Specialist." },
+            { "title": "Flujo de autorización", "text": "Implementa captura y confirmación según contrato." }
+          ]
+        }
+      ]
+    },
+    "reference": {
+      "id": "reference",
+      "title": "Referencia rápida",
+      "description": "Consulta técnica.",
+      "sections": [
+        {
+          "type": "text",
+          "content": "Consulta la documentación oficial **Payless API** para endpoints y payloads completos."
+        }
+      ]
+    }
+  }
+}

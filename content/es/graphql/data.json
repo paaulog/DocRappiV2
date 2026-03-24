@@ -1,0 +1,144 @@
+{
+  "meta": { "language": "es", "technology": "graphql", "title": "GraphQL API", "version": "2.0" },
+  "nav": [
+    {
+      "id": "getting-started", "title": "Primeros Pasos", "icon": "🚀", "expanded": true,
+      "items": [
+        { "id": "overview",       "title": "Descripción General" },
+        { "id": "authentication", "title": "Autenticación" }
+      ]
+    },
+    {
+      "id": "queries", "title": "Queries", "icon": "🔍",
+      "items": [
+        { "id": "query-orders", "title": "orders", "method": "GET" },
+        { "id": "query-order",  "title": "order",  "method": "GET" }
+      ]
+    },
+    {
+      "id": "mutations", "title": "Mutations", "icon": "✏️",
+      "items": [
+        { "id": "confirm-order",       "title": "confirmOrder",      "method": "POST" },
+        { "id": "update-order-status", "title": "updateOrderStatus", "method": "PUT" },
+        { "id": "cancel-order",        "title": "cancelOrder",       "method": "DELETE" }
+      ]
+    }
+  ],
+  "pages": {
+    "overview": {
+      "id": "overview",
+      "title": "GraphQL API — Descripción General",
+      "description": "La API GraphQL ofrece una interfaz flexible y tipada para interactuar con la plataforma de pedidos.",
+      "sections": [
+        {
+          "type": "kv",
+          "title": "Endpoint GraphQL",
+          "items": [
+            { "label": "Sandbox",    "value": "https://sandbox-api.example.com/graphql" },
+            { "label": "Producción", "value": "https://api.example.com/graphql" }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Método HTTP",
+          "content": "Todas las operaciones GraphQL usan **POST** con `Content-Type: application/json`."
+        },
+        {
+          "type": "code",
+          "title": "Ejemplo de Solicitud",
+          "lang": "bash",
+          "code": "curl -X POST https://api.example.com/graphql \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"query\": \"{ orders(status: PENDING) { id status } }\"}'"
+        }
+      ]
+    },
+    "authentication": {
+      "id": "authentication",
+      "title": "Autenticación",
+      "description": "La API GraphQL comparte el mismo sistema de autenticación OAuth 2.0 que la REST API.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Mismas Credenciales",
+          "content": "Usa las mismas credenciales `client_id` y `client_secret` de la REST API."
+        }
+      ]
+    },
+    "query-orders": {
+      "id": "query-orders",
+      "title": "Query: orders",
+      "method": "GET",
+      "endpoint": "query { orders }",
+      "description": "Retorna una lista de pedidos con soporte de filtros y paginación.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Query GraphQL",
+          "lang": "javascript",
+          "code": "query GetOrders($status: OrderStatus, $page: Int) {\n  orders(status: $status, page: $page) {\n    data { id status createdAt customer { name } totalAmount }\n    pagination { page totalItems hasNext }\n  }\n}"
+        }
+      ]
+    },
+    "query-order": {
+      "id": "query-order",
+      "title": "Query: order",
+      "method": "GET",
+      "endpoint": "query { order(id: $id) }",
+      "description": "Retorna los detalles completos de un pedido específico.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Query GraphQL",
+          "lang": "javascript",
+          "code": "query GetOrder($id: ID!) {\n  order(id: $id) {\n    id status createdAt\n    customer { name phone }\n    items { id name quantity unitPrice }\n    totalAmount currency\n  }\n}"
+        }
+      ]
+    },
+    "confirm-order": {
+      "id": "confirm-order",
+      "title": "Mutation: confirmOrder",
+      "method": "POST",
+      "endpoint": "mutation { confirmOrder }",
+      "description": "Confirma la recepción de un pedido. Debe llamarse en menos de 5 minutos.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Mutation GraphQL",
+          "lang": "javascript",
+          "code": "mutation ConfirmOrder($id: ID!, $input: ConfirmOrderInput!) {\n  confirmOrder(id: $id, input: $input) {\n    id status estimatedReadyAt\n  }\n}"
+        }
+      ]
+    },
+    "update-order-status": {
+      "id": "update-order-status",
+      "title": "Mutation: updateOrderStatus",
+      "method": "PUT",
+      "endpoint": "mutation { updateOrderStatus }",
+      "description": "Actualiza el estado de un pedido confirmado.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Mutation GraphQL",
+          "lang": "javascript",
+          "code": "mutation UpdateStatus($id: ID!, $input: UpdateStatusInput!) {\n  updateOrderStatus(id: $id, input: $input) {\n    id status updatedAt\n  }\n}"
+        }
+      ]
+    },
+    "cancel-order": {
+      "id": "cancel-order",
+      "title": "Mutation: cancelOrder",
+      "method": "DELETE",
+      "endpoint": "mutation { cancelOrder }",
+      "description": "Cancela un pedido activo.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "Mutation GraphQL",
+          "lang": "javascript",
+          "code": "mutation CancelOrder($id: ID!, $input: CancelOrderInput!) {\n  cancelOrder(id: $id, input: $input) {\n    id status cancelledAt\n  }\n}"
+        }
+      ]
+    }
+  }
+}

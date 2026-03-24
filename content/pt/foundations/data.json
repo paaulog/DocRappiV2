@@ -1,0 +1,167 @@
+{
+  "meta": {
+    "language": "pt",
+    "technology": "foundations",
+    "title": "Fundamentos de Integracao",
+    "version": "1.0"
+  },
+  "nav": [
+    {
+      "id": "base",
+      "title": "Comece aqui",
+      "icon": "🧭",
+      "expanded": true,
+      "items": [
+        { "id": "overview", "title": "Visao Geral" },
+        { "id": "doc-map", "title": "Mapa da Documentacao" }
+      ]
+    },
+    {
+      "id": "core",
+      "title": "Fundamentos tecnicos",
+      "icon": "🔐",
+      "items": [
+        { "id": "authentication", "title": "Autenticacao" },
+        { "id": "environments", "title": "Ambientes e credenciais" },
+        { "id": "errors", "title": "Modelo de erros" }
+      ]
+    },
+    {
+      "id": "recipes",
+      "title": "Receitas de integracao",
+      "icon": "🧪",
+      "items": [
+        { "id": "recipes-overview", "title": "Como usar receitas" },
+        { "id": "recipe-orders", "title": "Receita: fluxo de pedidos" },
+        { "id": "recipe-catalog", "title": "Receita: catalogo e estoque" }
+      ]
+    }
+  ],
+  "pages": {
+    "overview": {
+      "id": "overview",
+      "title": "Fundamentos antes das APIs",
+      "description": "Esta camada organiza o portal antes de entrar em Open Orders, Open Catalog, REST API ou GraphQL API.",
+      "sections": [
+        {
+          "type": "cards",
+          "items": [
+            { "icon": "🏪", "title": "Integracoes de negocio", "text": "Open Orders, Open Catalog e Inventory focam o que seu sistema resolve no negocio." },
+            { "icon": "🔌", "title": "Canais e protocolos", "text": "REST API, GraphQL API e Webhook definem como trafegar dados." },
+            { "icon": "🛡️", "title": "Fundamentos comuns", "text": "Autenticacao, ambientes, erros e padroes sao reaproveitados por toda integracao." }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Estrutura recomendada",
+          "content": "Primeiro entenda **fundamentos**. Depois escolha a **integracao de negocio**. Por fim, implemente via **canal/protocolo** adequado."
+        }
+      ]
+    },
+    "doc-map": {
+      "id": "doc-map",
+      "title": "Mapa da documentacao",
+      "description": "Organizacao para reduzir ambiguidade e acelerar onboarding tecnico.",
+      "sections": [
+        {
+          "type": "steps",
+          "items": [
+            { "title": "Ler fundamentos", "text": "Autenticacao, ambientes e tratamento de erros." },
+            { "title": "Escolher integracao", "text": "Open Orders, Open Catalog ou Inventory conforme objetivo." },
+            { "title": "Definir canal", "text": "REST, GraphQL e/ou Webhook conforme necessidade de consumo." },
+            { "title": "Executar receitas", "text": "Seguir guias orientados por caso real e validar em sandbox." }
+          ]
+        }
+      ]
+    },
+    "authentication": {
+      "id": "authentication",
+      "title": "Autenticacao",
+      "description": "Padrao unico para todas as integracoes da plataforma.",
+      "sections": [
+        {
+          "type": "text",
+          "content": "Utilize credenciais de integracao para obter token e enviar `Authorization: Bearer <token>` nas chamadas protegidas."
+        },
+        {
+          "type": "callout",
+          "variant": "warning",
+          "title": "Boas praticas",
+          "content": "Nunca exponha credenciais no frontend de producao. Renove token antes de expirar e audite falhas de autenticacao."
+        }
+      ]
+    },
+    "environments": {
+      "id": "environments",
+      "title": "Ambientes e credenciais",
+      "description": "Use sandbox para testes e promova para producao apos homologacao.",
+      "sections": [
+        {
+          "type": "kv",
+          "items": [
+            { "label": "Sandbox", "value": "Teste funcional e validacao de fluxo" },
+            { "label": "Producao", "value": "Operacao real com monitoramento" }
+          ]
+        }
+      ]
+    },
+    "errors": {
+      "id": "errors",
+      "title": "Modelo de erros",
+      "description": "Padrao transversal para observabilidade e retry.",
+      "sections": [
+        {
+          "type": "errors",
+          "rows": [
+            { "code": 400, "status": "Bad Request", "description": "Payload invalido ou inconsistente." },
+            { "code": 401, "status": "Unauthorized", "description": "Token ausente, invalido ou expirado." },
+            { "code": 429, "status": "Too Many Requests", "description": "Limite de taxa excedido." },
+            { "code": 500, "status": "Server Error", "description": "Falha interna; aplicar retry com backoff." }
+          ]
+        }
+      ]
+    },
+    "recipes-overview": {
+      "id": "recipes-overview",
+      "title": "Como usar receitas",
+      "description": "Receitas conectam negocio + canal + endpoint em um fluxo simples.",
+      "sections": [
+        {
+          "type": "text",
+          "content": "Cada receita orienta o fluxo ponta a ponta: contexto, pre-requisitos, chamadas, validacao e tratamento de erros."
+        }
+      ]
+    },
+    "recipe-orders": {
+      "id": "recipe-orders",
+      "title": "Receita: fluxo de pedidos",
+      "description": "Exemplo de trilha para Open Orders com eventos e confirmacoes.",
+      "sections": [
+        {
+          "type": "steps",
+          "items": [
+            { "title": "Receber pedido", "text": "Via webhook ou polling, conforme o setup escolhido." },
+            { "title": "Confirmar recebimento", "text": "Responder no endpoint de ack dentro da janela esperada." },
+            { "title": "Atualizar status", "text": "Publicar eventos de preparo, separacao e conclusao." }
+          ]
+        }
+      ]
+    },
+    "recipe-catalog": {
+      "id": "recipe-catalog",
+      "title": "Receita: catalogo e estoque",
+      "description": "Fluxo pratico para sincronizar produtos, preco e disponibilidade.",
+      "sections": [
+        {
+          "type": "steps",
+          "items": [
+            { "title": "Carga inicial", "text": "Publicar estrutura base de categorias e produtos." },
+            { "title": "Sincronizacao incremental", "text": "Atualizar preco e estoque com frequencia definida." },
+            { "title": "Monitorar rejeicoes", "text": "Tratar erros de validacao e inconsistencias de SKU." }
+          ]
+        }
+      ]
+    }
+  }
+}

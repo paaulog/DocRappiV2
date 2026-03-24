@@ -1,0 +1,165 @@
+{
+  "meta": { "language": "en", "technology": "graphql", "title": "GraphQL API", "version": "2.0" },
+  "nav": [
+    {
+      "id": "getting-started", "title": "Getting Started", "icon": "🚀", "expanded": true,
+      "items": [
+        { "id": "overview", "title": "Overview" },
+        { "id": "authentication", "title": "Authentication" }
+      ]
+    },
+    {
+      "id": "queries", "title": "Queries", "icon": "🔍",
+      "items": [
+        { "id": "query-orders", "title": "orders", "method": "GET" },
+        { "id": "query-order",  "title": "order",  "method": "GET" }
+      ]
+    },
+    {
+      "id": "mutations", "title": "Mutations", "icon": "✏️",
+      "items": [
+        { "id": "confirm-order",       "title": "confirmOrder",      "method": "POST" },
+        { "id": "update-order-status", "title": "updateOrderStatus", "method": "PUT" },
+        { "id": "cancel-order",        "title": "cancelOrder",       "method": "DELETE" }
+      ]
+    }
+  ],
+  "pages": {
+    "overview": {
+      "id": "overview",
+      "title": "GraphQL API Overview",
+      "description": "The GraphQL API provides a flexible, typed interface for interacting with the orders platform.",
+      "sections": [
+        {
+          "type": "kv",
+          "title": "GraphQL Endpoint",
+          "items": [
+            { "label": "Sandbox",    "value": "https://sandbox-api.example.com/graphql" },
+            { "label": "Production", "value": "https://api.example.com/graphql" }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "HTTP Method",
+          "content": "All GraphQL operations use **POST** with `Content-Type: application/json`. The request body must contain `query` (string), `variables` (object, optional) and `operationName` (string, optional)."
+        },
+        {
+          "type": "cards",
+          "items": [
+            { "icon": "🎯", "title": "No Over-fetching", "text": "Request exactly the fields you need, nothing more." },
+            { "icon": "🔗", "title": "Typed Schema",     "text": "SDL schema with well-defined and documented types." },
+            { "icon": "🔔", "title": "Subscriptions",    "text": "Real-time updates via WebSocket for order events." },
+            { "icon": "🧩", "title": "Introspection",    "text": "Explore the full schema via introspection in the Playground." }
+          ]
+        },
+        {
+          "type": "code",
+          "title": "Request Example",
+          "lang": "bash",
+          "code": "curl -X POST https://api.example.com/graphql \\\n  -H \"Authorization: Bearer {access_token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"query\": \"{ orders(status: PENDING) { id status customer { name } } }\"}'"
+        }
+      ]
+    },
+    "authentication": {
+      "id": "authentication",
+      "title": "Authentication",
+      "description": "The GraphQL API shares the same OAuth 2.0 authentication system as the REST API.",
+      "sections": [
+        {
+          "type": "callout",
+          "variant": "info",
+          "title": "Same Credentials",
+          "content": "Use the same `client_id` and `client_secret` as the REST API. See the **Authentication** section in the REST docs for the complete token flow."
+        }
+      ]
+    },
+    "query-orders": {
+      "id": "query-orders",
+      "title": "Query: orders",
+      "method": "GET",
+      "endpoint": "query { orders }",
+      "description": "Returns a list of orders with support for filters and pagination.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "GraphQL Query",
+          "lang": "javascript",
+          "code": "query GetOrders($status: OrderStatus, $page: Int, $pageSize: Int) {\n  orders(status: $status, page: $page, pageSize: $pageSize) {\n    data {\n      id status createdAt\n      customer { name phone }\n      items { id name quantity unitPrice }\n      totalAmount currency\n    }\n    pagination { page pageSize totalItems hasNext }\n  }\n}"
+        },
+        {
+          "type": "code",
+          "title": "Variables",
+          "lang": "json",
+          "code": "{\n  \"status\": \"PENDING\",\n  \"page\": 1,\n  \"pageSize\": 20\n}"
+        }
+      ]
+    },
+    "query-order": {
+      "id": "query-order",
+      "title": "Query: order",
+      "method": "GET",
+      "endpoint": "query { order(id: $id) }",
+      "description": "Returns the complete details of a specific order by ID.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "GraphQL Query",
+          "lang": "javascript",
+          "code": "query GetOrder($id: ID!) {\n  order(id: $id) {\n    id status createdAt updatedAt\n    customer { name phone }\n    items { id name quantity unitPrice totalPrice notes }\n    totalAmount currency\n    payment { method status brand }\n    deliveryAddress { street number city state zipcode }\n    statusHistory { status timestamp }\n  }\n}"
+        }
+      ]
+    },
+    "confirm-order": {
+      "id": "confirm-order",
+      "title": "Mutation: confirmOrder",
+      "method": "POST",
+      "endpoint": "mutation { confirmOrder }",
+      "description": "Confirms receipt of an order. Must be called within 5 minutes.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "GraphQL Mutation",
+          "lang": "javascript",
+          "code": "mutation ConfirmOrder($id: ID!, $input: ConfirmOrderInput!) {\n  confirmOrder(id: $id, input: $input) {\n    id status estimatedReadyAt confirmedAt\n  }\n}"
+        },
+        {
+          "type": "code",
+          "title": "Variables",
+          "lang": "json",
+          "code": "{\n  \"id\": \"ord_9f3a2b1c\",\n  \"input\": { \"estimatedTime\": 25 }\n}"
+        }
+      ]
+    },
+    "update-order-status": {
+      "id": "update-order-status",
+      "title": "Mutation: updateOrderStatus",
+      "method": "PUT",
+      "endpoint": "mutation { updateOrderStatus }",
+      "description": "Updates the status of a confirmed order.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "GraphQL Mutation",
+          "lang": "javascript",
+          "code": "mutation UpdateOrderStatus($id: ID!, $input: UpdateStatusInput!) {\n  updateOrderStatus(id: $id, input: $input) {\n    id status previousStatus updatedAt\n  }\n}"
+        }
+      ]
+    },
+    "cancel-order": {
+      "id": "cancel-order",
+      "title": "Mutation: cancelOrder",
+      "method": "DELETE",
+      "endpoint": "mutation { cancelOrder }",
+      "description": "Cancels an active order.",
+      "sections": [
+        {
+          "type": "code",
+          "title": "GraphQL Mutation",
+          "lang": "javascript",
+          "code": "mutation CancelOrder($id: ID!, $input: CancelOrderInput!) {\n  cancelOrder(id: $id, input: $input) {\n    id status cancelledAt cancellationReason\n    refund { status amount estimatedDate }\n  }\n}"
+        }
+      ]
+    }
+  }
+}
