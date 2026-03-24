@@ -1,7 +1,7 @@
 export const TECHNOLOGIES = [
   { id: 'foundations', label: 'Fundamentos', description: 'Introdução e padrões comuns', defaultPage: 'overview', category: 'foundations' },
 
-  { id: 'orders', label: 'Open Orders', description: 'Pedidos e ciclo de vida', defaultPage: 'intro', category: 'integrations' },
+  { id: 'orders', label: 'Open Orders', description: 'Pedidos e ciclo de vida', defaultPage: 'guide-open-orders', category: 'integrations' },
   { id: 'catalog', label: 'Open Catalog', description: 'Catálogo e produtos', defaultPage: 'overview', category: 'integrations' },
   { id: 'inventory', label: 'Inventory', description: 'Estoque e disponibilidade', defaultPage: 'overview', category: 'integrations' },
   { id: 'payless', label: 'Payless', description: 'Pagamentos e conciliação', defaultPage: 'overview', category: 'integrations' },

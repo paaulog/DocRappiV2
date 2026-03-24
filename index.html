@@ -132,10 +132,10 @@
       </div>
 
       <div id="editor-login-view" class="editor-section">
-        <p class="editor-help">Acesso rápido para edição local no navegador.</p>
+        <p class="editor-help">Acesso protegido para editar conteúdo compartilhado (Supabase).</p>
         <div class="editor-grid">
-          <label>Usuário<input id="editor-username" value="admin"></label>
-          <label>Senha<input id="editor-password" type="password" value="rappi123"></label>
+          <label>Email<input id="editor-username" type="email" placeholder="editor@empresa.com"></label>
+          <label>Senha<input id="editor-password" type="password" placeholder="••••••••"></label>
         </div>
         <div class="editor-actions">
           <button id="editor-login-btn" class="editor-primary-btn">Entrar</button>
@@ -144,10 +144,27 @@
       </div>
 
       <div id="editor-content-view" class="editor-section" style="display:none">
-        <p class="editor-help">Edição local para a tecnologia e idioma atuais. Salve, exporte ou importe um JSON.</p>
-        <textarea id="editor-json-input" spellcheck="false"></textarea>
+        <p class="editor-help">Edição local orientada por formulário para manter a documentação sem depender de JSON bruto.</p>
+        <div class="editor-grid">
+          <label>Página
+            <select id="editor-page-select"></select>
+          </label>
+          <label>Título da página
+            <input id="editor-page-title" type="text">
+          </label>
+        </div>
+        <div class="editor-grid editor-grid-single">
+          <label>Descrição da página
+            <textarea id="editor-page-description" rows="3"></textarea>
+          </label>
+        </div>
+        <div id="editor-sections-form" class="editor-sections-form"></div>
+        <details class="editor-advanced">
+          <summary>Modo avançado (JSON)</summary>
+          <textarea id="editor-json-input" spellcheck="false"></textarea>
+        </details>
         <div class="editor-actions">
-          <button id="editor-save-btn" class="editor-primary-btn">Salvar local</button>
+          <button id="editor-save-btn" class="editor-primary-btn">Salvar para todos</button>
           <button id="editor-export-btn">Exportar JSON</button>
           <label class="editor-import-label">
             Importar JSON
@@ -160,6 +177,13 @@
     </div>
   </div>
 
+  <script>
+    // Preencha com as credenciais públicas do projeto Supabase.
+    window.__APP_CONFIG = {
+      SUPABASE_URL: 'https://lpryfwivsgrzyeledslf.supabase.co',
+      SUPABASE_ANON_KEY: 'sb_publishable_GhfinQjiTHUktto8TuWA3Q_0LoCNMSH',
+    };
+  </script>
   <script type="module" src="js/app.js"></script>
 </body>
 </html>

@@ -2,6 +2,8 @@
  * content-loader.js — Fetches and caches JSON content files
  */
 
+import { fetchRemoteContent, isSupabaseConfigured } from './supabase-client.js';
+
 const cache = new Map();
 const OVERRIDE_PREFIX = 'docs_override_';
 
@@ -19,13 +21,24 @@ export async function loadContent(language, technology) {
   if (cache.has(key)) return cache.get(key);
 
   try {
-    const localOverride = localStorage.getItem(getOverrideKey(language, technology));
-    if (localOverride) {
-      const parsedOverride = JSON.parse(localOverride);
-      cache.set(key, parsedOverride);
-      return parsedOverride;
+    // 1) Shared source of truth (Supabase), when configured
+    if (isSupabaseConfigured()) {
+      const remote = await fetchRemoteContent(language, technology);
+      if (remote) {
+        cache.set(key, remote);
+        return remote;
+      }
     }
 
+    // 2) Local override fallback (useful for local drafts/offline mode)
+    const localOverride = localStorage.getItem(getOverrideKey(language, technology));
+    if (localOverride) {
+      const parsed = JSON.parse(localOverride);
+      cache.set(key, parsed);
+      return parsed;
+    }
+
+    // 3) Static repository content
     const url = `content/${language}/${technology}/data.json`;
     const res = await fetch(url);
 

@@ -7,118 +7,84 @@
   },
   "nav": [
     {
-      "id": "introduction",
-      "title": "Introduction",
-      "icon": "🏠",
+      "id": "guide",
+      "title": "Guide",
+      "icon": "📘",
       "expanded": true,
       "items": [
-        { "id": "intro",             "title": "Integrations Overview" },
-        { "id": "open-orders-intro", "title": "What is Open Orders?" },
-        { "id": "modos-operacao",    "title": "Modes of Operation" },
-        { "id": "autenticacao",      "title": "Authentication" }
+        { "id": "guide-open-orders", "title": "Business context and usage" }
       ]
     },
     {
-      "id": "order-lifecycle",
-      "title": "Order Lifecycle",
-      "icon": "🔄",
-      "items": [
-        { "id": "lifecycle",         "title": "Understanding the Lifecycle" },
-        { "id": "status-pedido",     "title": "Order Status" },
-        { "id": "eventos-rappi",     "title": "Rappi Events" },
-        { "id": "eventos-varejista", "title": "Retailer Events" }
-      ]
-    },
-    {
-      "id": "lite-full",
-      "title": "Orders Lite & Full",
-      "icon": "⚖️",
+      "id": "endpoints",
+      "title": "Endpoints",
+      "icon": "🧩",
       "expanded": true,
       "items": [
-        { "id": "modos-operacao", "title": "Compare modes" },
-        { "id": "lite-fluxo", "title": "Orders Lite — flow" },
-        { "id": "full-fluxo", "title": "Orders Full — flow" }
-      ]
-    },
-    {
-      "id": "data-ingestion",
-      "title": "Receiving data",
-      "icon": "📡",
-      "expanded": true,
-      "items": [
-        { "id": "recebimento-visao-geral", "title": "Webhook, polling & mode (Lite/Full)" },
-        { "id": "via-webhook",        "title": "Via Webhook" },
-        { "id": "via-polling",        "title": "Via Polling",         "method": "GET" },
-        { "id": "acusar-recebimento", "title": "Acknowledge Order",   "method": "POST" }
-      ]
-    },
-    {
-      "id": "retailer-actions",
-      "title": "Retailer Actions",
-      "icon": "🏪",
-      "items": [
-        { "id": "iniciar-separacao", "title": "Start Picking",       "method": "POST" },
-        { "id": "informar-invoice",  "title": "Report Invoice",      "method": "POST" },
-        { "id": "solicitar-courier", "title": "Request Courier",     "method": "POST" },
-        { "id": "cancelamento",      "title": "Cancel Order",        "method": "POST" }
-      ]
-    },
-    {
-      "id": "reference",
-      "title": "Reference",
-      "icon": "📖",
-      "items": [
-        { "id": "substituicoes", "title": "Item Substitutions" },
-        { "id": "erros",         "title": "Error Codes" }
+        { "id": "endpoints-overview", "title": "Endpoint map and recipes" },
+        { "id": "via-webhook", "title": "Via Webhook" },
+        { "id": "via-polling", "title": "Via Polling", "method": "GET" },
+        { "id": "acusar-recebimento", "title": "Acknowledge Order", "method": "POST" },
+        { "id": "iniciar-separacao", "title": "Start Picking", "method": "POST" },
+        { "id": "informar-invoice", "title": "Report Invoice", "method": "POST" },
+        { "id": "solicitar-courier", "title": "Request Courier", "method": "POST" },
+        { "id": "cancelamento", "title": "Cancel Order", "method": "POST" }
       ]
     }
   ],
   "pages": {
 
-    "intro": {
-      "id": "intro",
-      "title": "Welcome to Rappi Open APIs",
-      "description": "Official documentation for Rappi ecosystem integrators. Everything you need to connect your management system to the Rappi platform.",
+    "guide-open-orders": {
+      "id": "guide-open-orders",
+      "title": "Guide — Open Orders",
+      "description": "Simplified view of business context, endpoint usage, and payment-lifecycle dependencies.",
       "sections": [
         {
-          "type": "cards",
-          "items": [
-            {
-              "icon": "📦",
-              "title": "Open Orders",
-              "text": "Receive and manage orders placed by customers on the Rappi platform using your own picking and logistics infrastructure."
-            },
-            {
-              "icon": "🗂️",
-              "title": "Open Catalog",
-              "text": "Manage your store's product catalog on Rappi — create, update, and organize products and categories."
-            },
-            {
-              "icon": "📊",
-              "title": "Inventory Integration",
-              "text": "Automatically sync stock and prices between your ERP/WMS and the Rappi catalog."
-            }
-          ]
+          "type": "text",
+          "title": "Business context",
+          "content": "Open Orders is designed for partners that need operational ownership of order fulfillment while maintaining event consistency with the platform."
         },
         {
-          "type": "text",
-          "title": "How to Use this Documentation",
-          "content": "The documentation is organized into two complementary areas:\n\n**Guides** — Narrative content covering complete integration cycles with examples and practical use cases. Ideal for understanding **how** to implement.\n\n**API Reference** — Direct technical specifications: endpoints, methods, parameters, and request/response formats. Ideal for reference during development."
+          "type": "cards",
+          "title": "When to use Open Orders endpoints",
+          "items": [
+            { "icon": "📥", "title": "Order intake", "text": "Use webhook/polling + acknowledge to guarantee reliable ingestion." },
+            { "icon": "🏪", "title": "Operational flow", "text": "Use picking/invoice/courier endpoints when retailer-driven events are required." },
+            { "icon": "🚫", "title": "Exception handling", "text": "Use cancellation/substitutions with traceability and idempotency." }
+          ]
         },
         {
           "type": "callout",
           "variant": "info",
-          "title": "Mandatory prerequisite",
-          "content": "To use **Open Orders**, your store must already have a functional **Inventory Integration** with Rappi. This ensures stock displayed on the platform reflects store reality."
+          "title": "Payment lifecycle dependency",
+          "content": "Order state transitions must stay consistent with payment/fiscal lifecycle checkpoints to avoid reconciliation drift."
         },
         {
           "type": "steps",
-          "title": "Recommended Integration Journey",
+          "title": "Recommended sequence",
           "items": [
-            { "title": "Inventory Integration", "text": "Set up stock and price synchronization via SFTP or API before any other integration." },
-            { "title": "Authentication",         "text": "Get your partner credentials and configure the OAuth 2.0 flow to authenticate API calls." },
-            { "title": "Open Orders",            "text": "Implement order reception via webhook or polling and configure lifecycle events." },
-            { "title": "Open Catalog (optional)","text": "Centralize catalog management directly from your system, without accessing the Rappi dashboard." }
+            { "title": "Ingest", "text": "Webhook/Polling + immediate acknowledge." },
+            { "title": "Process", "text": "Picking/invoice updates per operation model." },
+            { "title": "Dispatch", "text": "Request courier and follow delivery events." },
+            { "title": "Close loop", "text": "Handle errors/cancellations with idempotent logs." }
+          ]
+        }
+      ]
+    },
+    "endpoints-overview": {
+      "id": "endpoints-overview",
+      "title": "Endpoints — recipes and examples",
+      "description": "Quick map across request recipes, response examples, and copyable snippets.",
+      "sections": [
+        {
+          "type": "errors",
+          "rows": [
+            { "code": "POST", "status": "/orders/{id}/acknowledge", "description": "Acknowledge order intake." },
+            { "code": "POST", "status": "/orders/{id}/start-picking", "description": "Start picking (Full)." },
+            { "code": "POST", "status": "/orders/{id}/invoice", "description": "Report invoice/final basket." },
+            { "code": "POST", "status": "/orders/{id}/request-courier", "description": "Request courier dispatch." },
+            { "code": "POST", "status": "/orders/{id}/cancel", "description": "Cancel eligible order." },
+            { "code": "GET", "status": "/orders", "description": "Polling for orders/events." }
           ]
         }
       ]

@@ -289,17 +289,12 @@ img { max-width: 100%; }
 }
 
 .tech-nav-dropdown {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 100%;
-  z-index: 400;
-  max-height: min(70vh, 420px);
-  overflow-y: auto;
+  position: static;
+  z-index: 1;
   background: #FFFFFF;
-  border: 1px solid #E5E7EB;
-  border-radius: 0 0 10px 10px;
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+  border-top: 1px solid #E5E7EB;
+  border-radius: 0;
+  box-shadow: none;
 }
 .tech-nav-dropdown-inner {
   padding: 8px 0 10px;
@@ -1152,9 +1147,59 @@ body.sidebar-dropdown-nav #nav-tree {
   padding: 8px 10px;
   font-size: 13px;
 }
+.editor-grid select,
+.editor-grid textarea {
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: var(--font);
+}
+.editor-grid-single {
+  grid-template-columns: 1fr;
+}
+.editor-sections-form {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.editor-section-card {
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #FCFCFD;
+}
+.editor-section-card-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6B7280;
+}
+.editor-section-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: #6B7280;
+}
+.editor-advanced {
+  margin-top: 12px;
+  border: 1px dashed #E5E7EB;
+  border-radius: 12px;
+  padding: 8px 10px 10px;
+}
+.editor-advanced summary {
+  cursor: pointer;
+  font-size: 12px;
+  color: #6B7280;
+  font-weight: 600;
+}
 #editor-json-input {
   width: 100%;
-  min-height: 360px;
+  min-height: 220px;
   border: 1px solid #E5E7EB;
   border-radius: 12px;
   padding: 12px;
@@ -1442,6 +1487,17 @@ body.theme-dark .editor-modal {
 body.theme-dark .editor-panel {
   background: #0F1117;
   border-color: rgba(255,255,255,0.08);
+}
+body.theme-dark .editor-section-card,
+body.theme-dark .editor-advanced {
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.12);
+}
+body.theme-dark .editor-grid select,
+body.theme-dark .editor-grid textarea {
+  background: #0F1117;
+  color: #E5E7EB;
+  border-color: rgba(255,255,255,0.10);
 }
 
 body.theme-dark .theme-btn {

@@ -7,54 +7,193 @@
   },
   "nav": [
     {
-      "id": "root",
-      "title": "Payless",
-      "icon": "💳",
+      "id": "overview-architecture",
+      "title": "Overview & Integration Architecture",
+      "icon": "🧭",
       "expanded": true,
       "items": [
-        { "id": "overview", "title": "Visión general" },
-        { "id": "guides", "title": "Guías y flujos" },
-        { "id": "reference", "title": "Referencia rápida" }
+        { "id": "overview", "title": "Contexto y arquitectura" }
+      ]
+    },
+    {
+      "id": "environment-setup",
+      "title": "Environment Setup",
+      "icon": "🛠️",
+      "items": [
+        { "id": "environment-setup", "title": "Sandbox y credenciales" }
+      ]
+    },
+    {
+      "id": "auth-validation",
+      "title": "Authentication & Validation",
+      "icon": "🔐",
+      "items": [
+        { "id": "authentication-validation", "title": "Autenticación y validación" },
+        { "id": "endpoint-validate-payment", "title": "Endpoint: validar pago", "method": "POST" }
+      ]
+    },
+    {
+      "id": "payment-flow",
+      "title": "Payment Flow",
+      "icon": "💸",
+      "items": [
+        { "id": "payment-flow", "title": "Flujo principal de pago" },
+        { "id": "endpoint-authorize-payment", "title": "Endpoint: autorizar pago", "method": "POST" }
+      ]
+    },
+    {
+      "id": "transaction-management",
+      "title": "Transaction Management",
+      "icon": "🧾",
+      "items": [
+        { "id": "transaction-management", "title": "Cancelaciones y refunds" },
+        { "id": "endpoint-cancel-transaction", "title": "Endpoint: cancelar transacción", "method": "POST" },
+        { "id": "endpoint-refund-transaction", "title": "Endpoint: refund", "method": "POST" }
+      ]
+    },
+    {
+      "id": "monitoring-health",
+      "title": "System Monitoring & Health",
+      "icon": "📈",
+      "items": [
+        { "id": "system-monitoring-health", "title": "Monitoreo y salud del sistema" },
+        { "id": "endpoint-heartbeat", "title": "Endpoint: heartbeat", "method": "GET" }
       ]
     }
   ],
   "pages": {
     "overview": {
       "id": "overview",
-      "title": "Payless — Visión general",
-      "description": "Integración de pagos y conciliación (contenido en expansión).",
+      "title": "Payless — Arquitectura de integración",
+      "description": "Estructura orientada al journey de integración.",
       "sections": [
         {
-          "type": "callout",
-          "variant": "info",
-          "title": "En construcción",
-          "content": "Esta sección refleja el área **Payless API** de la documentación pública."
-        }
-      ]
-    },
-    "guides": {
-      "id": "guides",
-      "title": "Guías y flujos",
-      "description": "Orientación de alto nivel.",
-      "sections": [
-        {
-          "type": "steps",
+          "type": "cards",
           "items": [
-            { "title": "Credenciales", "text": "Obtén endpoints y claves con Integrations Specialist." },
-            { "title": "Flujo de autorización", "text": "Implementa captura y confirmación según contrato." }
+            { "icon": "1️⃣", "title": "Setup", "text": "Preparar entorno y credenciales." },
+            { "icon": "2️⃣", "title": "Auth/Validation", "text": "Validar transacción antes de cobrar." },
+            { "icon": "3️⃣", "title": "Payment Flow", "text": "Autorizar y persistir estado." },
+            { "icon": "4️⃣", "title": "Transaction Mgmt", "text": "Cancelar o reembolsar con trazabilidad." },
+            { "icon": "5️⃣", "title": "Monitoring", "text": "Verificar salud y disponibilidad." }
           ]
         }
       ]
     },
-    "reference": {
-      "id": "reference",
-      "title": "Referencia rápida",
-      "description": "Consulta técnica.",
+    "environment-setup": {
+      "id": "environment-setup",
+      "title": "Environment Setup",
+      "sections": [
+        { "type": "text", "content": "Configura sandbox, credenciales y callbacks antes del flujo de pago." }
+      ]
+    },
+    "authentication-validation": {
+      "id": "authentication-validation",
+      "title": "Authentication & Validation",
+      "sections": [
+        { "type": "text", "content": "Valida requisitos y autenticación antes de autorizar pagos." }
+      ]
+    },
+    "payment-flow": {
+      "id": "payment-flow",
+      "title": "Payment Flow",
       "sections": [
         {
-          "type": "text",
-          "content": "Consulta la documentación oficial **Payless API** para endpoints y payloads completos."
+          "type": "steps",
+          "items": [
+            { "title": "Validar", "text": "Verifica elegibilidad." },
+            { "title": "Autorizar", "text": "Ejecuta endpoint de autorización." },
+            { "title": "Persistir", "text": "Guarda estado y referencias." }
+          ]
         }
+      ]
+    },
+    "transaction-management": {
+      "id": "transaction-management",
+      "title": "Transaction Management",
+      "sections": [
+        { "type": "text", "content": "Gestiona cancelaciones y refunds con idempotencia." }
+      ]
+    },
+    "system-monitoring-health": {
+      "id": "system-monitoring-health",
+      "title": "System Monitoring & Health",
+      "sections": [
+        { "type": "text", "content": "Monitorea heartbeat, errores y latencia." }
+      ]
+    },
+    "endpoint-authorize-payment": {
+      "id": "endpoint-authorize-payment",
+      "title": "Endpoint: autorizar pago",
+      "method": "POST",
+      "endpoint": "/payless/v1/payments/authorize",
+      "sections": [
+        { "type": "text", "title": "Explicación de negocio", "content": "Autoriza la transacción para continuar el flujo." },
+        { "type": "kv", "title": "Posición del flujo", "items": [ { "label": "Fase", "value": "Payment Flow" } ] },
+        { "type": "callout", "variant": "warning", "title": "Precondiciones", "content": "Token válido y transaction_id idempotente." },
+        { "type": "code", "title": "Request example", "lang": "json", "code": "{\n  \"transaction_id\": \"txn_100200\",\n  \"amount\": 12590,\n  \"currency\": \"BRL\"\n}" },
+        { "type": "code", "title": "Response example", "lang": "json", "code": "{ \"status\": \"AUTHORIZED\" }" },
+        { "type": "errors", "title": "Errores", "rows": [ { "code": 400, "status": "Bad Request", "description": "Payload inválido." } ] },
+        { "type": "code", "title": "Snippet", "lang": "bash", "code": "curl -X POST https://api.example.com/payless/v1/payments/authorize" }
+      ]
+    },
+    "endpoint-validate-payment": {
+      "id": "endpoint-validate-payment",
+      "title": "Endpoint: validar pago",
+      "method": "POST",
+      "endpoint": "/payless/v1/payments/validate",
+      "sections": [
+        { "type": "text", "title": "Explicación de negocio", "content": "Reduce errores validando antes de autorizar." },
+        { "type": "kv", "title": "Posición del flujo", "items": [ { "label": "Fase", "value": "Authentication & Validation" } ] },
+        { "type": "callout", "variant": "warning", "title": "Precondiciones", "content": "Token y campos requeridos." },
+        { "type": "code", "title": "Request example", "lang": "json", "code": "{ \"transaction_id\": \"txn_100200\" }" },
+        { "type": "code", "title": "Response example", "lang": "json", "code": "{ \"valid\": true }" },
+        { "type": "errors", "title": "Errores", "rows": [ { "code": 409, "status": "Conflict", "description": "Duplicado." } ] },
+        { "type": "code", "title": "Snippet", "lang": "javascript", "code": "await fetch('/payless/v1/payments/validate', { method: 'POST' })" }
+      ]
+    },
+    "endpoint-cancel-transaction": {
+      "id": "endpoint-cancel-transaction",
+      "title": "Endpoint: cancelar transacción",
+      "method": "POST",
+      "endpoint": "/payless/v1/transactions/{id}/cancel",
+      "sections": [
+        { "type": "text", "title": "Explicación de negocio", "content": "Revierte transacciones elegibles." },
+        { "type": "kv", "title": "Posición del flujo", "items": [ { "label": "Fase", "value": "Transaction Management" } ] },
+        { "type": "callout", "variant": "warning", "title": "Precondiciones", "content": "Estado válido para cancelación." },
+        { "type": "code", "title": "Request example", "lang": "json", "code": "{ \"reason\": \"ORDER_ABORTED\" }" },
+        { "type": "code", "title": "Response example", "lang": "json", "code": "{ \"status\": \"CANCELED\" }" },
+        { "type": "errors", "title": "Errores", "rows": [ { "code": 422, "status": "Unprocessable Entity", "description": "Estado inválido." } ] },
+        { "type": "code", "title": "Snippet", "lang": "python", "code": "requests.post(url, json={\"reason\":\"ORDER_ABORTED\"})" }
+      ]
+    },
+    "endpoint-refund-transaction": {
+      "id": "endpoint-refund-transaction",
+      "title": "Endpoint: refund",
+      "method": "POST",
+      "endpoint": "/payless/v1/transactions/{id}/refund",
+      "sections": [
+        { "type": "text", "title": "Explicación de negocio", "content": "Aplica estorno de transacción liquidada." },
+        { "type": "kv", "title": "Posición del flujo", "items": [ { "label": "Fase", "value": "Transaction Management" } ] },
+        { "type": "callout", "variant": "warning", "title": "Precondiciones", "content": "Monto y razón válidos." },
+        { "type": "code", "title": "Request example", "lang": "json", "code": "{ \"amount\": 5000 }" },
+        { "type": "code", "title": "Response example", "lang": "json", "code": "{ \"refund_status\": \"PROCESSING\" }" },
+        { "type": "errors", "title": "Errores", "rows": [ { "code": 409, "status": "Conflict", "description": "Refund duplicado." } ] },
+        { "type": "code", "title": "Snippet", "lang": "bash", "code": "curl -X POST https://api.example.com/payless/v1/transactions/{id}/refund" }
+      ]
+    },
+    "endpoint-heartbeat": {
+      "id": "endpoint-heartbeat",
+      "title": "Endpoint: heartbeat",
+      "method": "GET",
+      "endpoint": "/payless/v1/heartbeat",
+      "sections": [
+        { "type": "text", "title": "Explicación de negocio", "content": "Verifica disponibilidad del servicio." },
+        { "type": "kv", "title": "Posición del flujo", "items": [ { "label": "Fase", "value": "System Monitoring & Health" } ] },
+        { "type": "callout", "variant": "info", "title": "Precondiciones", "content": "Ejecutar chequeos periódicos con alertas." },
+        { "type": "code", "title": "Request example", "lang": "http", "code": "GET /payless/v1/heartbeat HTTP/1.1" },
+        { "type": "code", "title": "Response example", "lang": "json", "code": "{ \"status\": \"UP\" }" },
+        { "type": "errors", "title": "Errores", "rows": [ { "code": 503, "status": "Service Unavailable", "description": "Dependencia caída." } ] },
+        { "type": "code", "title": "Snippet", "lang": "bash", "code": "curl -fsS https://api.example.com/payless/v1/heartbeat" }
       ]
     }
   }

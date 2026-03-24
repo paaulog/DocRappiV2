@@ -7,119 +7,104 @@
   },
   "nav": [
     {
-      "id": "introducao",
-      "title": "Introdução",
-      "icon": "🏠",
+      "id": "guide",
+      "title": "Guide",
+      "icon": "📘",
       "expanded": true,
       "items": [
-        { "id": "intro",             "title": "Visão Geral das Integrações" },
-        { "id": "open-orders-intro", "title": "O que é Open Orders?" },
-        { "id": "modos-operacao",    "title": "Modos de Operação" },
-        { "id": "autenticacao",      "title": "Autenticação" }
+        { "id": "guide-open-orders", "title": "Contexto, uso e dependências" }
       ]
     },
     {
-      "id": "ciclo-pedido",
-      "title": "Ciclo de Vida do Pedido",
-      "icon": "🔄",
-      "items": [
-        { "id": "lifecycle",          "title": "Entendendo o Ciclo de Vida" },
-        { "id": "status-pedido",      "title": "Status do Pedido" },
-        { "id": "eventos-rappi",      "title": "Eventos Rappi" },
-        { "id": "eventos-varejista",  "title": "Eventos do Varejista" }
-      ]
-    },
-    {
-      "id": "lite-full",
-      "title": "Orders Lite e Full",
-      "icon": "⚖️",
+      "id": "endpoints",
+      "title": "Endpoints",
+      "icon": "🧩",
       "expanded": true,
       "items": [
-        { "id": "modos-operacao", "title": "Comparar modos" },
-        { "id": "lite-fluxo", "title": "Orders Lite — fluxo" },
-        { "id": "full-fluxo", "title": "Orders Full — fluxo" }
-      ]
-    },
-    {
-      "id": "recebimento-dados",
-      "title": "Recebimento de dados",
-      "icon": "📡",
-      "expanded": true,
-      "items": [
-        { "id": "recebimento-visao-geral", "title": "Webhook, polling e modo (Lite/Full)" },
-        { "id": "via-webhook",        "title": "Via Webhook" },
-        { "id": "via-polling",        "title": "Via Polling",          "method": "GET" },
-        { "id": "acusar-recebimento", "title": "Acusar Recebimento",   "method": "POST" }
-      ]
-    },
-    {
-      "id": "acoes-varejista",
-      "title": "Ações do Varejista",
-      "icon": "🏪",
-      "items": [
-        { "id": "iniciar-separacao",  "title": "Iniciar Separação",    "method": "POST" },
-        { "id": "informar-invoice",   "title": "Informar Invoice",     "method": "POST" },
-        { "id": "solicitar-courier",  "title": "Solicitar Courier",    "method": "POST" },
-        { "id": "cancelamento",       "title": "Cancelar Pedido",      "method": "POST" }
-      ]
-    },
-    {
-      "id": "referencia",
-      "title": "Referência",
-      "icon": "📖",
-      "items": [
-        { "id": "substituicoes",      "title": "Substituições de Itens" },
-        { "id": "erros",              "title": "Códigos de Erro" }
+        { "id": "endpoints-overview", "title": "Mapa de endpoints e receitas" },
+        { "id": "via-webhook", "title": "Via Webhook" },
+        { "id": "via-polling", "title": "Via Polling", "method": "GET" },
+        { "id": "acusar-recebimento", "title": "Acusar Recebimento", "method": "POST" },
+        { "id": "iniciar-separacao", "title": "Iniciar Separação", "method": "POST" },
+        { "id": "informar-invoice", "title": "Informar Invoice", "method": "POST" },
+        { "id": "solicitar-courier", "title": "Solicitar Courier", "method": "POST" },
+        { "id": "cancelamento", "title": "Cancelar Pedido", "method": "POST" }
       ]
     }
   ],
   "pages": {
 
-    "intro": {
-      "id": "intro",
-      "title": "Bem-vindo ao Rappi Open APIs",
-      "description": "Documentação oficial para integradores do ecossistema Rappi. Aqui você encontra tudo que precisa para conectar seu sistema de gestão à plataforma Rappi.",
+    "guide-open-orders": {
+      "id": "guide-open-orders",
+      "title": "Guide — Open Orders",
+      "description": "Visão simplificada de contexto de negócio, quando usar endpoints e dependências no ciclo de pagamento.",
       "sections": [
         {
+          "type": "text",
+          "title": "Contexto de negócio",
+          "content": "Open Orders permite que o parceiro receba pedidos e mantenha o controle operacional do fulfillment. O objetivo é reduzir latência de processamento e manter rastreabilidade de eventos entre plataforma e varejista."
+        },
+        {
           "type": "cards",
+          "title": "Quando usar os endpoints de Open Orders",
           "items": [
             {
-              "icon": "📦",
-              "title": "Open Orders",
-              "text": "Receba e gerencie pedidos feitos pelos clientes na plataforma Rappi usando sua própria infraestrutura de separação e logística."
+              "icon": "📥",
+              "title": "Recepção de pedidos",
+              "text": "Use Webhook/Polling e acknowledge para garantir que nenhum pedido fique sem processamento."
             },
             {
-              "icon": "🗂️",
-              "title": "Open Catalog",
-              "text": "Gerencie o catálogo de produtos da sua loja no Rappi — criação, atualização e organização de produtos e categorias."
+              "icon": "🏪",
+              "title": "Execução operacional",
+              "text": "Use endpoints de separação, invoice e courier quando o modelo de operação exigir eventos do varejista."
             },
             {
-              "icon": "📊",
-              "title": "Inventory Integration",
-              "text": "Mantenha estoque e preços sincronizados automaticamente entre seu ERP/WMS e o catálogo Rappi."
+              "icon": "🚫",
+              "title": "Exceções",
+              "text": "Use cancelamento quando necessário e mantenha estratégia de substituição para reduzir impacto ao cliente."
             }
           ]
         },
         {
-          "type": "text",
-          "title": "Como usar esta documentação",
-          "content": "A documentação está organizada em duas áreas complementares:\n\n**Guias** — Conteúdo narrativo cobrindo ciclos de integração completos, com exemplos e casos de uso práticos. Ideal para entender **como** implementar.\n\n**Referência de API** — Especificações técnicas diretas: endpoints, métodos, parâmetros e formatos de request/response. Ideal para consultas durante o desenvolvimento."
-        },
-        {
           "type": "callout",
           "variant": "info",
-          "title": "Pré-requisito obrigatório",
-          "content": "Para utilizar o **Open Orders**, sua loja já deve ter uma **Integração de Inventário** funcional com a Rappi. Isso garante que o estoque exibido na plataforma reflita a realidade da loja."
+          "title": "Dependência no ciclo de pagamento",
+          "content": "O fluxo de pedidos depende da confirmação e consistência de estado para evitar divergências com faturamento/pagamento. Garanta que os eventos de status sejam enviados na ordem correta para manter reconciliação operacional."
         },
         {
           "type": "steps",
-          "title": "Jornada de Integração Recomendada",
+          "title": "Sequência recomendada",
           "items": [
-            { "title": "Integração de Inventário", "text": "Configure a sincronização de estoque e preços via SFTP ou API antes de qualquer outra integração." },
-            { "title": "Autenticação",             "text": "Obtenha suas credenciais de parceiro e configure o fluxo OAuth 2.0 para autenticar chamadas à API." },
-            { "title": "Open Orders",              "text": "Implemente o recebimento de pedidos via webhook ou polling e configure os eventos do ciclo de vida." },
-            { "title": "Open Catalog (opcional)",  "text": "Centralize a gestão de catálogo diretamente do seu sistema, sem acessar o painel Rappi." }
+            { "title": "Receber", "text": "Webhook/Polling + acknowledge imediato." },
+            { "title": "Processar", "text": "Separação/invoice conforme modelo operativo (Lite/Full)." },
+            { "title": "Despachar", "text": "Solicitar courier e acompanhar eventos de entrega." },
+            { "title": "Encerrar", "text": "Tratar cancelamentos/erros com idempotência e logs." }
           ]
+        }
+      ]
+    },
+    "endpoints-overview": {
+      "id": "endpoints-overview",
+      "title": "Endpoints — receitas e exemplos",
+      "description": "Mapa técnico para navegação rápida entre requests, responses e blocos copiáveis.",
+      "sections": [
+        {
+          "type": "errors",
+          "title": "Lista de endpoints relacionados",
+          "rows": [
+            { "code": "POST", "status": "/orders/{id}/acknowledge", "description": "Confirma recebimento do pedido." },
+            { "code": "POST", "status": "/orders/{id}/start-picking", "description": "Início de separação (Full)." },
+            { "code": "POST", "status": "/orders/{id}/invoice", "description": "Reporta invoice/cesta final." },
+            { "code": "POST", "status": "/orders/{id}/request-courier", "description": "Solicita courier." },
+            { "code": "POST", "status": "/orders/{id}/cancel", "description": "Cancela pedido elegível." },
+            { "code": "GET", "status": "/orders", "description": "Polling para recuperação de pedidos/eventos." }
+          ]
+        },
+        {
+          "type": "callout",
+          "variant": "success",
+          "title": "Páginas técnicas",
+          "content": "Cada endpoint no menu desta aba contém: exemplo de request, exemplo de response, erros possíveis e blocos de código copiáveis."
         }
       ]
     },
