@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      try {
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('docs-theme') || 'light');
+      } catch (e) {}
+    </script>
+    <title>Rappi CPGS Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/css/style.css" />
+  </head>
+  <body data-page="landing">
+    <div class="page-shell" id="page-shell">
+      <header class="landing__header">
+        <div class="landing__header-bar">
+          <span class="landing__header-spacer" aria-hidden="true"></span>
+          <button type="button" class="btn btn--theme" data-theme-toggle aria-label="Toggle theme">
+            Modo Escuro
+          </button>
+        </div>
+        <img class="landing__logo" src="assets/img/logo.png" alt="Rappi" />
+        <h1 class="landing__title">Documentação Open APIs</h1>
+        <p class="lead landing__subtitle">Todas nossas soluções em um único lugar.</p>
+      </header>
+      <main class="landing__main">
+        <p class="muted landing__intro">
+          Fluxo de integraço com todas nossas soluções. Para mais informações, entre em contato com nosso time.
+        </p>
+        <div class="flowchart-stage-wrap">
+          <div class="flowchart-scroll">
+            <div class="diagram-wrap flowchart" id="diagram-wrap">
+              <svg id="dependency-svg" class="flowchart-svg" aria-hidden="true"></svg>
+              <div class="flowchart-row" id="flowchart-grid">
+                <a
+                  id="card-open-catalog"
+                  class="api-card flowchart-card flowchart-card--timeline fg-catalog"
+                  href="pages/open-catalog.html"
+                  data-page-link
+                >
+                  <span class="api-card__name">Open Catalog</span>
+                  <span class="api-card__note">Criação de catálogo.</span>
+                </a>
+
+                <div class="flowchart-inv-stack">
+                  <a
+                    id="card-inventory"
+                    class="api-card flowchart-card flowchart-card--timeline fg-inventory"
+                    href="pages/inventory.html"
+                    data-page-link
+                  >
+                    <span class="api-card__name">Basic Inventory</span>
+                    <span class="api-card__note">Atualização de estoque, preço e descontos simples. <br>É obrigatório possuir catálogo para esta solução.
+                    </span>
+                  </a>
+                  <a
+                    id="card-complex-discounts"
+                    class="api-card flowchart-card flowchart-card--timeline fg-complex"
+                    href="pages/complex-discounts.html"
+                    data-page-link
+                  >
+                    <span class="api-card__name">Complex Discounts</span>
+                    <span class="api-card__note">Promoções/descontos complexos<br>É obrigatório possuir inventário para esta solução.</span>
+                  </a>
+                </div>
+
+                <div class="flowchart-exclusive-tier fg-exclusive" id="group-exclusive" aria-label="Mutually exclusive APIs">
+                  <span class="exclusive-badge">Escolher uma das duas soluções</span>
+                  <div class="flowchart-exclusive-group-box" id="exclusive-group-box">
+                    <a id="card-open-orders" class="api-card flowchart-card flowchart-card--group" href="pages/open-orders.html" data-page-link>
+                      <span class="api-card__name">Open Orders</span>
+                      <span class="api-card__note">É obrigatório possuir inventário para esta solução.</span>
+                    </a>
+                    <a id="card-payless" class="api-card flowchart-card flowchart-card--group" href="pages/payless.html" data-page-link>
+                      <span class="api-card__name">Payless</span>
+                      <span class="api-card__note">É obrigatório possuir inventário para esta solução.</span>
+                    </a>
+                  </div>
+                </div>
+
+                <a
+                  id="card-loyalty"
+                  class="api-card flowchart-card flowchart-card--timeline fg-loyalty"
+                  href="pages/loyalty.html"
+                  data-page-link
+                >
+                  <span class="api-card__name">Loyalty</span>
+                  <span class="api-card__note">É obrigatório possuir Open Orders/Payless para esta solução.</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="assets/js/content.js"></script>
+    <script src="assets/js/credentials.js"></script>
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>

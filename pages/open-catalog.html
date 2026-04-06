@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      try {
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('docs-theme') || 'light');
+      } catch (e) {}
+    </script>
+    <title>Open Catalog — Documentação</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body data-page="api" data-api="open-catalog" data-static-api>
+    <div class="page-shell" id="page-shell">
+      <div class="api-layout">
+        <div class="sidebar-shell">
+          <aside class="sidebar" aria-label="Documentação">
+            <a href="../index.html" class="sidebar__logo" data-page-link
+              ><img src="../assets/img/logo.png" alt="Rappi"
+            /></a>
+            <div class="sidebar__top">
+              <button type="button" class="btn btn--theme" data-theme-toggle aria-label="Alternar tema">
+                Modo escuro
+              </button>
+              <nav class="sidebar__nav" aria-label="Nesta página">
+                <a href="#section-basic-requirements">Requisitos básicos</a>
+                <a href="#section-overview">Visão geral</a>
+                <a href="#section-key-concepts">Conceitos-chave</a>
+                <a href="#section-product-creation-flow">Fluxo de criação de produto</a>
+                <a href="#section-endpoints">Endpoints</a>
+              </nav>
+            </div>
+            <div class="sidebar__bottom">
+              <div class="sidebar__cred-wrap">
+                <span class="credentials-badge" data-credentials-badge hidden>Credentials set</span>
+                <button type="button" class="btn btn--primary" data-open-credentials>Definir credenciais</button>
+              </div>
+              <a href="../index.html" class="btn btn--ghost" data-page-link style="text-align: center">← Todas as APIs</a>
+            </div>
+          </aside>
+        </div>
+        <main class="api-main" id="main">
+          <div id="api-content-root">
+            <header class="api-main__header">
+              <h1>Open Catalog</h1>
+              <p class="lead">
+                Com a Open Catalog você coloca seus produtos na Rappi de forma estruturada: primeiro descobre em qual categoria
+                cada item se encaixa, depois registra o produto no catálogo da Rappi e, por fim, associa preço e estoque a cada
+                loja física.
+              </p>
+            </header>
+
+            <section class="section-anchor" id="section-basic-requirements" aria-labelledby="h-basic">
+              <h2 id="h-basic">Requisitos básicos</h2>
+              <ul>
+                <li>Conta de parceiro e credenciais válidas. Cada chamada usa autenticação Bearer.</li>
+                <li>
+                  O host da API varia por país: substitua <code>{server}</code> pelo domínio regional (por exemplo, o mesmo
+                  usado na documentação de autenticação da Rappi para o seu mercado). Todas as URLs de catálogo começam com
+                  <code>https://services.{server}/api/open-api/v1/catalog/</code>.
+                </li>
+                <li>Conexão HTTPS obrigatória.</li>
+                <li>
+                  Esta API é o ponto de partida: não depende de outras APIs de parceiro. Depois, inventário e outras integrações
+                  usam os IDs de produto e de loja que você cria aqui.
+                </li>
+              </ul>
+            </section>
+
+            <section class="section-anchor" id="section-overview" aria-labelledby="h-overview">
+              <h2 id="h-overview">Visão geral</h2>
+              <p>
+                Na prática, o app da Rappi mostra ao usuário o que existe na loja mais relevante para a localização dele — não
+                em um depósito único nacional. Por isso o catálogo tem duas dimensões: o produto “genérico” na Rappi (nome,
+                categoria, imagens, EAN) e a oferta em cada loja (preço, disponibilidade).
+              </p>
+              <p>
+                A API de Catálogo é o conjunto de operações que liga seu ERP ou sistema ao modelo da Rappi. Você não escolhe
+                categorias livremente: precisa usar a árvore de categorias fornecida pela plataforma e os atributos da categoria
+                folha (a mais específica) para cada produto.
+              </p>
+              <p>
+                Resumo em três etapas: (1) descobrir a categoria correta e quais campos são obrigatórios; (2) criar o produto de
+                retailer — a Rappi devolve um identificador que você deve guardar junto do seu SKU; (3) usar os IDs de loja da
+                Rappi para publicar o item nas unidades certas, com preço e estoque.
+              </p>
+              <p>
+                Separe bem estes conceitos: SKU é o seu código interno; o id numérico devolvido pela Rappi é o que você usará
+                em chamadas posteriores (inventário, pedidos, etc.). Um erro comum é pular a etapa de loja ou confundir
+                categoria intermediária com categoria folha.
+              </p>
+            </section>
+
+            <section class="section-anchor" id="section-key-concepts" aria-labelledby="h-key-concepts">
+              <h2 id="h-key-concepts">Conceitos-chave</h2>
+              <p>
+                Categorias funcionam como departamentos e corredores: agrupam produtos parecidos e definem quais informações o
+                item precisa ter. Só a categoria do último nível (folha) traz a lista completa de atributos válidos para criar
+                o produto. Categorias de níveis acima servem para navegar até essa folha.
+              </p>
+              <p>
+                Você obtém a lista inicial de categorias, depois a árvore completa, e por fim os detalhes de uma categoria pelo
+                id. Não há preditor automático de categoria: a escolha da folha é sua, com base no tipo de produto.
+              </p>
+              <p>
+                Produto de retailer é a cópia do seu item no sistema da Rappi, com id próprio. É diferente do produto master
+                (curado pela plataforma) e do que aparece só como “virtual” no app. Nas Open APIs, você trabalha diretamente
+                com criação de produto de retailer e com o vínculo na loja física.
+              </p>
+              <p>
+                Produto na loja é o mesmo produto de retailer associado a uma loja específica, já com preço e quantidade
+                disponível. Sem esse vínculo por loja, o usuário não vê o item como comprável naquela unidade.
+              </p>
+              <p>
+                Loja na Rappi corresponde a uma unidade operacional com endereço; você recebe um id de loja para cada uma e
+                deve cruzar com o código da loja no seu sistema. Esse id entra em qualquer fluxo que seja “por loja” (estoque,
+                disponibilidade).
+              </p>
+              <p>
+                Inventário (atualização contínua de preço e estoque) vem depois que o produto já existe e está ligado à loja.
+                A API de catálogo prepara o terreno; manter dados atualizados é outro conjunto de integrações.
+              </p>
+            </section>
+
+            <section class="section-anchor" id="section-product-creation-flow" aria-labelledby="h-flow">
+              <h2 id="h-flow">Fluxo de criação de produto</h2>
+              <p>Siga a ordem abaixo. Pular uma etapa costuma gerar erro na API ou produto invisível no app.</p>
+              <p>
+                <strong>Etapa 1 — Descobrir a categoria.</strong> Objetivo: saber o <code>category_id</code> da folha e a lista
+                de atributos. Comece listando categorias de primeiro nível; use a árvore para descer até a folha; chame o
+                detalhe da categoria folha para ver cada atributo (código, tipo, obrigatoriedade).
+              </p>
+              <p>
+                <strong>Etapa 2 — Registrar o produto.</strong> Objetivo: obter o id da Rappi para cada SKU (ou para cada
+                variação). Envie <code>POST</code> em <code>/catalog/products</code> com a categoria, textos, imagens em URL
+                pública HTTPS, EAN quando existir, e os atributos exigidos pela folha. Se <code>has_variation</code> for
+                verdadeiro, cada variação recebe um id; todas compartilham um <code>parent_id</code>.
+              </p>
+              <p>
+                Guarde em seu banco a tabela SKU ↔ id Rappi (e <code>parent_id</code> se houver variações). Sem esse
+                mapeamento, você não consegue atualizar estoque nem reconciliar pedidos.
+              </p>
+              <p>
+                <strong>Etapa 3 — Publicar na loja.</strong> Objetivo: o item aparecer para compra na loja certa. Liste as lojas
+                com <code>GET /catalog/stores</code>, relacione cada id ao seu cadastro de unidades e envie preço e estoque por
+                loja conforme o contrato de integração (ajustes de endereço, horário ou configuração comercial ficam com a KAM).
+              </p>
+              <p>
+                Depois disso, o ciclo de vida continua: alterações de preço e quantidade devem refletir na Rappi com a frequência
+                que a operação exige, para evitar venda sem estoque ou preço desatualizado.
+              </p>
+            </section>
+
+            <section class="section-anchor" id="section-endpoints" aria-labelledby="h-endpoints">
+              <h2 id="h-endpoints">Endpoints</h2>
+
+              <article class="endpoint-block section-anchor" id="endpoint-list-categories">
+                <h3>
+                  <span class="method-badge">GET</span>
+                  https://services.{server}/api/open-api/v1/catalog/categories
+                </h3>
+                <p>
+                  Use quando ainda não sabe quais categorias existem no topo. A resposta traz apenas o primeiro nível (a árvore
+                  completa tem três níveis). A partir daqui você combina com <code>category-tree</code> para achar a folha.
+                  Envie o header <code>Authorization: Bearer {token}</code>.
+                </p>
+                <p class="muted">Sem corpo de requisição.</p>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Exemplo de resposta (JSON)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{
+  "data": [
+    { "id": 3569, "name": "Acessórios bebês e crianças" },
+    { "id": 2900, "name": "Animais de estimação" }
+  ]
+}</code></pre>
+                </div>
+                <div class="try-soon">
+                  <button type="button" class="btn btn--ghost" disabled title="Em breve">Experimentar (em breve)</button>
+                </div>
+              </article>
+
+              <article class="endpoint-block section-anchor" id="endpoint-category-tree">
+                <h3>
+                  <span class="method-badge">GET</span>
+                  https://services.{server}/api/open-api/v1/catalog/category-tree
+                </h3>
+                <p>
+                  Use para ver a hierarquia inteira de uma vez: cada nó pode ter um array <code>children</code>. Navegue até o
+                  último nível e anote o id da categoria folha antes de criar produto.
+                </p>
+                <p class="muted">Sem corpo de requisição.</p>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Exemplo de resposta (JSON)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{
+  "id": 2896,
+  "name": "category-tree-br",
+  "parentId": null,
+  "children": [
+    {
+      "id": 2900,
+      "name": "animais-de-estimação",
+      "parentId": 2896,
+      "children": []
+    }
+  ]
+}</code></pre>
+                </div>
+                <div class="try-soon">
+                  <button type="button" class="btn btn--ghost" disabled title="Em breve">Experimentar (em breve)</button>
+                </div>
+              </article>
+
+              <article class="endpoint-block section-anchor" id="endpoint-category-by-id">
+                <h3>
+                  <span class="method-badge">GET</span>
+                  https://services.{server}/api/open-api/v1/catalog/categories/{category_id}
+                </h3>
+                <p>
+                  Chame com o id da categoria folha que você escolheu. A resposta lista <code>attributes</code>: use o campo
+                  <code>code</code> nos payloads de criação de produto e respeite <code>isRequired</code> e as regras de
+                  <code>validation</code>.
+                </p>
+                <p class="muted">Sem corpo de requisição.</p>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Exemplo de resposta (JSON)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{
+  "id": 1098,
+  "country": "CO",
+  "attributes": [
+    {
+      "id": 9,
+      "name": "Tamaño",
+      "code": "size",
+      "validation": { "type": "string" }
+    }
+  ],
+  "hasProducts": true,
+  "totalProducts": 38324
+}</code></pre>
+                </div>
+                <div class="try-soon">
+                  <button type="button" class="btn btn--ghost" disabled title="Em breve">Experimentar (em breve)</button>
+                </div>
+              </article>
+
+              <article class="endpoint-block section-anchor" id="endpoint-publish-product">
+                <h3>
+                  <span class="method-badge">POST</span>
+                  https://services.{server}/api/open-api/v1/catalog/products
+                </h3>
+                <p>
+                  Cria o produto de retailer. Campos gerais: <code>category_id</code> (folha), <code>name</code>,
+                  <code>description</code>, <code>has_variation</code>, <code>presentation</code> (quantidade e unidade),
+                  <code>sellType</code> (como o item pode ser vendido). Dentro de <code>product</code> vão <code>sku</code>,
+                  <code>ean</code> (ou regra especial se não houver código de barras), <code>images</code> (URLs HTTPS públicas,
+                  PNG ou JPG, preferencialmente menores que 1 MB) e <code>attributes</code> alinhados aos <code>code</code> da
+                  categoria. Na resposta, guarde <code>id</code> por item e <code>parent_id</code> quando houver variações.
+                </p>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Corpo da requisição (JSON)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{
+  "category_id": 13,
+  "name": "Rappi Shoes",
+  "description": "Rappi Shoes",
+  "has_variation": false,
+  "presentation": { "quantity": 1, "unitType": "Und" },
+  "sellType": {
+    "type": "U",
+    "minQuantity": 1,
+    "maxQuantity": 10,
+    "stepQuantity": 1
+  },
+  "product": [
+    {
+      "sku": "1335",
+      "ean": 7702122343494,
+      "name": "Rappi Shoes",
+      "images": [{ "path": "https://example.com/product_0.jpg", "position": 1 }],
+      "attributes": { "color_alt": "white" }
+    }
+  ]
+}</code></pre>
+                </div>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Exemplo de resposta (JSON)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{
+  "category_id": 13,
+  "name": "Rappi Shoes",
+  "product": {
+    "successful": [
+      {
+        "id": 2147484292,
+        "parent_id": 151139,
+        "sku": "1335",
+        "ean": 730170648596
+      }
+    ]
+  }
+}</code></pre>
+                </div>
+                <div class="try-soon">
+                  <button type="button" class="btn btn--ghost" disabled title="Em breve">Experimentar (em breve)</button>
+                </div>
+              </article>
+
+              <article class="endpoint-block section-anchor" id="endpoint-list-products">
+                <h3>
+                  <span class="method-badge">GET</span>
+                  https://services.{server}/api/open-api/v1/catalog/products
+                </h3>
+                <p>
+                  Lista os produtos já criados para o seu retailer. Paginação por cabeçalhos <code>limit</code> (padrão 20,
+                  máximo 50) e <code>offset</code>. O retorno é resumido (útil para conferência e reconciliação); campos
+                  completos seguem o contrato vigente do endpoint na API (confira a especificação atual no seu ambiente).
+                </p>
+                <p class="muted">Sem corpo de requisição.</p>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Exemplo de resposta (JSON)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{
+  "data": [
+    {
+      "id": 2147653816,
+      "sku": "31201",
+      "name": "Refresco Open",
+      "ean": "2200000312075",
+      "status": "published",
+      "country": "CO"
+    }
+  ],
+  "limit": 50,
+  "offset": 0
+}</code></pre>
+                </div>
+                <div class="try-soon">
+                  <button type="button" class="btn btn--ghost" disabled title="Em breve">Experimentar (em breve)</button>
+                </div>
+              </article>
+
+              <article class="endpoint-block section-anchor" id="endpoint-products-by-sku">
+                <h3>
+                  <span class="method-badge">GET</span>
+                  https://services.{server}/api/open-api/v1/catalog/products/sku?skus=SKU1,SKU2
+                </h3>
+                <p>
+                  Use quando você já tem os SKUs internos e quer buscar os registros correspondentes na Rappi em lote. Até 200
+                  SKUs por chamada. Passe-os no query parameter <code>skus</code>, em geral separados por vírgula.
+                </p>
+                <p class="muted">Sem corpo de requisição.</p>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Exemplo de resposta (JSON)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">[
+  {
+    "id": 905397117,
+    "sku": "13350",
+    "name": "Rappi Shoes",
+    "status": "published",
+    "country": "BR"
+  }
+]</code></pre>
+                </div>
+                <div class="try-soon">
+                  <button type="button" class="btn btn--ghost" disabled title="Em breve">Experimentar (em breve)</button>
+                </div>
+              </article>
+
+              <article class="endpoint-block section-anchor" id="endpoint-list-stores">
+                <h3>
+                  <span class="method-badge">GET</span>
+                  https://services.{server}/api/open-api/v1/catalog/stores
+                </h3>
+                <p>
+                  Primeiro passo para saber em qual “lugar” da Rappi cada unidade física sua foi cadastrada. Cada item traz
+                  <code>id</code>, nome, endereço e coordenadas. Paginação: <code>limit</code> e <code>offset</code> (ex.:
+                  <code>limit=200</code>). Cruze cada <code>id</code> com o código de loja no seu sistema antes de enviar estoque
+                  ou preço por loja.
+                </p>
+                <p class="muted">Sem corpo de requisição.</p>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Exemplo de resposta (JSON)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{
+  "data": [
+    {
+      "id": 8136,
+      "country": "CO",
+      "status": "published",
+      "name": "20221213_21_Store_Name",
+      "lat": "4.678318",
+      "long": "-74.05496",
+      "address": "Calle 93, Bogota, Colombia - ."
+    }
+  ]
+}</code></pre>
+                </div>
+                <div class="try-soon">
+                  <button type="button" class="btn btn--ghost" disabled title="Em breve">Experimentar (em breve)</button>
+                </div>
+              </article>
+            </section>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <div id="modal-backdrop" class="modal-backdrop" data-close-credentials tabindex="-1" aria-hidden="true"></div>
+    <div
+      id="credentials-modal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cred-title"
+      aria-hidden="true"
+    >
+      <h2 id="cred-title">Definir credenciais</h2>
+      <p class="muted">Valores opcionais para exemplos nesta página.</p>
+      <form id="credentials-form">
+        <div class="modal__field">
+          <label for="field-api-key">Chave de API</label>
+          <input type="password" id="field-api-key" name="apiKey" autocomplete="off" spellcheck="false" placeholder="Sua chave" />
+        </div>
+        <div class="modal__field">
+          <label for="field-store-id">ID da loja</label>
+          <input type="text" id="field-store-id" name="storeId" autocomplete="off" placeholder="Identificador da loja" />
+        </div>
+        <div class="modal__field">
+          <label for="field-merchant">ID do merchant</label>
+          <input type="text" id="field-merchant" name="merchantId" autocomplete="off" placeholder="Merchant" />
+        </div>
+        <div class="modal__field">
+          <label for="field-webhook">URL do webhook</label>
+          <input type="url" id="field-webhook" name="webhookUrl" autocomplete="off" placeholder="https://" />
+        </div>
+        <div class="modal__actions">
+          <button type="submit" class="btn btn--primary">Salvar</button>
+          <button type="button" class="btn btn--ghost" data-close-credentials>Cancelar</button>
+          <button type="button" class="btn btn--ghost" id="credentials-clear">Limpar credenciais</button>
+        </div>
+      </form>
+      <p class="modal__note">
+        Armazenado apenas em sessionStorage nesta aba. Nada é enviado a servidores externos por este site.
+      </p>
+    </div>
+
+    <div id="copy-toast" class="copy-toast" aria-live="polite">Copiado!</div>
+
+    <script src="../assets/js/credentials.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" crossorigin="anonymous"></script>
+    <script src="../assets/js/main.js"></script>
+  </body>
+</html>

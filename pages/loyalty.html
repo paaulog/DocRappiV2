@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      try {
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('docs-theme') || 'light');
+      } catch (e) {}
+    </script>
+    <title>Loyalty — API documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body data-page="api" data-api="loyalty">
+    <div class="page-shell" id="page-shell">
+      <div class="api-layout">
+        <div class="sidebar-shell">
+          <aside class="sidebar" aria-label="Documentation navigation">
+            <a href="../index.html" class="sidebar__logo" data-page-link
+              ><img src="../assets/img/logo.png" alt="Rappi"
+            /></a>
+            <div class="sidebar__top">
+              <button type="button" class="btn btn--theme" data-theme-toggle aria-label="Toggle theme">
+                Dark mode
+              </button>
+              <nav class="sidebar__nav" aria-label="On this page">
+                <a href="#section-basic-requirements">Basic Requirements</a>
+                <a href="#section-overview">Overview</a>
+                <a href="#section-endpoints">Endpoints</a>
+              </nav>
+            </div>
+            <div class="sidebar__bottom">
+              <div class="sidebar__cred-wrap">
+                <span class="credentials-badge" data-credentials-badge hidden>Credentials set</span>
+                <button type="button" class="btn btn--primary" data-open-credentials>Set Your Credentials</button>
+              </div>
+              <a href="../index.html" class="btn btn--ghost" data-page-link style="text-align: center">← All APIs</a>
+            </div>
+          </aside>
+        </div>
+        <main class="api-main" id="main">
+          <div id="api-content-root"></div>
+        </main>
+      </div>
+    </div>
+
+    <div id="modal-backdrop" class="modal-backdrop" data-close-credentials tabindex="-1" aria-hidden="true"></div>
+    <div
+      id="credentials-modal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cred-title"
+      aria-hidden="true"
+    >
+      <h2 id="cred-title">Set Your Credentials</h2>
+      <p class="muted">Placeholder fields — values appear in JSON examples on this page only.</p>
+      <form id="credentials-form">
+        <div class="modal__field">
+          <label for="field-api-key">API key</label>
+          <input type="password" id="field-api-key" name="apiKey" autocomplete="off" spellcheck="false" placeholder="Your API key" />
+        </div>
+        <div class="modal__field">
+          <label for="field-store-id">Store ID</label>
+          <input type="text" id="field-store-id" name="storeId" autocomplete="off" placeholder="Store identifier" />
+        </div>
+        <div class="modal__field">
+          <label for="field-merchant">Merchant ID</label>
+          <input type="text" id="field-merchant" name="merchantId" autocomplete="off" placeholder="Merchant identifier" />
+        </div>
+        <div class="modal__field">
+          <label for="field-webhook">Webhook URL</label>
+          <input type="url" id="field-webhook" name="webhookUrl" autocomplete="off" placeholder="https://" />
+        </div>
+        <div class="modal__actions">
+          <button type="submit" class="btn btn--primary">Save</button>
+          <button type="button" class="btn btn--ghost" data-close-credentials>Cancel</button>
+          <button type="button" class="btn btn--ghost" id="credentials-clear">Clear credentials</button>
+        </div>
+      </form>
+      <p class="modal__note">
+        Stored in sessionStorage only for this tab. Cleared when you close the tab or refresh the page. Nothing is sent
+        to any server from this site.
+      </p>
+    </div>
+
+    <div id="copy-toast" class="copy-toast" aria-live="polite">Copied!</div>
+
+    <script src="../assets/js/content.js"></script>
+    <script src="../assets/js/credentials.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" crossorigin="anonymous"></script>
+    <script src="../assets/js/main.js"></script>
+  </body>
+</html>
