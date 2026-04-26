@@ -33,10 +33,9 @@
               </button>
               <nav class="sidebar__nav" aria-label="Nesta página">
                 <a href="#section-basic-requirements">Requisitos básicos</a>
-                <a href="#section-overview">Visão geral</a>
-                <a href="#section-key-concepts">Conceitos-chave</a>
-                <a href="#section-product-creation-flow">Fluxo de criação de produto</a>
                 <a href="#section-endpoints">Endpoints</a>
+                <a href="#section-relevant-flows">Fluxos relevantes</a>
+                <a href="#section-guide">Guia</a>
               </nav>
             </div>
             <div class="sidebar__bottom">
@@ -74,90 +73,6 @@
                   usam os IDs de produto e de loja que você cria aqui.
                 </li>
               </ul>
-            </section>
-
-            <section class="section-anchor" id="section-overview" aria-labelledby="h-overview">
-              <h2 id="h-overview">Visão geral</h2>
-              <p>
-                Na prática, o app da Rappi mostra ao usuário o que existe na loja mais relevante para a localização dele — não
-                em um depósito único nacional. Por isso o catálogo tem duas dimensões: o produto “genérico” na Rappi (nome,
-                categoria, imagens, EAN) e a oferta em cada loja (preço, disponibilidade).
-              </p>
-              <p>
-                A API de Catálogo é o conjunto de operações que liga seu ERP ou sistema ao modelo da Rappi. Você não escolhe
-                categorias livremente: precisa usar a árvore de categorias fornecida pela plataforma e os atributos da categoria
-                folha (a mais específica) para cada produto.
-              </p>
-              <p>
-                Resumo em três etapas: (1) descobrir a categoria correta e quais campos são obrigatórios; (2) criar o produto de
-                retailer — a Rappi devolve um identificador que você deve guardar junto do seu SKU; (3) usar os IDs de loja da
-                Rappi para publicar o item nas unidades certas, com preço e estoque.
-              </p>
-              <p>
-                Separe bem estes conceitos: SKU é o seu código interno; o id numérico devolvido pela Rappi é o que você usará
-                em chamadas posteriores (inventário, pedidos, etc.). Um erro comum é pular a etapa de loja ou confundir
-                categoria intermediária com categoria folha.
-              </p>
-            </section>
-
-            <section class="section-anchor" id="section-key-concepts" aria-labelledby="h-key-concepts">
-              <h2 id="h-key-concepts">Conceitos-chave</h2>
-              <p>
-                Categorias funcionam como departamentos e corredores: agrupam produtos parecidos e definem quais informações o
-                item precisa ter. Só a categoria do último nível (folha) traz a lista completa de atributos válidos para criar
-                o produto. Categorias de níveis acima servem para navegar até essa folha.
-              </p>
-              <p>
-                Você obtém a lista inicial de categorias, depois a árvore completa, e por fim os detalhes de uma categoria pelo
-                id. Não há preditor automático de categoria: a escolha da folha é sua, com base no tipo de produto.
-              </p>
-              <p>
-                Produto de retailer é a cópia do seu item no sistema da Rappi, com id próprio. É diferente do produto master
-                (curado pela plataforma) e do que aparece só como “virtual” no app. Nas Open APIs, você trabalha diretamente
-                com criação de produto de retailer e com o vínculo na loja física.
-              </p>
-              <p>
-                Produto na loja é o mesmo produto de retailer associado a uma loja específica, já com preço e quantidade
-                disponível. Sem esse vínculo por loja, o usuário não vê o item como comprável naquela unidade.
-              </p>
-              <p>
-                Loja na Rappi corresponde a uma unidade operacional com endereço; você recebe um id de loja para cada uma e
-                deve cruzar com o código da loja no seu sistema. Esse id entra em qualquer fluxo que seja “por loja” (estoque,
-                disponibilidade).
-              </p>
-              <p>
-                Inventário (atualização contínua de preço e estoque) vem depois que o produto já existe e está ligado à loja.
-                A API de catálogo prepara o terreno; manter dados atualizados é outro conjunto de integrações.
-              </p>
-            </section>
-
-            <section class="section-anchor" id="section-product-creation-flow" aria-labelledby="h-flow">
-              <h2 id="h-flow">Fluxo de criação de produto</h2>
-              <p>Siga a ordem abaixo. Pular uma etapa costuma gerar erro na API ou produto invisível no app.</p>
-              <p>
-                <strong>Etapa 1 — Descobrir a categoria.</strong> Objetivo: saber o <code>category_id</code> da folha e a lista
-                de atributos. Comece listando categorias de primeiro nível; use a árvore para descer até a folha; chame o
-                detalhe da categoria folha para ver cada atributo (código, tipo, obrigatoriedade).
-              </p>
-              <p>
-                <strong>Etapa 2 — Registrar o produto.</strong> Objetivo: obter o id da Rappi para cada SKU (ou para cada
-                variação). Envie <code>POST</code> em <code>/catalog/products</code> com a categoria, textos, imagens em URL
-                pública HTTPS, EAN quando existir, e os atributos exigidos pela folha. Se <code>has_variation</code> for
-                verdadeiro, cada variação recebe um id; todas compartilham um <code>parent_id</code>.
-              </p>
-              <p>
-                Guarde em seu banco a tabela SKU ↔ id Rappi (e <code>parent_id</code> se houver variações). Sem esse
-                mapeamento, você não consegue atualizar estoque nem reconciliar pedidos.
-              </p>
-              <p>
-                <strong>Etapa 3 — Publicar na loja.</strong> Objetivo: o item aparecer para compra na loja certa. Liste as lojas
-                com <code>GET /catalog/stores</code>, relacione cada id ao seu cadastro de unidades e envie preço e estoque por
-                loja conforme o contrato de integração (ajustes de endereço, horário ou configuração comercial ficam com a KAM).
-              </p>
-              <p>
-                Depois disso, o ciclo de vida continua: alterações de preço e quantidade devem refletir na Rappi com a frequência
-                que a operação exige, para evitar venda sem estoque ou preço desatualizado.
-              </p>
             </section>
 
             <section class="section-anchor" id="section-endpoints" aria-labelledby="h-endpoints">
@@ -428,6 +343,92 @@
                   <button type="button" class="btn btn--ghost" disabled title="Em breve">Experimentar (em breve)</button>
                 </div>
               </article>
+            </section>
+
+            <section class="section-anchor" id="section-relevant-flows" aria-labelledby="h-flows">
+              <h2 id="h-flows">Fluxos relevantes</h2>
+              <p>
+                Fluxo de criação de produto. Siga a ordem abaixo — pular etapas costuma gerar erro na API ou produto invisível
+                no app.
+              </p>
+              <p>
+                <strong>Etapa 1 — Descobrir a categoria.</strong> Objetivo: saber o <code>category_id</code> da folha e a lista
+                de atributos. Comece listando categorias de primeiro nível; use a árvore para descer até a folha; chame o
+                detalhe da categoria folha para ver cada atributo (código, tipo, obrigatoriedade).
+              </p>
+              <p>
+                <strong>Etapa 2 — Registrar o produto.</strong> Objetivo: obter o id da Rappi para cada SKU (ou para cada
+                variação). Envie <code>POST</code> em <code>/catalog/products</code> com a categoria, textos, imagens em URL
+                pública HTTPS, EAN quando existir, e os atributos exigidos pela folha. Se <code>has_variation</code> for
+                verdadeiro, cada variação recebe um id; todas compartilham um <code>parent_id</code>.
+              </p>
+              <p>
+                Guarde em seu banco a tabela SKU ↔ id Rappi (e <code>parent_id</code> se houver variações). Sem esse
+                mapeamento, você não consegue atualizar estoque nem reconciliar pedidos.
+              </p>
+              <p>
+                <strong>Etapa 3 — Publicar na loja.</strong> Objetivo: o item aparecer para compra na loja certa. Liste as lojas
+                com <code>GET /catalog/stores</code>, relacione cada id ao seu cadastro de unidades e envie preço e estoque por
+                loja conforme o contrato de integração (ajustes de endereço, horário ou configuração comercial ficam com a KAM).
+              </p>
+              <p>
+                Depois disso, o ciclo de vida continua: alterações de preço e quantidade devem refletir na Rappi com a frequência
+                que a operação exige, para evitar venda sem estoque ou preço desatualizado.
+              </p>
+            </section>
+
+            <section class="section-anchor" id="section-guide" aria-labelledby="h-guide">
+              <h2 id="h-guide">Guia</h2>
+              <h3>Visão geral</h3>
+              <p>
+                Na prática, o app da Rappi mostra ao usuário o que existe na loja mais relevante para a localização dele — não
+                em um depósito único nacional. Por isso o catálogo tem duas dimensões: o produto “genérico” na Rappi (nome,
+                categoria, imagens, EAN) e a oferta em cada loja (preço, disponibilidade).
+              </p>
+              <p>
+                A API de Catálogo é o conjunto de operações que liga seu ERP ou sistema ao modelo da Rappi. Você não escolhe
+                categorias livremente: precisa usar a árvore de categorias fornecida pela plataforma e os atributos da categoria
+                folha (a mais específica) para cada produto.
+              </p>
+              <p>
+                Resumo em três etapas: (1) descobrir a categoria correta e quais campos são obrigatórios; (2) criar o produto de
+                retailer — a Rappi devolve um identificador que você deve guardar junto do seu SKU; (3) usar os IDs de loja da
+                Rappi para publicar o item nas unidades certas, com preço e estoque.
+              </p>
+              <p>
+                Separe bem estes conceitos: SKU é o seu código interno; o id numérico devolvido pela Rappi é o que você usará
+                em chamadas posteriores (inventário, pedidos, etc.). Um erro comum é pular a etapa de loja ou confundir
+                categoria intermediária com categoria folha.
+              </p>
+
+              <h3>Conceitos-chave</h3>
+              <p>
+                Categorias funcionam como departamentos e corredores: agrupam produtos parecidos e definem quais informações o
+                item precisa ter. Só a categoria do último nível (folha) traz a lista completa de atributos válidos para criar
+                o produto. Categorias de níveis acima servem para navegar até essa folha.
+              </p>
+              <p>
+                Você obtém a lista inicial de categorias, depois a árvore completa, e por fim os detalhes de uma categoria pelo
+                id. Não há preditor automático de categoria: a escolha da folha é sua, com base no tipo de produto.
+              </p>
+              <p>
+                Produto de retailer é a cópia do seu item no sistema da Rappi, com id próprio. É diferente do produto master
+                (curado pela plataforma) e do que aparece só como “virtual” no app. Nas Open APIs, você trabalha diretamente
+                com criação de produto de retailer e com o vínculo na loja física.
+              </p>
+              <p>
+                Produto na loja é o mesmo produto de retailer associado a uma loja específica, já com preço e quantidade
+                disponível. Sem esse vínculo por loja, o usuário não vê o item como comprável naquela unidade.
+              </p>
+              <p>
+                Loja na Rappi corresponde a uma unidade operacional com endereço; você recebe um id de loja para cada uma e
+                deve cruzar com o código da loja no seu sistema. Esse id entra em qualquer fluxo que seja “por loja” (estoque,
+                disponibilidade).
+              </p>
+              <p>
+                Inventário (atualização contínua de preço e estoque) vem depois que o produto já existe e está ligado à loja.
+                A API de catálogo prepara o terreno; manter dados atualizados é outro conjunto de integrações.
+              </p>
             </section>
           </div>
         </main>

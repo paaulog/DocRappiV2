@@ -351,47 +351,61 @@
     const root = document.getElementById('api-content-root');
     if (!root) return;
 
+    const applyPh = (s) => (window.PartnerCredentials ? PartnerCredentials.applyPlaceholders(s) : s);
+
     const reqs = (doc.basicRequirements || [])
-      .map((r) => `<li>${escapeHtml(window.PartnerCredentials ? PartnerCredentials.applyPlaceholders(r) : r)}</li>`)
+      .map((r) => `<li>${escapeHtml(applyPh(r))}</li>`)
       .join('');
 
     const endpoints = (doc.endpoints || []).map((ep, i) => renderEndpoint(ep, i, doc)).join('');
 
-    const overviewParas = doc.overviewParagraphs || (doc.overview ? [doc.overview] : []);
-    const overviewHtml = overviewParas
-      .map((p) => `<p>${escapeHtml(window.PartnerCredentials ? PartnerCredentials.applyPlaceholders(p) : p)}</p>`)
+    const flowsHtml = (doc.relevantFlows || [])
+      .map((p) => `<p>${escapeHtml(applyPh(p))}</p>`)
       .join('');
 
-    const leadText =
-      doc.lead ||
-      (doc.overview && doc.overview.split('.')[0] ? doc.overview.split('.')[0] + '.' : doc.title);
+    const guideHtml = (doc.guide || [])
+      .map((p) => `<p>${escapeHtml(applyPh(p))}</p>`)
+      .join('');
 
-    const extraSections = (doc.additionalSections || []).map(renderAdditionalSection).join('');
+    const leadText = doc.lead || doc.title;
 
     const sec = (doc.labels && doc.labels.sections) || {};
+
+    const flowsSection = flowsHtml
+      ? `
+      <section class="section-anchor" id="section-relevant-flows" aria-labelledby="h-flows">
+        <h2 id="h-flows">${escapeHtml(sec.relevantFlows || 'Fluxos relevantes')}</h2>
+        ${flowsHtml}
+      </section>`
+      : '';
+
+    const guideSection = guideHtml
+      ? `
+      <section class="section-anchor" id="section-guide" aria-labelledby="h-guide">
+        <h2 id="h-guide">${escapeHtml(sec.guide || 'Guia')}</h2>
+        ${guideHtml}
+      </section>`
+      : '';
 
     root.innerHTML = `
       <header class="api-main__header">
         <h1>${escapeHtml(doc.title)}</h1>
-        <p class="lead">${escapeHtml(window.PartnerCredentials ? PartnerCredentials.applyPlaceholders(leadText) : leadText)}</p>
+        <p class="lead">${escapeHtml(applyPh(leadText))}</p>
       </header>
 
       <section class="section-anchor" id="section-basic-requirements" aria-labelledby="h-basic">
-        <h2 id="h-basic">${escapeHtml(sec.basicRequirements || 'Basic Requirements')}</h2>
+        <h2 id="h-basic">${escapeHtml(sec.basicRequirements || 'Requisitos básicos')}</h2>
         <ul>${reqs}</ul>
       </section>
-
-      <section class="section-anchor" id="section-overview" aria-labelledby="h-overview">
-        <h2 id="h-overview">${escapeHtml(sec.overview || 'Overview')}</h2>
-        ${overviewHtml}
-      </section>
-
-      ${extraSections}
 
       <section class="section-anchor" id="section-endpoints" aria-labelledby="h-endpoints">
         <h2 id="h-endpoints">${escapeHtml(sec.endpoints || 'Endpoints')}</h2>
         ${endpoints}
       </section>
+
+      ${flowsSection}
+
+      ${guideSection}
     `;
 
     bindCopyButtons(root);
