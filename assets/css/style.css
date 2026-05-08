@@ -825,16 +825,6 @@ body[data-page='landing'] .page-shell {
   scroll-margin-top: 1.25rem;
 }
 
-.api-doc-links {
-  margin: 0.75rem 0 0;
-  padding-left: 1.25rem;
-  line-height: 1.55;
-}
-
-.api-doc-links li {
-  margin: 0.35rem 0;
-}
-
 /* ----- Code blocks (dark surface, syntax colors) ----- */
 .code-block-wrap {
   margin: 1.25rem 0 1.75rem;
@@ -1057,15 +1047,4 @@ body[data-page='landing'] .page-shell {
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0);
-}
-
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
 }
