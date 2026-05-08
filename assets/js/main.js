@@ -21,161 +21,9 @@
     });
   }
 
-  /** ----- Landing: SVG arrows over HTML flex flowchart ----- */
-  const ns = 'http://www.w3.org/2000/svg';
-
-  function edge(el, side, wrap) {
-    const r = el.getBoundingClientRect();
-    const w = wrap.getBoundingClientRect();
-    const left = r.left - w.left;
-    const top = r.top - w.top;
-    switch (side) {
-      case 'right':
-        return { x: left + r.width, y: top + r.height / 2 };
-      case 'left':
-        return { x: left, y: top + r.height / 2 };
-      case 'bottom':
-        return { x: left + r.width / 2, y: top + r.height };
-      case 'top':
-        return { x: left + r.width / 2, y: top };
-      default:
-        return { x: left + r.width / 2, y: top + r.height / 2 };
-    }
-  }
-
-  function linePath(x1, y1, x2, y2) {
-    return `M ${x1} ${y1} L ${x2} ${y2}`;
-  }
-
-  function alignOpenCatalog() {
-    const inventory = document.getElementById('card-inventory');
-    const openCatalog = document.getElementById('card-open-catalog');
-    if (!inventory || !openCatalog) return;
-    const invRect = inventory.getBoundingClientRect();
-    const catRect = openCatalog.getBoundingClientRect();
-    const diff = invRect.top + invRect.height / 2 - (catRect.top + catRect.height / 2);
-    const current = parseFloat(openCatalog.style.marginTop) || 0;
-    openCatalog.style.marginTop = current + diff + 'px';
-  }
-
-  function drawArrows(opts) {
-    const skipAlignAfter = opts && opts.skipAlignAfter;
-    const wrap = document.getElementById('diagram-wrap');
-    const svg = document.getElementById('dependency-svg');
-    if (!wrap || !svg) return;
-
-    const cat = document.getElementById('card-open-catalog');
-    const inv = document.getElementById('card-inventory');
-    const comp = document.getElementById('card-complex-discounts');
-    const exclusiveGroup = document.getElementById('exclusive-group-box');
-    const loy = document.getElementById('card-loyalty');
-
-    const rect = wrap.getBoundingClientRect();
-    if (rect.width < 10) return;
-
-    svg.setAttribute('width', String(rect.width));
-    svg.setAttribute('height', String(rect.height));
-    svg.setAttribute('viewBox', `0 0 ${rect.width} ${rect.height}`);
-    svg.innerHTML = '';
-
-    const FLOW = '#E8521A';
-
-    const defs = document.createElementNS(ns, 'defs');
-    const marker = document.createElementNS(ns, 'marker');
-    marker.setAttribute('id', 'arrowhead');
-    marker.setAttribute('markerWidth', '18');
-    marker.setAttribute('markerHeight', '14');
-    marker.setAttribute('refX', '16');
-    marker.setAttribute('refY', '7');
-    marker.setAttribute('markerUnits', 'userSpaceOnUse');
-    marker.setAttribute('orient', 'auto');
-    const poly = document.createElementNS(ns, 'polygon');
-    poly.setAttribute('points', '0 0, 18 7, 0 14');
-    poly.setAttribute('fill', FLOW);
-    marker.appendChild(poly);
-    defs.appendChild(marker);
-    svg.appendChild(defs);
-
-    function addFlowPath(d, opts) {
-      const path = document.createElementNS(ns, 'path');
-      path.setAttribute('d', d);
-      path.setAttribute('fill', 'none');
-      path.setAttribute('stroke', opts && opts.muted ? '#8b8e97' : FLOW);
-      path.setAttribute('stroke-width', opts && opts.thin ? '2.25' : '3.5');
-      path.setAttribute('marker-end', opts && opts.noArrow ? 'none' : 'url(#arrowhead)');
-      path.setAttribute('class', 'flowchart-path flowchart-path--animate flowchart-path--pulse');
-      svg.appendChild(path);
-      const len = path.getTotalLength();
-      path.style.strokeDasharray = String(len);
-      path.style.strokeDashoffset = String(len);
-      requestAnimationFrame(() => {
-        path.style.transition = 'stroke-dashoffset 1.05s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-        path.style.strokeDashoffset = '0';
-      });
-    }
-
-    const yMain = inv ? edge(inv, 'right', wrap).y : 0;
-
-    if (cat && inv) {
-      const x1 = edge(cat, 'right', wrap).x;
-      const x2 = edge(inv, 'left', wrap).x;
-      addFlowPath(linePath(x1, yMain, x2, yMain));
-    }
-    if (inv && exclusiveGroup) {
-      const x1 = edge(inv, 'right', wrap).x;
-      const x2 = edge(exclusiveGroup, 'left', wrap).x;
-      addFlowPath(linePath(x1, yMain, x2, yMain));
-    }
-    if (inv && comp) {
-      const a = edge(inv, 'bottom', wrap);
-      const b = edge(comp, 'top', wrap);
-      addFlowPath(linePath(a.x, a.y, b.x, b.y));
-    }
-    if (exclusiveGroup && loy) {
-      const a = edge(exclusiveGroup, 'right', wrap);
-      const x2 = edge(loy, 'left', wrap).x;
-      const y = a.y;
-      addFlowPath(linePath(a.x, y, x2, y));
-    }
-
-    if (!skipAlignAfter) {
-      requestAnimationFrame(() => {
-        setTimeout(() => {
-          alignOpenCatalog();
-          drawArrows({ skipAlignAfter: true });
-        }, 60);
-      });
-    }
-  }
-
-  function scheduleDrawArrows() {
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        drawArrows();
-      }, 50);
-    });
-  }
-
-  window.drawArrows = drawArrows;
-  window.drawDependencyLines = drawArrows;
-
-  function initLandingDiagram() {
-    if (!document.getElementById('diagram-wrap')) return;
-    scheduleDrawArrows();
-    let t;
-    window.addEventListener('resize', () => {
-      clearTimeout(t);
-      t = setTimeout(scheduleDrawArrows, 120);
-    });
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(() => scheduleDrawArrows());
-    }
-  }
-
   function toggleTheme() {
     const next = getTheme() === 'dark' ? 'light' : 'dark';
     setTheme(next);
-    scheduleDrawArrows();
   }
 
   /** ----- Page enter / leave transitions ----- */
@@ -533,7 +381,6 @@
     initPageShell();
     initTheme();
     initPageTransitions();
-    initLandingDiagram();
     renderApiPage();
     initCredentialsModal();
     updateCredentialsBadge();

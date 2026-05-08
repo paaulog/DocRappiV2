@@ -6,7 +6,6 @@
   --font-sans: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-mono: ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, monospace;
   --orange: #e8521a;
-  --flowchart-orange: #e8521a;
   --orange-soft: rgba(232, 82, 26, 0.12);
   --orange-hover: #cf4712;
   --radius: 12px;
@@ -284,14 +283,6 @@ body[data-page='landing'] .page-shell {
   box-sizing: border-box;
 }
 
-.landing__intro {
-  text-align: center;
-  margin-bottom: 1.75rem;
-  max-width: 40rem;
-  margin-left: auto;
-  margin-right: auto;
-}
-
 /* ----- Landing cards grid (lado a lado, independentes) ----- */
 .landing__cards {
   display: grid;
@@ -336,216 +327,6 @@ body[data-page='landing'] .page-shell {
   }
 }
 
-/* Horizontal flowchart — centered stage (airy page margins) */
-.flowchart-stage-wrap {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  min-height: min(56vh, 640px);
-  padding: 48px 64px;
-  box-sizing: border-box;
-}
-
-@media (max-width: 900px) {
-  .flowchart-stage-wrap {
-    padding: 40px 32px;
-  }
-}
-
-@media (max-width: 640px) {
-  .flowchart-stage-wrap {
-    min-height: auto;
-    padding: 32px 20px;
-  }
-}
-
-/* FIX 3: centraliza o diagrama no eixo horizontal */
-.flowchart-scroll {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  max-width: min(1180px, calc(100vw - 128px));
-  margin: 0 auto;
-  overflow-x: auto;
-  overflow-y: visible;
-  padding: 16px;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  box-sizing: border-box;
-}
-
-.flowchart-scroll::-webkit-scrollbar {
-  height: 8px;
-}
-
-.flowchart-scroll::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 8px;
-}
-
-.diagram-wrap.flowchart {
-  position: relative;
-  width: 100%;
-  max-width: min(1180px, calc(100vw - 128px));
-  margin: 0 auto;
-  padding: 2rem 1.5rem 2.5rem;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-}
-
-.flowchart-svg {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  overflow: visible;
-  z-index: 0;
-}
-
-/*
- * FIX 1 — eixo horizontal: Catalog, Inventory stack, Exclusive, Loyalty numa linha flex;
- * align-items: center alinha ao centro vertical do item mais alto (grupo exclusivo).
- */
-.flowchart-row {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: center;
-  gap: 80px;
-  width: max-content;
-  max-width: none;
-  min-width: min-content;
-  box-sizing: border-box;
-}
-
-/* FIX 2 — Inventory + Complex em coluna, um único item da linha principal */
-.flowchart-inv-stack {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 42px;
-  flex: 0 0 auto;
-}
-
-/* Same fixed size for timeline cards (Catalog, Inventory, Complex, Loyalty) */
-.flowchart-card--timeline {
-  width: 160px;
-  height: 120px;
-  min-height: 120px;
-  max-height: 120px;
-  box-sizing: border-box;
-  padding: 0.6rem 0.7rem;
-  overflow: hidden;
-}
-
-.flowchart-card--timeline .api-card__name {
-  font-size: 0.92rem;
-}
-
-.flowchart-card--timeline .api-card__note {
-  font-size: 0.65rem;
-  line-height: 1.3;
-}
-
-.flowchart-card {
-  flex: 0 0 auto;
-}
-
-/* Slightly wider inside the dashed group (more text) */
-.flowchart-card--group {
-  width: 100%;
-  max-width: 200px;
-  min-height: 100px;
-  padding: 0.65rem 0.75rem;
-}
-
-.flowchart-exclusive-tier {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-  width: min(240px, 28vw);
-  flex: 0 0 auto;
-  position: relative;
-}
-
-/* Badge fora do fluxo: topo da caixa tracejada alinhado ao Inventory */
-.flowchart-exclusive-tier .exclusive-badge {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 100%;
-  margin-bottom: 0.5rem;
-  width: max-content;
-  max-width: min(18rem, 92vw);
-  z-index: 1;
-}
-
-/* Dashed stack: Open Orders / Payless */
-.flowchart-exclusive-group-box {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  align-items: stretch;
-  gap: 1rem;
-  width: 100%;
-  padding: 1.25rem 1.25rem;
-  border: 2px dashed rgba(232, 82, 26, 0.55);
-  border-radius: var(--radius);
-  background: var(--bg-elevated);
-  box-shadow: var(--card-shadow);
-  box-sizing: border-box;
-}
-
-.flowchart-exclusive-group-box .flowchart-card--group {
-  max-width: none;
-}
-
-@media (max-width: 1100px) {
-  .flowchart-row {
-    gap: min(80px, 5vw);
-  }
-}
-
-@media (max-width: 640px) {
-  .flowchart-card--timeline {
-    width: min(160px, 88vw);
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .flowchart-exclusive-tier {
-    width: min(280px, 92vw);
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
-
-.exclusive-badge {
-  font-size: 0.72rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--orange);
-  background: var(--orange-soft);
-  padding: 0.35rem 0.85rem;
-  border-radius: 999px;
-  border: 1px solid rgba(232, 82, 26, 0.35);
-  text-align: center;
-  width: 100%;
-  max-width: 18rem;
-}
-
 .api-card {
   display: flex;
   flex-direction: column;
@@ -567,11 +348,6 @@ body[data-page='landing'] .page-shell {
   background: var(--orange-soft);
 }
 
-.flowchart-row .api-card:hover {
-  transform: none;
-  box-shadow: 0 6px 20px rgba(232, 82, 26, 0.14);
-}
-
 .api-card__name {
   font-weight: 600;
   font-size: 1rem;
@@ -586,55 +362,12 @@ body[data-page='landing'] .page-shell {
   margin-top: auto;
 }
 
-.api-card--exclusive {
-  border-style: dashed;
-  border-color: rgba(255, 107, 0, 0.4);
-}
-
-.api-card--exclusive:hover {
-  background: rgba(255, 107, 0, 0.06);
-}
-
-.flowchart-path {
-  fill: none;
-  stroke: var(--flowchart-orange);
-  stroke-width: 3.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.flowchart-path--animate.flowchart-path--pulse {
-  animation: flowchartPulse 2.4s ease-in-out 1.15s infinite;
-}
-
-@keyframes flowchartPulse {
-  0%,
-  100% {
-    opacity: 0.85;
-    filter: drop-shadow(0 0 0 transparent);
-  }
-  50% {
-    opacity: 1;
-    filter: drop-shadow(0 0 0.35rem rgba(232, 82, 26, 0.65));
-  }
-}
-
 /* ----- API layout -----
    Sidebar fixa à esquerda, centralizada na vertical — permanece visível ao rolar (viewport). */
 .api-layout {
   display: block;
   min-height: 100vh;
   position: relative;
-}
-
-#card-loyalty {
-  align-self: flex-start;
-  margin-top: 100px;
-}
-
-#card-open-catalog {
-  align-self: flex-start;
-  margin-bottom: 100px;
 }
 
 .sidebar-shell {
