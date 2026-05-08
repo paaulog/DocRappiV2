@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="pt-BR" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,7 +8,7 @@
         document.documentElement.setAttribute('data-theme', localStorage.getItem('docs-theme') || 'light');
       } catch (e) {}
     </script>
-    <title>Payless — API documentation</title>
+    <title>Payless — Documentação</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
@@ -19,20 +19,20 @@
       crossorigin="anonymous"
     />
   </head>
-  <body data-page="api" data-api="payless">
+  <body data-page="api" data-api="payless" data-static-api>
     <div class="page-shell" id="page-shell">
       <div class="api-layout">
         <div class="sidebar-shell">
-          <aside class="sidebar" aria-label="Documentation navigation">
+          <aside class="sidebar" aria-label="Documentação">
             <a href="../index.html" class="sidebar__logo" data-page-link
               ><img src="../assets/img/logo.png" alt="Rappi"
             /></a>
             <div class="sidebar__top">
-              <button type="button" class="btn btn--theme" data-theme-toggle aria-label="Toggle theme">
-                Dark mode
+              <button type="button" class="btn btn--theme" data-theme-toggle aria-label="Alternar tema">
+                Modo escuro
               </button>
               <nav class="sidebar__nav" aria-label="Nesta página">
-                <a href="#section-basic-requirements">Requisitos básicos</a>
+                <a href="#section-payless-requirements">Requisitos para integração Payless</a>
                 <a href="#section-endpoints">Endpoints</a>
                 <a href="#section-relevant-flows">Fluxos relevantes</a>
                 <a href="#section-guide">Guia</a>
@@ -41,14 +41,68 @@
             <div class="sidebar__bottom">
               <div class="sidebar__cred-wrap">
                 <span class="credentials-badge" data-credentials-badge hidden>Credentials set</span>
-                <button type="button" class="btn btn--primary" data-open-credentials>Set Your Credentials</button>
               </div>
-              <a href="../index.html" class="btn btn--ghost" data-page-link style="text-align: center">← All APIs</a>
+              <a href="../index.html" class="btn btn--ghost" data-page-link style="text-align: center">← Todas as APIs</a>
             </div>
           </aside>
         </div>
         <main class="api-main" id="main">
-          <div id="api-content-root"></div>
+          <div id="api-content-root">
+            <header class="api-main__header">
+              <h1>Payless</h1>
+              <p class="lead">
+                Modelo de pagamento integrado em que a Rappi gerencia a cobrança ao cliente final.
+              </p>
+            </header>
+
+            <section class="section-anchor" id="section-payless-requirements" aria-labelledby="h-payless-requirements">
+              <h2 id="h-payless-requirements">Requisitos para integração Payless</h2>
+              <p>Para operar com o modelo Payless na Rappi, existem alguns pontos importantes:</p>
+              <ul>
+                <li>Inventário integrado.</li>
+                <li>Credenciais Bearer válidas.</li>
+                <li>Acordo comercial Payless ativo com a Rappi.</li>
+              </ul>
+            </section>
+
+            <section class="section-anchor" id="section-endpoints" aria-labelledby="h-endpoints">
+              <h2 id="h-endpoints">Endpoints</h2>
+
+              <article class="endpoint-block section-anchor" id="endpoint-example">
+                <h3>
+                  <span class="method-badge">GET</span>
+                  /v1/payless/example
+                </h3>
+                <p>Endpoint de exemplo. Substitua pelo contrato real assim que disponível.</p>
+                <p class="muted">Sem corpo de requisição.</p>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Exemplo de resposta (JSON)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{}</code></pre>
+                </div>
+                <div class="try-soon">
+                  <button type="button" class="btn btn--ghost" disabled title="Em breve">Experimentar (em breve)</button>
+                </div>
+              </article>
+            </section>
+
+            <section class="section-anchor" id="section-relevant-flows" aria-labelledby="h-flows">
+              <h2 id="h-flows">Fluxos relevantes</h2>
+              <p>
+                Fluxo de venda: cliente paga na Rappi → Rappi consolida valores e repassa ao parceiro conforme contrato.
+              </p>
+              <p>Fluxo de reconciliação financeira: utilize os relatórios periódicos para conferir repasses.</p>
+            </section>
+
+            <section class="section-anchor" id="section-guide" aria-labelledby="h-guide">
+              <h2 id="h-guide">Guia</h2>
+              <p>Payless e Open Orders são exclusivos — cada parceiro adota apenas um.</p>
+              <p>Não exija pagamento adicional na entrega: o cliente já pagou pela plataforma.</p>
+              <p>Acompanhe o ciclo financeiro junto ao time comercial Rappi para evitar divergências.</p>
+            </section>
+          </div>
         </main>
       </div>
     </div>
@@ -62,40 +116,38 @@
       aria-labelledby="cred-title"
       aria-hidden="true"
     >
-      <h2 id="cred-title">Set Your Credentials</h2>
-      <p class="muted">Placeholder fields — values appear in JSON examples on this page only.</p>
+      <h2 id="cred-title">Definir credenciais</h2>
+      <p class="muted">Valores opcionais para exemplos nesta página.</p>
       <form id="credentials-form">
         <div class="modal__field">
-          <label for="field-api-key">API key</label>
-          <input type="password" id="field-api-key" name="apiKey" autocomplete="off" spellcheck="false" placeholder="Your API key" />
+          <label for="field-api-key">Chave de API</label>
+          <input type="password" id="field-api-key" name="apiKey" autocomplete="off" spellcheck="false" placeholder="Sua chave" />
         </div>
         <div class="modal__field">
-          <label for="field-store-id">Store ID</label>
-          <input type="text" id="field-store-id" name="storeId" autocomplete="off" placeholder="Store identifier" />
+          <label for="field-store-id">ID da loja</label>
+          <input type="text" id="field-store-id" name="storeId" autocomplete="off" placeholder="Identificador da loja" />
         </div>
         <div class="modal__field">
-          <label for="field-merchant">Merchant ID</label>
-          <input type="text" id="field-merchant" name="merchantId" autocomplete="off" placeholder="Merchant identifier" />
+          <label for="field-merchant">ID do merchant</label>
+          <input type="text" id="field-merchant" name="merchantId" autocomplete="off" placeholder="Merchant" />
         </div>
         <div class="modal__field">
-          <label for="field-webhook">Webhook URL</label>
+          <label for="field-webhook">URL do webhook</label>
           <input type="url" id="field-webhook" name="webhookUrl" autocomplete="off" placeholder="https://" />
         </div>
         <div class="modal__actions">
-          <button type="submit" class="btn btn--primary">Save</button>
-          <button type="button" class="btn btn--ghost" data-close-credentials>Cancel</button>
-          <button type="button" class="btn btn--ghost" id="credentials-clear">Clear credentials</button>
+          <button type="submit" class="btn btn--primary">Salvar</button>
+          <button type="button" class="btn btn--ghost" data-close-credentials>Cancelar</button>
+          <button type="button" class="btn btn--ghost" id="credentials-clear">Limpar credenciais</button>
         </div>
       </form>
       <p class="modal__note">
-        Stored in sessionStorage only for this tab. Cleared when you close the tab or refresh the page. Nothing is sent
-        to any server from this site.
+        Armazenado apenas em sessionStorage nesta aba. Nada é enviado a servidores externos por este site.
       </p>
     </div>
 
-    <div id="copy-toast" class="copy-toast" aria-live="polite">Copied!</div>
+    <div id="copy-toast" class="copy-toast" aria-live="polite">Copiado!</div>
 
-    <script src="../assets/js/content.js"></script>
     <script src="../assets/js/credentials.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" crossorigin="anonymous"></script>
