@@ -908,3 +908,64 @@ body[data-page='landing'] .page-shell {
   visibility: visible;
   transform: translateX(-50%) translateY(0);
 }
+
+/* ----- Image lightbox (click to expand) ----- */
+.api-main img,
+.landing__header img {
+  cursor: zoom-in;
+}
+
+.docs-image-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.75rem 1rem 1rem;
+  box-sizing: border-box;
+}
+
+.docs-image-lightbox[hidden] {
+  display: none !important;
+}
+
+.docs-image-lightbox__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  cursor: zoom-out;
+}
+
+.docs-image-lightbox__img {
+  position: relative;
+  z-index: 1;
+  max-width: min(96vw, calc(100vw - 2rem));
+  max-height: min(92vh, calc(100vh - 3.5rem));
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--radius);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  cursor: default;
+}
+
+.docs-image-lightbox__close {
+  position: fixed;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 2;
+  font-size: 1.5rem;
+  line-height: 1;
+  padding: 0.35rem 0.65rem;
+  min-width: 2.5rem;
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+html.docs-image-lightbox-open,
+body.docs-image-lightbox-open {
+  overflow: hidden;
+}

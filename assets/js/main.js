@@ -314,6 +314,90 @@
     badge.hidden = !has;
   }
 
+  /** ----- Image lightbox (click to expand) ----- */
+  function lightboxAriaLabels() {
+    const lang = (document.documentElement.lang || '').toLowerCase();
+    if (lang.startsWith('es')) {
+      return {
+        dialog: 'Imagen ampliada',
+        close: 'Cerrar',
+      };
+    }
+    if (lang.startsWith('pt')) {
+      return {
+        dialog: 'Imagem ampliada',
+        close: 'Fechar',
+      };
+    }
+    return {
+      dialog: 'Expanded image',
+      close: 'Close',
+    };
+  }
+
+  function shouldExpandImage(img) {
+    if (!(img instanceof HTMLImageElement) || !img.src) return false;
+    if (img.closest('.sidebar')) return false;
+    if (img.closest('.modal')) return false;
+    if (img.closest('#credentials-modal')) return false;
+    if (img.closest('#docs-image-lightbox')) return false;
+    if (img.hasAttribute('data-no-lightbox')) return false;
+    return true;
+  }
+
+  function initImageLightbox() {
+    if (document.getElementById('docs-image-lightbox')) return;
+
+    const labels = lightboxAriaLabels();
+    const overlay = document.createElement('div');
+    overlay.id = 'docs-image-lightbox';
+    overlay.className = 'docs-image-lightbox';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', labels.dialog);
+    overlay.hidden = true;
+    overlay.innerHTML = `
+      <div class="docs-image-lightbox__backdrop" data-lightbox-dismiss tabindex="-1"></div>
+      <button type="button" class="docs-image-lightbox__close btn btn--ghost" data-lightbox-dismiss aria-label="${labels.close}">×</button>
+      <img class="docs-image-lightbox__img" alt="" />
+    `;
+    document.body.appendChild(overlay);
+
+    const fullImg = overlay.querySelector('.docs-image-lightbox__img');
+
+    function openLightbox(src, alt) {
+      fullImg.src = src;
+      fullImg.alt = alt || '';
+      overlay.hidden = false;
+      document.documentElement.classList.add('docs-image-lightbox-open');
+      document.body.classList.add('docs-image-lightbox-open');
+    }
+
+    function closeLightbox() {
+      overlay.hidden = true;
+      fullImg.removeAttribute('src');
+      fullImg.alt = '';
+      document.documentElement.classList.remove('docs-image-lightbox-open');
+      document.body.classList.remove('docs-image-lightbox-open');
+    }
+
+    document.body.addEventListener('click', (e) => {
+      const img = e.target.closest('img');
+      if (!img || !shouldExpandImage(img)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      openLightbox(img.currentSrc || img.src, img.alt || '');
+    });
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target.closest('[data-lightbox-dismiss]')) closeLightbox();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !overlay.hidden) closeLightbox();
+    });
+  }
+
   /** Credentials modal */
   function initCredentialsModal() {
     const backdrop = document.getElementById('modal-backdrop');
@@ -381,6 +465,7 @@
     initPageShell();
     initTheme();
     initPageTransitions();
+    initImageLightbox();
     renderApiPage();
     initCredentialsModal();
     updateCredentialsBadge();
