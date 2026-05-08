@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      try {
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('docs-theme') || 'light');
+      } catch (e) {}
+    </script>
+    <title>Complex Discounts — Documentación</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../../assets/css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body data-page="api" data-api="complex-discounts" data-static-api>
+    <div class="page-shell" id="page-shell">
+      <div class="api-layout">
+        <div class="sidebar-shell">
+          <aside class="sidebar" aria-label="Documentación">
+            <a href="../index.html" class="sidebar__logo" data-page-link
+              ><img src="../../assets/img/logo.png" alt="Rappi"
+            /></a>
+            <div class="sidebar__top">
+              <div class="docs-lang-switch sidebar__langs" data-docs-lang-switch aria-label="Idioma"></div>
+              <button type="button" class="btn btn--theme" data-theme-toggle aria-label="Cambiar tema">
+                Modo oscuro
+              </button>
+              <nav class="sidebar__nav" aria-label="En esta página">
+                <a href="#section-discount-requirements">Requisitos para crear descuentos</a>
+                <a href="#section-endpoints">Endpoints</a>
+                <a href="#section-relevant-flows">Flujos relevantes</a>
+                <a href="#section-guide">Guía</a>
+              </nav>
+            </div>
+            <div class="sidebar__bottom">
+              <div class="sidebar__cred-wrap">
+                <span class="credentials-badge" data-credentials-badge hidden>Credentials set</span>
+              </div>
+              <a href="../index.html" class="btn btn--ghost" data-page-link style="text-align: center">← Todas las APIs</a>
+            </div>
+          </aside>
+        </div>
+        <main class="api-main" id="main">
+          <div id="api-content-root">
+            <header class="api-main__header">
+              <h1>Complex Discounts</h1>
+              <p class="lead">
+                Crea promociones y descuentos con reglas avanzadas (combos, escalonados, por público).
+              </p>
+            </header>
+
+            <section class="section-anchor" id="section-discount-requirements" aria-labelledby="h-discount-requirements">
+              <h2 id="h-discount-requirements">Requisitos para crear descuentos</h2>
+              <p>Para crear promociones y descuentos avanzados en Rappi, hay algunos puntos importantes:</p>
+              <ul>
+                <li>Inventario ativo e estável — descontos só fazem sentido sobre produtos com preço base atualizado.</li>
+                <li>Credenciales Bearer válidas.</li>
+                <li>Definición prévia das regras de negócio (vigência, segmento, limite por pedido).</li>
+              </ul>
+            </section>
+
+            <section class="section-anchor" id="section-endpoints" aria-labelledby="h-endpoints">
+              <h2 id="h-endpoints">Endpoints</h2>
+
+              <article class="endpoint-block section-anchor" id="endpoint-example">
+                <h3>
+                  <span class="method-badge">POST</span>
+                  /v1/discounts/example
+                </h3>
+                <p>Endpoint de ejemplo. Sustitúyelo por el contrato real en cuanto esté disponible.</p>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Body da requisição (JSON)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{}</code></pre>
+                </div>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Ejemplo de respuesta (JSON)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{}</code></pre>
+                </div>
+                <div class="try-soon">
+                  <button type="button" class="btn btn--ghost" disabled title="Próximamente">Probar (próximamente)</button>
+                </div>
+              </article>
+            </section>
+
+            <section class="section-anchor" id="section-relevant-flows" aria-labelledby="h-flows">
+              <h2 id="h-flows">Flujos relevantes</h2>
+              <p>
+                Fluxo de criação de promoção: defina regra → publique no escopo (loja/produto) → monitore ativações.
+              </p>
+              <p>
+                Fluxo de encerramento: agende fim ou desative manualmente para evitar descontos fora de campanha.
+              </p>
+            </section>
+
+            <section class="section-anchor" id="section-guide" aria-labelledby="h-guide">
+              <h2 id="h-guide">Guía</h2>
+              <p>
+                Descontos complexos rodam sobre o preço já carregado no inventário; se o preço base estiver
+                desatualizado, o desconto também ficará.
+              </p>
+              <p>Siempre prueba la promoción en homologación antes de activarla en producción.</p>
+              <p>Documenta vigencia y reglas junto al KAM — facilita auditoría y soporte al partner.</p>
+            </section>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <div id="modal-backdrop" class="modal-backdrop" data-close-credentials tabindex="-1" aria-hidden="true"></div>
+    <div
+      id="credentials-modal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cred-title"
+      aria-hidden="true"
+    >
+      <h2 id="cred-title">Definir credenciales</h2>
+      <p class="muted">Valores opcionales para ejemplos en esta página.</p>
+      <form id="credentials-form">
+        <div class="modal__field">
+          <label for="field-api-key">Clave de API</label>
+          <input type="password" id="field-api-key" name="apiKey" autocomplete="off" spellcheck="false" placeholder="Tu clave" />
+        </div>
+        <div class="modal__field">
+          <label for="field-store-id">ID de la tienda</label>
+          <input type="text" id="field-store-id" name="storeId" autocomplete="off" placeholder="Identificador de la tienda" />
+        </div>
+        <div class="modal__field">
+          <label for="field-merchant">ID del merchant</label>
+          <input type="text" id="field-merchant" name="merchantId" autocomplete="off" placeholder="Merchant" />
+        </div>
+        <div class="modal__field">
+          <label for="field-webhook">URL del webhook</label>
+          <input type="url" id="field-webhook" name="webhookUrl" autocomplete="off" placeholder="https://" />
+        </div>
+        <div class="modal__actions">
+          <button type="submit" class="btn btn--primary">Guardar</button>
+          <button type="button" class="btn btn--ghost" data-close-credentials>Cancelar</button>
+          <button type="button" class="btn btn--ghost" id="credentials-clear">Limpiar credenciales</button>
+        </div>
+      </form>
+      <p class="modal__note">
+        Almacenado solo en sessionStorage en esta pestaña. Este sitio no envía nada a servidores externos.
+      </p>
+    </div>
+
+    <script src="../../assets/js/credentials.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" crossorigin="anonymous"></script>
+    <script defer src="../../assets/js/lang-switcher.js"></script>
+    <script src="../../assets/js/main.js"></script>
+  </body>
+</html>

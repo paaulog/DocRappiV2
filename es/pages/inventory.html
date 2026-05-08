@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
+<html lang="es" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,11 +8,11 @@
         document.documentElement.setAttribute('data-theme', localStorage.getItem('docs-theme') || 'light');
       } catch (e) {}
     </script>
-    <title>Inventário — API e SFTP</title>
+    <title>Inventario — API y SFTP</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../../assets/css/style.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
@@ -23,94 +23,100 @@
     <div class="page-shell" id="page-shell">
       <div class="api-layout">
         <div class="sidebar-shell">
-          <aside class="sidebar" aria-label="Documentação">
+          <aside class="sidebar" aria-label="Documentación">
             <a href="../index.html" class="sidebar__logo" data-page-link
-              ><img src="../assets/img/logo.png" alt="Rappi"
+              ><img src="../../assets/img/logo.png" alt="Rappi"
             /></a>
             <div class="sidebar__top">
-              <button type="button" class="btn btn--theme" data-theme-toggle aria-label="Alternar tema">
-                Modo escuro
+              <div class="docs-lang-switch sidebar__langs" data-docs-lang-switch aria-label="Idioma"></div>
+              <button type="button" class="btn btn--theme" data-theme-toggle aria-label="Cambiar tema">
+                Modo oscuro
               </button>
-              <nav class="sidebar__nav" aria-label="Nesta página">
-                <a href="#section-api-intro">Início — via API</a>
+              <nav class="sidebar__nav" aria-label="En esta página">
+                <a href="#section-api-intro">Inicio — vía API</a>
                 <a href="#section-endpoints">Endpoints</a>
-                <a href="#section-sftp-intro">Início — via SFTP</a>
+                <a href="#section-sftp-intro">Inicio — vía SFTP</a>
+                <a href="#section-guide">Notas importantes</a>
               </nav>
             </div>
             <div class="sidebar__bottom">
               <div class="sidebar__cred-wrap">
                 <span class="credentials-badge" data-credentials-badge hidden>Credentials set</span>
               </div>
-              <a href="../index.html" class="btn btn--ghost" data-page-link style="text-align: center">← Todas as APIs</a>
+              <a href="../index.html" class="btn btn--ghost" data-page-link style="text-align: center">← Todas las APIs</a>
             </div>
           </aside>
         </div>
         <main class="api-main" id="main">
           <div id="api-content-root">
             <header class="api-main__header">
-              <h1>Inventário</h1>
+              <h1>Inventario</h1>
               <p class="lead">
-                Atualize estoque, preços e descontos simples na Rappi por <strong>API</strong> ou em
+                Actualiza stock, precios y descuentos simples en Rappi vía <strong>API</strong> o
                 <strong>SFTP</strong>.
               </p>
             </header>
 
             <section class="section-anchor" id="section-api-intro" aria-labelledby="h-api-intro">
-              <h2 id="h-api-intro">Início — via API</h2>
-              <p>Para atualizar inventário pela API, há alguns pontos importantes:</p>
+              <h2 id="h-api-intro">Inicio — vía API</h2>
+              <p>Para actualizar inventario por API HTTPS, hay algunos puntos importantes:</p>
 
-              <h3>O que é a Integração de Inventário?</h3>
+              <h3>¿Qué es la Integración de Inventario?</h3>
               <p>
-                A integração de inventário consiste na atualização <strong>APENAS</strong> do estoque, preços e dos descontos simples de um varejista na
-                Rappi — neste canal, por chamadas via API.
+                La integración de inventario existe para facilitar la actualización de stock y precios de un minorista en
+                Rappi — en este canal, mediante llamadas JSON por HTTP (<code>datasets</code>).
               </p>
 
               <h3>Requisitos</h3>
               <ul>
-                <li>Catálogo de produtos já cadastrado na Rappi.</li>
-                <li>Lista de IDs lojas para que a Rappi crie equivalencias em seu lado</li>
-                <li>(<code>api_key</code>) para autenticação na API</li>
+                <li>Catálogo de productos ya registrado en Rappi.</li>
+                <li>Lista de tiendas con equivalencia de IDs entre el minorista y Rappi.</li>
+                <li>Clave de API (<code>api_key</code>) para el entorno acordado (pruebas o producción).</li>
               </ul>
 
-              <h3>Autenticação e formato</h3>
+              <h3>Autenticación y formato</h3>
               <p>
-                Envie <code>api_key</code> no <strong>header</strong>. 
-                <div class="doc-note">
-                  👍 Solicite sua <strong>API key de ambiente de testes</strong> ao engenheiro de integração.
-                </div>
+                Envía <code>api_key</code> en el <strong>header</strong>. El cuerpo contiene principalmente el arreglo <code>records</code>:
+                cada objeto representa un producto de la tienda. La API puede aceptar otros campos (nombre, descripción, EAN, etc.),
+                pero solo <strong><code>price</code></strong>, <strong><code>discount_price</code></strong> y
+                <strong><code>stock</code></strong> actualizan efectivamente esos valores del lado de Rappi, según tu
+                contrato.
+              </p>
 
-              <h3>Uma loja por requisição</h3>
+              <h3>Una tienda por solicitud</h3>
               <p>
-                Cada chamada representa <strong>o inventário de uma única loja</strong> — todos os registros devem estar
-                alinhados a esse escopo combinado para o projeto.
+                Cada llamada representa <strong>el inventario de una sola tienda</strong> — todos los registros deben estar
+                alineados con ese alcance acordado para el proyecto.
               </p>
 
               <div class="doc-note doc-note--warn">
-                🚧 Se <strong>mais de uma loja</strong> for enviada na mesma solicitação, o endpoint poderá retornar
-                erro.
+                🚧 Si se envía <strong>más de una tienda</strong> incorrectamente en la misma solicitud, el endpoint puede devolver
+                error.
               </div>
 
-              
+              <div class="doc-note">
+                👍 Solicita tu <strong>API key del entorno de pruebas</strong> al ingeniero de integración.
+              </div>
             </section>
 
             <section class="section-anchor" id="section-endpoints" aria-labelledby="h-endpoints">
               <h2 id="h-endpoints">Endpoints</h2>
 
               <article class="endpoint-block section-anchor" id="endpoint-datasets-ingest">
-                <h3><span class="method-badge">POST</span> /datasets</h3>
+                <h3><span class="method-badge">POST</span> /api/cpgs-integration/datasets</h3>
                 <p>
-                  URL:
-                  <code> https://services.grability.rappi.com/api/cpgs-integration/datasets</code>.
+                  Ingesta masiva de inventario (<code>datasets</code>). URL base de ejemplo:
+                  <code>https://services.grability.rappi.com/api/cpgs-integration/datasets</code>.
                 </p>
 
                 <div class="code-block-wrap">
                   <div class="code-block__bar">
-                    <span>Requisição (cURL)</span>
+                    <span>Solicitud (cURL)</span>
                     <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                   </div>
                   <pre><code class="language-bash">curl --location --request POST 'https://services.grability.rappi.com/api/cpgs-integration/datasets' \
 --header 'Content-Type: application/json' \
---header 'api_key: {api_key}' \
+--header 'api_key: {test_api_key}' \
 --data-raw '{
     "type": "",
     "records": [
@@ -133,151 +139,157 @@
                 </div>
 
                 <p class="muted">
-                  📘 Coleção Postman com exemplos básicos — <b>Solicite a coleção no Postman ao engenheiro de integração</b>
+                  📘 Colección de Postman con ejemplos básicos —
+                  <a
+                    href="https://api.postman.com/collections/15370950-1f11e34a-815d-42af-b1cc-3d254c1a43fa"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    >abrir en Postman</a
+                  >.
                 </p>
 
-                <h3>Glossário</h3>
+                <h3>Registros (campos esperados)</h3>
                 <p>
-                  Tabela referência para cabeçalho e objetos dentro de <code>records[]</code>. Mantenha os nomes alinhados ao
-                  contrato com o seu engenheiro de integração.
+                  Tabla de referencia para el encabezado y objetos dentro de <code>records[]</code>. Mantén los nombres alineados con
+                  el contrato acordado con tu ingeniero de integración.
                 </p>
                 <div class="table-wrap">
                   <table class="api-doc-table">
                     <thead>
                       <tr>
                         <th>Campo</th>
-                        <th>Exigência</th>
+                        <th>Requisito</th>
                         <th>Tipo</th>
-                        <th>Escopo</th>
-                        <th>Definição</th>
+                        <th>Alcance</th>
+                        <th>Definición</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
                         <td><code>api_key</code></td>
-                        <td>Obrigatório</td>
+                        <td>Obligatorio</td>
                         <td>string</td>
                         <td>Header</td>
-                        <td>Token de autorização exclusivo da integração.</td>
+                        <td>Token exclusivo de integración.</td>
                       </tr>
                       <tr>
                         <td><code>type</code></td>
                         <td>Opcional</td>
                         <td>string</td>
                         <td>Body</td>
-                        <td>Tipo conforme combinado (<code>string</code> vazia ou <code>delta</code>).</td>
+                        <td>Tipo según lo acordado (<code>string</code> vacía o <code>full</code>/<code>delta</code>).</td>
                       </tr>
                       <tr>
                         <td><code>id</code></td>
-                        <td>Obrigatório</td>
+                        <td>Obligatorio</td>
                         <td>string</td>
                         <td><code>records[]</code></td>
-                        <td>SKU / PLU do parceiro.</td>
+                        <td>SKU / PLU del partner.</td>
                       </tr>
                       <tr>
                         <td><code>store_id</code></td>
-                        <td>Obrigatório</td>
+                        <td>Obligatorio</td>
                         <td>string</td>
                         <td><code>records[]</code></td>
-                        <td>Identificador da loja (parceiro ou Rappi).</td>
+                        <td>Identificador de la tienda (partner o Rappi).</td>
                       </tr>
                       <tr>
                         <td><code>ean</code></td>
-                        <td>Obrigatório</td>
+                        <td>Obligatorio</td>
                         <td>string</td>
                         <td><code>records[]</code></td>
-                        <td>Código de barras (pode ser UPC).</td>
+                        <td>Código de barras (puede ser UPC).</td>
                       </tr>
                       <tr>
                         <td><code>name</code></td>
-                        <td>Obrigatório</td>
+                        <td>Obligatorio</td>
                         <td>string</td>
                         <td><code>records[]</code></td>
-                        <td>Nome do produto.</td>
+                        <td>Nombre del producto.</td>
                       </tr>
                       <tr>
                         <td><code>trademark</code></td>
-                        <td>Obrigatório</td>
+                        <td>Obligatorio</td>
                         <td>string</td>
                         <td><code>records[]</code></td>
                         <td>Marca registrada.</td>
                       </tr>
                       <tr>
                         <td><code>description</code></td>
-                        <td>Obrigatório</td>
+                        <td>Obligatorio</td>
                         <td>string</td>
                         <td><code>records[]</code></td>
-                        <td>Descrição (evite vírgulas desnecessárias).</td>
+                        <td>Descripción (evita comas innecesarias).</td>
                       </tr>
                       <tr>
                         <td><code>price</code></td>
-                        <td>Obrigatório</td>
+                        <td>Obligatorio</td>
                         <td>número</td>
                         <td><code>records[]</code></td>
-                        <td>Preço cheio na moeda local.</td>
+                        <td>Precio completo en moneda local.</td>
                       </tr>
                       <tr>
                         <td><code>discount_price</code></td>
                         <td>Opcional</td>
                         <td>número</td>
                         <td><code>records[]</code></td>
-                        <td>Preço final com desconto.</td>
+                        <td>Precio final con descuento.</td>
                       </tr>
                       <tr>
                         <td><code>stock</code></td>
-                        <td>Obrigatório</td>
-                        <td>inteiro</td>
+                        <td>Obligatorio</td>
+                        <td>entero</td>
                         <td><code>records[]</code></td>
-                        <td>Unidades em estoque.</td>
+                        <td>Unidades en stock.</td>
                       </tr>
                       <tr>
                         <td><code>sale_type</code></td>
-                        <td>Obrigatório</td>
+                        <td>Obligatorio</td>
                         <td>string</td>
                         <td><code>records[]</code></td>
-                        <td>Tipo de venda.</td>
+                        <td>Tipo de venta.</td>
                       </tr>
                       <tr>
                         <td><code>is_available</code></td>
-                        <td>Obrigatório</td>
+                        <td>Obligatorio</td>
                         <td>booleano / null</td>
                         <td><code>records[]</code></td>
-                        <td>Campo esperado em muitos contratos — veja observação logo abaixo.</td>
+                        <td>Campo esperado en muchos contratos — ver nota abajo.</td>
                       </tr>
                       <tr>
                         <td><code>image_url</code></td>
-                        <td>Obrigatório</td>
+                        <td>Obligatorio</td>
                         <td>string</td>
                         <td><code>records[]</code></td>
-                        <td>URL da imagem.</td>
+                        <td>URL de la imagen.</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
 
                 <div class="doc-note">
-                  👍 <strong>O que vale lembrar:</strong>
+                  👍 <strong>Qué tener en cuenta:</strong>
                   <ul style="margin: 0.5rem 0 0 1.25rem">
                     <li>
-                      <code>is_available</code> deve ser enviado quando combinado no contrato, mas tipicamente
-                      <strong>não altera a lógica</strong> de disponibilização.
+                      <code>is_available</code> debe enviarse cuando se acuerde en el contrato, pero normalmente
+                      <strong>no altera la lógica</strong> de disponibilidad.
                     </li>
-                    <li>Campos opcionais podem vir vazios ou omitidos dentro do combinado.</li>
-                    <li>Não são aceitos campos fora da lista acordada.</li>
-                    <li>O campo <code>id</code> é prioritário junto ao EAN para conciliação interna.</li>
+                    <li>Los campos opcionales pueden venir vacíos u omitidos según lo acordado.</li>
+                    <li>No se aceptan campos fuera de la lista acordada.</li>
+                    <li>El campo <code>id</code> es prioritario junto con el EAN para conciliación interna.</li>
                   </ul>
                 </div>
 
                 <h3>Carga completa (FULL)</h3>
                 <p>
-                  A carga deve refletir o catálogo completo disponível na loja. Produtos ausentes ficam como indisponíveis (além
-                  dos marcados assim no payload).
+                  La carga debe reflejar el catálogo completo disponible en la tienda. Los productos ausentes quedan como no disponibles (además
+                  de los marcados así en el payload).
                 </p>
-                <p class="muted">Use corpo equivalente com <code>"type": ""</p>
+                <p class="muted">En muchos casos usa un cuerpo equivalente con <code>"type": ""</code> — valida los detalles con tu equipo.</p>
 
                 <div class="code-block-wrap">
                   <div class="code-block__bar">
-                    <span>Requisição (cURL)</span>
+                    <span>Solicitud (cURL)</span>
                     <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                   </div>
                   <pre><code class="language-bash">curl --location --request POST 'https://services.grability.rappi.com/api/cpgs-integration/datasets' \
@@ -306,13 +318,13 @@
 
                 <h3>Carga delta</h3>
                 <p>
-                  Envie somente itens com alteração relevante desde a última sincronização. Inclua
-                  <code>"type": "delta"</code> no corpo raiz como abaixo.
+                  Envía solo ítems con cambios relevantes desde la última sincronización. Los demás permanecen igual. Incluye
+                  <code>"type": "delta"</code> en el cuerpo raíz como abajo.
                 </p>
 
                 <div class="code-block-wrap">
                   <div class="code-block__bar">
-                    <span>Requisição (cURL · delta)</span>
+                    <span>Solicitud (cURL · delta)</span>
                     <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                   </div>
                   <pre><code class="language-bash">curl --location --request POST 'https://services.grability.rappi.com/api/cpgs-integration/datasets' \
@@ -340,19 +352,19 @@
                 </div>
 
                 <div class="doc-note doc-note--warn">
-                  ❗️ <strong>Não é permitido operar somente com cargas 'delta'</strong>. É necessário enviar
-                  ao menos <strong>uma carga 'full' por dia</strong>, preferencialmente no início do dia útil.
+                  ❗️ Igual que en SFTP, <strong>no está permitido operar solo con cargas delta</strong>. Combínalo con
+                  <strong>al menos una carga completa por día</strong>, preferentemente al inicio de la jornada.
                 </div>
 
-                <h3>Exemplo volumoso</h3>
+                <h3>Exemplo volumoso (homologação)</h3>
                 <p>
-                  Exemplo com vários SKUs e um único <code>store_id</code> — útil para validar performance de payload com a
-                  <code>api_key</code> de testes.
+                  Ejemplo con varios SKUs y un único <code>store_id</code> — útil para validar el rendimiento del payload con la
+                  <code>api_key</code> de pruebas.
                 </p>
 
                 <div class="code-block-wrap">
                   <div class="code-block__bar">
-                    <span>Requisição (cURL)</span>
+                    <span>Solicitud (cURL)</span>
                     <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                   </div>
                   <pre><code class="language-bash">curl --location 'https://services.grability.rappi.com/api/cpgs-integration/datasets' \
@@ -504,15 +516,15 @@
 }'</code></pre>
                 </div>
 
-                <h3>Resposta de sucesso</h3>
+                <h3>Respuesta exitosa</h3>
                 <div class="doc-note">
-                  👍 <strong>HTTP 201 Created:</strong> o corpo traz um <code>job_id</code>, <code>status</code> e
-                  um timestamp.
+                  👍 <strong>HTTP 201 Created:</strong> el cuerpo trae un <code>job_id</code>, <code>status</code> y
+                  marca de tiempo — otros canales (correo/notificaciones internas) siguen lo acordado en el proyecto.
                 </div>
 
                 <div class="code-block-wrap">
                   <div class="code-block__bar">
-                    <span>Exemplo de resposta (JSON)</span>
+                    <span>Ejemplo de respuesta (JSON)</span>
                     <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                   </div>
                   <pre><code class="language-json">{
@@ -523,11 +535,11 @@
                 </div>
 
                 <p class="muted">
-                  💡 ❗ Falta de campo obrigatório — <strong>HTTP 400</strong>:
+                  💡 ❗ Falta campo obligatorio — <strong>HTTP 400</strong>:
                 </p>
                 <div class="code-block-wrap">
                   <div class="code-block__bar">
-                    <span>Exemplo de resposta (JSON)</span>
+                    <span>Ejemplo de respuesta (JSON)</span>
                     <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                   </div>
                   <pre><code class="language-json">{
@@ -540,11 +552,11 @@
                 </div>
 
                 <p class="muted">
-                  💡 ❗ Token ou fonte inativa — <strong>HTTP 400</strong> (Bucket / data source não ativo ou inexistente) ] - contate o engenheiro de integração:
+                  💡 ❗ Token o fuente inactiva — <strong>HTTP 400</strong> (Bucket / data source no activo o inexistente):
                 </p>
                 <div class="code-block-wrap">
                   <div class="code-block__bar">
-                    <span>Exemplo de resposta (JSON)</span>
+                    <span>Ejemplo de respuesta (JSON)</span>
                     <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                   </div>
                   <pre><code class="language-json">{
@@ -553,235 +565,274 @@
                 </div>
 
                 <div class="try-soon">
-                  <button type="button" class="btn btn--ghost" disabled title="Em breve">Experimentar (em breve)</button>
+                  <button type="button" class="btn btn--ghost" disabled title="Próximamente">Probar (próximamente)</button>
                 </div>
               </article>
             </section>
 
             <section class="section-anchor" id="section-sftp-intro" aria-labelledby="h-sftp-intro">
-              <h2 id="h-sftp-intro">Início — via SFTP</h2>
+              <h2 id="h-sftp-intro">Inicio — vía SFTP</h2>
 
-              <h3>Requisitos de integração</h3>
+              <h3>¿Qué es la Integración de Inventario?</h3>
+              <p>
+                La integración de inventario existe para facilitar la actualización del stock y precios de un minorista en Rappi.
+              </p>
+
+              <h3>Requisitos de integración</h3>
               <ul>
-                <li>Catálogo de produtos já cadastrado na Rappi.</li>
-                <li>Lista de lojas com equivalência de IDs de loja entre varejista e Rappi.</li>
-                <li>Arquivo PPK (chave SSH) para autenticação SFTP.</li>
-                <li>Acesso ao FileZilla.</li>
-                <li>Capacidade técnica e operacional de integrar pelo menos uma vez ao dia uma <strong>carga full</strong>.</li>
+                <li>Catálogo de productos ya registrado en Rappi.</li>
+                <li>Lista de tiendas con equivalencia de IDs entre el minorista y Rappi.</li>
+                <li>Archivo PPK (clave SSH) para autenticación SFTP.</li>
+                <li>Acceso a FileZilla u otro cliente SFTP compatible.</li>
+                <li>Capacidad técnica y operativa para integrar al menos una <strong>carga completa</strong> al día.</li>
               </ul>
 
-              <h3>A solicitação (envio por arquivo)</h3>
+              <h3>La solicitud (envío por archivo)</h3>
               <p>
-                Nesta modalidade é necessário depositar o arquivo de inventário dentro da pasta designada em nosso
+                En esta modalidad es necesario depositar el archivo de inventario en la carpeta designada de nuestro
                 servidor SFTP.
               </p>
 
               <div class="doc-note">
-                👍 <strong>Múltiplas lojas em um único arquivo</strong>: é possível enviar várias lojas no mesmo arquivo.
+                👍 <strong>Múltiples tiendas en un único archivo</strong>: es posible enviar varias tiendas en el mismo archivo.
               </div>
 
-              <h3>Nome do arquivo</h3>
+              <h3>Nombre del archivo</h3>
               <p>
-                O nome do arquivo de integração deve seguir um dos quatro formatos abaixo. Se o envio for <strong>por
-                loja</strong>, o nome deve incluir o ID da loja de onde o estoque está sendo reportado. Se o envio for
-                <strong>único arquivo com todas as lojas</strong>, use o nome do parceiro.
+                El nombre del archivo de integración debe seguir uno de los cuatro formatos siguientes. Si el envío es <strong>por
+                tienda</strong>, el nombre debe incluir el ID de la tienda desde donde se reporta el stock. Si el envío es
+                <strong>un único archivo con todas las tiendas</strong>, usa el nombre del partner.
               </p>
               <ul>
-                <li>Data + hora: <code>STOREID_YYYY-MM-DD_HHmm.csv</code></li>
-                <li>Somente data: <code>STOREID_YYYY-MM-DD.csv</code></li>
-                <li>Data + hora (todas as lojas): <code>NOME_DO_PARCEIRO_YYYY-MM-DD_HHmm.csv</code></li>
-                <li>Somente data (todas as lojas): <code>NOME_DO_PARCEIRO_YYYY-MM-DD.csv</code></li>
+                <li>Fecha + hora: <code>STOREID_YYYY-MM-DD_HHmm.csv</code></li>
+                <li>Solo fecha: <code>STOREID_YYYY-MM-DD.csv</code></li>
+                <li>Fecha + hora (todas las tiendas): <code>NOMBRE_DEL_PARTNER_YYYY-MM-DD_HHmm.csv</code></li>
+                <li>Solo fecha (todas las tiendas): <code>NOMBRE_DEL_PARTNER_YYYY-MM-DD.csv</code></li>
               </ul>
               <p>
-                Se você optar por enviar todas as lojas em um único arquivo, as linhas devem estar ordenadas por loja.
+                Si eliges enviar todas las tiendas en un único archivo, las líneas deben estar ordenadas por tienda.
               </p>
 
-              <h3>Colunas</h3>
+              <h3>Columnas</h3>
               <div class="table-wrap">
                 <table class="api-doc-table">
                   <thead>
                     <tr>
                       <th>Campo</th>
-                      <th>Exigência</th>
+                      <th>Requisito</th>
                       <th>Tipo</th>
-                      <th>Escopo</th>
-                      <th>Definição</th>
+                      <th>Alcance</th>
+                      <th>Definición</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
                       <td><code>id</code></td>
-                      <td>Obrigatório</td>
+                      <td>Obligatorio</td>
                       <td>string</td>
-                      <td>Body (linha)</td>
-                      <td>ID do produto do parceiro (SKU, PLU).</td>
+                      <td>Body (fila)</td>
+                      <td>ID de producto del partner (SKU, PLU).</td>
                     </tr>
                     <tr>
                       <td><code>store_id</code></td>
-                      <td>Obrigatório</td>
+                      <td>Obligatorio</td>
                       <td>string</td>
-                      <td>Body (linha)</td>
-                      <td>Código de identificação da loja do parceiro ou da Rappi.</td>
+                      <td>Body (fila)</td>
+                      <td>Código de identificación de tienda del partner o de Rappi.</td>
                     </tr>
                     <tr>
                       <td><code>ean</code></td>
-                      <td>Obrigatório</td>
+                      <td>Obligatorio</td>
                       <td>string</td>
-                      <td>Body (linha)</td>
-                      <td>Código de barras (pode ser UPC).</td>
+                      <td>Body (fila)</td>
+                      <td>Código de barras (puede ser UPC).</td>
                     </tr>
                     <tr>
                       <td><code>name</code></td>
-                      <td>Obrigatório</td>
+                      <td>Obligatorio</td>
                       <td>string</td>
-                      <td>Body (linha)</td>
-                      <td>Nome do produto.</td>
+                      <td>Body (fila)</td>
+                      <td>Nombre del producto.</td>
                     </tr>
                     <tr>
                       <td><code>trademark</code></td>
-                      <td>Obrigatório</td>
+                      <td>Obligatorio</td>
                       <td>string</td>
-                      <td>Body (linha)</td>
-                      <td>Marca registrada do produto.</td>
+                      <td>Body (fila)</td>
+                      <td>Marca registrada del producto.</td>
                     </tr>
                     <tr>
                       <td><code>description</code></td>
-                      <td>Obrigatório</td>
+                      <td>Obligatorio</td>
                       <td>string</td>
-                      <td>Body (linha)</td>
-                      <td>Descrição do produto (evite vírgulas que quebrem o CSV).</td>
+                      <td>Body (fila)</td>
+                      <td>Descripción del producto (evita comas que rompan el CSV).</td>
                     </tr>
                     <tr>
                       <td><code>price</code></td>
-                      <td>Obrigatório</td>
+                      <td>Obligatorio</td>
                       <td>número</td>
-                      <td>Body (linha)</td>
-                      <td>Preço cheio na moeda local.</td>
+                      <td>Body (fila)</td>
+                      <td>Precio completo en moneda local.</td>
                     </tr>
                     <tr>
                       <td><code>discount_price</code></td>
                       <td>Opcional</td>
                       <td>número</td>
-                      <td>Body (linha)</td>
-                      <td>Preço com desconto aplicado (preço final).</td>
+                      <td>Body (fila)</td>
+                      <td>Precio con descuento aplicado (precio final).</td>
                     </tr>
                     <tr>
                       <td><code>stock</code></td>
-                      <td>Obrigatório</td>
-                      <td>inteiro</td>
-                      <td>Body (linha)</td>
-                      <td>Unidades reais em estoque.</td>
+                      <td>Obligatorio</td>
+                      <td>entero</td>
+                      <td>Body (fila)</td>
+                      <td>Unidades reales en stock.</td>
                     </tr>
                     <tr>
                       <td><code>sale_type</code></td>
-                      <td>Obrigatório</td>
+                      <td>Obligatorio</td>
                       <td>string</td>
-                      <td>Body (linha)</td>
-                      <td>Tipo de venda.</td>
+                      <td>Body (fila)</td>
+                      <td>Tipo de venta.</td>
                     </tr>
                     <tr>
                       <td><code>image_url</code></td>
-                      <td>Obrigatório</td>
+                      <td>Obligatorio</td>
                       <td>string</td>
-                      <td>Body (linha)</td>
-                      <td>URL da imagem.</td>
+                      <td>Body (fila)</td>
+                      <td>URL de la imagen.</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
 
               <p>
-                A tabela acima mostra os campos que devem constar na integração. A seguir há um exemplo de registro
-                mínimo, porém válido, para uma integração bem-sucedida — respeite também as convenções de nome de
-                arquivo.
+                La tabla anterior muestra los campos que deben incluirse en la integración. A continuación hay un ejemplo mínimo,
+                pero válido, para una integración exitosa — respeta también las convenciones del nombre de
+                archivo.
               </p>
               <div class="code-block-wrap">
                 <div class="code-block__bar">
-                  <span>Exemplo CSV (uma linha)</span>
+                  <span>Ejemplo CSV (una fila)</span>
                   <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                 </div>
                 <pre><code>id,store_id,ean,name,trademark,description,price,discount_price,stock,sale_type,image_url
-SKU-DEMO-1,900408633,7891234567890,Produto exemplo,Marca exemplo,Descrição sem vírgulas,10.99,9.49,120,U,https://cdn.exemplo.com/img.jpg</code></pre>
+SKU-DEMO-1,900408633,7891234567890,Producto ejemplo,Marca ejemplo,Descripción sin comas,10.99,9.49,120,U,https://cdn.ejemplo.com/img.jpg</code></pre>
               </div>
 
               <p class="muted">
-                Arquivos CSV ou TXT podem chegar sem cabeçalho e sem estes nomes de coluna. Se o arquivo não trouxer
-                cabeçalho padronizado, avise seu engenheiro de integração para mapear qual coluna corresponde a qual
+                Los archivos CSV o TXT pueden llegar sin encabezado y sin estos nombres de columna. Si el archivo no trae
+                encabezado estandarizado, avisa a tu ingeniero de integración para mapear qué columna corresponde a qué
                 campo.
               </p>
 
               <div class="doc-note">
-                👍 <strong>O que vale lembrar</strong>
+                👍 <strong>Qué tener en cuenta</strong>
                 <ul style="margin: 0.5rem 0 0 1.25rem">
                   <li>
-                    Os descontos são totalmente opcionais, mas ajudam a atrair usuários para as lojas no app Rappi.
+                    Los descuentos son totalmente opcionales, pero ayudan a atraer usuarios a las tiendas en la app de Rappi.
                   </li>
                   <li>
-                    Quando nem todos os produtos têm desconto, você pode repetir o preço integral em
-                    <code>discount_price</code> ou deixar em branco (evite enviar <code>0</code>).
+                    Cuando no todos los productos tienen descuento, puedes repetir el precio completo en
+                    <code>discount_price</code> o dejarlo en blanco (evita enviar <code>0</code>).
                   </li>
                   <li>
-                    Campos não obrigatórios podem vir vazios ou podem nem ser enviados, conforme o combinado para o caso.
+                    Los campos no obligatorios pueden venir vacíos o incluso no enviarse, según lo acordado para el caso.
                   </li>
-                  <li>Não são aceitos campos diferentes ou ausentes da lista fornecida.</li>
+                  <li>No se aceptan campos diferentes o faltantes respecto a la lista provista.</li>
                   <li>
-                    Embora <code>ean</code> seja obrigatório, nossos sistemas utilizam sobretudo o campo
-                    <code>id</code> para identificar produtos na base da Rappi.
+                    Aunque <code>ean</code> es obligatorio, nuestros sistemas usan sobre todo el campo
+                    <code>id</code> para identificar productos en la base de Rappi.
                   </li>
                 </ul>
               </div>
 
-              <h3>Tipos de integração</h3>
-              <p>Existem dois tipos de carga:</p>
+              <h3>Tipos de integración</h3>
+              <p>Existen dos tipos de carga:</p>
 
               <h4>COMPLETO (FULL)</h4>
               <p>
-                Uma atualização completa deve conter todo o catálogo disponível na loja. Qualquer produto que não
-                apareça no arquivo será marcado como indisponível, além daqueles já indicados como indisponíveis no
-                próprio arquivo.
+                Una actualización completa debe contener todo el catálogo disponible en la tienda. Cualquier producto que no
+                aparezca en el archivo se marcará como no disponible, además de los ya marcados como no disponibles en
+                el propio archivo.
               </p>
               <p>
-                Cargas completas <strong>não precisam de prefixo especial no arquivo</strong>, mas você também pode usar
-                o prefixo convenido pela integração, por exemplo <code>full:</code>.
+                Las cargas completas <strong>no necesitan prefijo especial en el archivo</strong>, pero también puedes usar
+                el prefijo acordado para la integración, por ejemplo <code>full:</code>.
               </p>
               <figure class="content-figure">
                 <img
-                  src="../assets/img/inventory-full-files-example.png"
-                  alt="Exemplo de arquivos de carga completa no FileZilla"
+                  src="../../assets/img/inventory-full-files-example.png"
+                  alt="Ejemplo de archivos de carga completa en FileZilla"
                 />
-                <figcaption>Exemplo de arquivos de carga completa (FULL) enviados via SFTP.</figcaption>
+                <figcaption>Ejemplo de archivos de carga completa (FULL) enviados vía SFTP.</figcaption>
               </figure>
 
               <h4>DELTA</h4>
               <p>
-                Atualizações delta precisam trazer apenas os produtos cujo estoque (ou valores relevantes) mudou desde a
-                última atualização. Os que não constarem no arquivo permanecem como estão no sistema.
+                Las actualizaciones delta deben incluir solo los productos cuyo stock (o valores relevantes) cambió desde la
+                última actualización. Los que no aparezcan en el archivo permanecen igual en el sistema.
               </p>
               <p>
-                Cargas <strong>delta</strong> devem indicar esse tipo conforme convenção técnica acordada — em geral, via
-                <strong>prefixo <code>delta</code> no nome ou no envio</strong>; confirme o padrão exato com o engenheiro
-                de integração.
+                Las cargas <strong>delta</strong> deben indicar ese tipo según la convención técnica acordada — en general, mediante
+                <strong>prefijo <code>delta</code> en el nombre o en el envío</strong>; confirma el patrón exacto con el ingeniero
+                de integración.
               </p>
               <figure class="content-figure">
                 <img
-                  src="../assets/img/inventory-delta-files-example.png"
-                  alt="Exemplo de arquivos de carga delta no FileZilla"
+                  src="../../assets/img/inventory-delta-files-example.png"
+                  alt="Ejemplo de archivos de carga delta en FileZilla"
                 />
-                <figcaption>Exemplo de arquivos de carga delta (DELTA) enviados via SFTP.</figcaption>
+                <figcaption>Ejemplo de archivos de carga delta (DELTA) enviados vía SFTP.</figcaption>
               </figure>
 
               <div class="doc-note doc-note--warn">
-                ❗️ Os parceiros <strong>não podem</strong> trabalhar apenas com cargas delta. Se optarem por deltas,
-                precisam enviar <strong>ao menos uma carga completa por dia</strong>. Recomendamos fazê‑lo logo no início do
-                dia útil.
+                ❗️ Los partners <strong>no pueden</strong> trabajar solo con cargas delta. Si optan por delta,
+                deben enviar <strong>al menos una carga completa por día</strong>. Recomendamos hacerlo al inicio de la
+                jornada.
               </div>
 
+              <h3>Pruebas de SFTP</h3>
+              <p>
+                Tu ingeniero de integración compartirá contigo el PPK del entorno de pruebas para probar la
+                conexión. En pruebas, utiliza siempre los <strong>mismos productos y la misma tienda</strong> acordados entre las
+                partes.
+              </p>
+
+              <div class="doc-note">
+                📘 <strong>Plantilla</strong>: tu ingeniero de integración te comparte un enlace de descarga (por ejemplo
+                <strong>"Descargar aquí"</strong>) con el archivo de ejemplo usado en pruebas.
+              </div>
+
+              <p>
+                Después del upload, informa al ingeniero de integración para que verifique en el pipeline si el procesamiento
+                ocurrió correctamente.
+              </p>
+
               <div class="doc-note doc-note--warn">
-                ❗ <strong>Importante</strong>: ao contrário da API, você <strong>não receberá resposta dentro do FileZilla
-                apenas por concluir o upload</strong> — o resultado da integração segue pelo fluxo assíncrono notificado pela
+                ❗ <strong>Importante</strong>: a diferencia de la API, <strong>no recibirás respuesta dentro de FileZilla
+                solo por finalizar el upload</strong> — el resultado de la integración sigue el flujo asíncrono notificado por
                 Rappi.
               </div>
             </section>
+
+            <section class="section-anchor" id="section-guide" aria-labelledby="h-guide">
+              <h2 id="h-guide">Notas importantes</h2>
+
+              <h3>Primera actualización vía API (producción)</h3>
+              <p>
+                Antes del go-live, confirma requisitos, pruebas SFTP/API y payloads con tu ingeniero. En producción usa la
+                <strong><code>API_KEY</code></strong> liberada solo tras autorización formal.
+              </p>
+
+              <h3>Uso combinado FULL + delta</h3>
+              <p>
+                Tanto por API como por SFTP, evita trabajar solo con cargas delta: combínalas con al menos una carga
+                completa diaria, preferentemente por la mañana.
+              </p>
+            </section>
+
 
           </div>
         </main>
@@ -797,40 +848,41 @@ SKU-DEMO-1,900408633,7891234567890,Produto exemplo,Marca exemplo,Descrição sem
       aria-labelledby="cred-title"
       aria-hidden="true"
     >
-      <h2 id="cred-title">Definir credenciais</h2>
-      <p class="muted">Valores opcionais para exemplos nesta página.</p>
+      <h2 id="cred-title">Definir credenciales</h2>
+      <p class="muted">Valores opcionales para ejemplos en esta página.</p>
       <form id="credentials-form">
         <div class="modal__field">
-          <label for="field-api-key">Chave de API</label>
-          <input type="password" id="field-api-key" name="apiKey" autocomplete="off" spellcheck="false" placeholder="Sua chave" />
+          <label for="field-api-key">Clave de API</label>
+          <input type="password" id="field-api-key" name="apiKey" autocomplete="off" spellcheck="false" placeholder="Tu clave" />
         </div>
         <div class="modal__field">
-          <label for="field-store-id">ID da loja</label>
-          <input type="text" id="field-store-id" name="storeId" autocomplete="off" placeholder="Identificador da loja" />
+          <label for="field-store-id">ID de la tienda</label>
+          <input type="text" id="field-store-id" name="storeId" autocomplete="off" placeholder="Identificador de la tienda" />
         </div>
         <div class="modal__field">
-          <label for="field-merchant">ID do merchant</label>
+          <label for="field-merchant">ID del merchant</label>
           <input type="text" id="field-merchant" name="merchantId" autocomplete="off" placeholder="Merchant" />
         </div>
         <div class="modal__field">
-          <label for="field-webhook">URL do webhook</label>
+          <label for="field-webhook">URL del webhook</label>
           <input type="url" id="field-webhook" name="webhookUrl" autocomplete="off" placeholder="https://" />
         </div>
         <div class="modal__actions">
-          <button type="submit" class="btn btn--primary">Salvar</button>
+          <button type="submit" class="btn btn--primary">Guardar</button>
           <button type="button" class="btn btn--ghost" data-close-credentials>Cancelar</button>
-          <button type="button" class="btn btn--ghost" id="credentials-clear">Limpar credenciais</button>
+          <button type="button" class="btn btn--ghost" id="credentials-clear">Limpiar credenciales</button>
         </div>
       </form>
       <p class="modal__note">
-        Armazenado apenas em sessionStorage nesta aba. Nada é enviado a servidores externos por este site.
+        Almacenado solo en sessionStorage en esta pestaña. Este sitio no envía nada a servidores externos.
       </p>
     </div>
 
-    <script src="../assets/js/credentials.js"></script>
+    <script src="../../assets/js/credentials.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js" crossorigin="anonymous"></script>
-    <script src="../assets/js/main.js"></script>
+    <script defer src="../../assets/js/lang-switcher.js"></script>
+    <script src="../../assets/js/main.js"></script>
   </body>
 </html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      try {
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('docs-theme') || 'light');
+      } catch (e) {}
+    </script>
+    <title>Rappi CPGS Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+  </head>
+  <body data-page="landing">
+    <div class="page-shell" id="page-shell">
+      <header class="landing__header">
+        <div class="landing__header-bar">
+          <span class="landing__header-spacer" aria-hidden="true"></span>
+          <div class="docs-lang-switch docs-lang-switch--landing" data-docs-lang-switch aria-label="Idioma"></div>
+          <button type="button" class="btn btn--theme" data-theme-toggle aria-label="Cambiar tema">
+            Modo oscuro
+          </button>
+        </div>
+        <img class="landing__logo" src="../assets/img/logo.png" alt="Rappi" />
+        <h1 class="landing__title">Documentación de Open APIs</h1>
+        <p class="lead landing__subtitle">Todas nuestras soluciones en un solo lugar.</p>
+      </header>
+      <main class="landing__main">
+        <section class="landing__cards" aria-label="APIs disponibles">
+          <a class="api-card landing__card" href="pages/open-catalog.html" data-page-link>
+            <span class="api-card__name">Open Catalog</span>
+            <span class="api-card__note">Catálogo de productos.</span>
+          </a>
+          <a class="api-card landing__card" href="pages/inventory.html" data-page-link>
+            <span class="api-card__name">Basic Inventory</span>
+            <span class="api-card__note">Actualización de inventario y precio.</span>
+          </a>
+          <a class="api-card landing__card" href="pages/complex-discounts.html" data-page-link>
+            <span class="api-card__name">Complex Discounts</span>
+            <span class="api-card__note">Promociones y descuentos avanzados.</span>
+          </a>
+          <a class="api-card landing__card" href="pages/open-orders.html" data-page-link>
+            <span class="api-card__name">Open Orders</span>
+            <span class="api-card__note">Gestión de pedidos.</span>
+          </a>
+          <a class="api-card landing__card" href="pages/payless.html" data-page-link>
+            <span class="api-card__name">Payless</span>
+            <span class="api-card__note">Pagos integrados.</span>
+          </a>
+          <a class="api-card landing__card" href="pages/loyalty.html" data-page-link>
+            <span class="api-card__name">Loyalty</span>
+            <span class="api-card__note">Programa de fidelización.</span>
+          </a>
+        </section>
+      </main>
+    </div>
+    <script src="../assets/js/content.js"></script>
+    <script src="../assets/js/credentials.js"></script>
+    <script defer src="../assets/js/lang-switcher.js"></script>
+    <script src="../assets/js/main.js"></script>
+  </body>
+</html>

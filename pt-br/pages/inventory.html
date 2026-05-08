@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../../assets/css/style.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
@@ -25,9 +25,10 @@
         <div class="sidebar-shell">
           <aside class="sidebar" aria-label="Documentação">
             <a href="../index.html" class="sidebar__logo" data-page-link
-              ><img src="../assets/img/logo.png" alt="Rappi"
+              ><img src="../../assets/img/logo.png" alt="Rappi"
             /></a>
             <div class="sidebar__top">
+              <div class="docs-lang-switch sidebar__langs" data-docs-lang-switch aria-label="Idioma"></div>
               <button type="button" class="btn btn--theme" data-theme-toggle aria-label="Alternar tema">
                 Modo escuro
               </button>
@@ -35,6 +36,7 @@
                 <a href="#section-api-intro">Início — via API</a>
                 <a href="#section-endpoints">Endpoints</a>
                 <a href="#section-sftp-intro">Início — via SFTP</a>
+                <a href="#section-guide">Notas importantes</a>
               </nav>
             </div>
             <div class="sidebar__bottom">
@@ -57,27 +59,29 @@
 
             <section class="section-anchor" id="section-api-intro" aria-labelledby="h-api-intro">
               <h2 id="h-api-intro">Início — via API</h2>
-              <p>Para atualizar inventário pela API, há alguns pontos importantes:</p>
+              <p>Para atualizar inventário pela API HTTPS, há alguns pontos importantes:</p>
 
               <h3>O que é a Integração de Inventário?</h3>
               <p>
-                A integração de inventário consiste na atualização <strong>APENAS</strong> do estoque, preços e dos descontos simples de um varejista na
-                Rappi — neste canal, por chamadas via API.
+                A integração de inventário existe para facilitar a atualização do estoque e dos preços de um varejista na
+                Rappi — neste canal, por chamadas com JSON via HTTP (<code>datasets</code>).
               </p>
 
               <h3>Requisitos</h3>
               <ul>
                 <li>Catálogo de produtos já cadastrado na Rappi.</li>
-                <li>Lista de IDs lojas para que a Rappi crie equivalencias em seu lado</li>
-                <li>(<code>api_key</code>) para autenticação na API</li>
+                <li>Lista de lojas com equivalência de IDs de loja entre varejista e Rappi.</li>
+                <li>Chave de API (<code>api_key</code>) para o ambiente acordado (testes ou produção).</li>
               </ul>
 
               <h3>Autenticação e formato</h3>
               <p>
-                Envie <code>api_key</code> no <strong>header</strong>. 
-                <div class="doc-note">
-                  👍 Solicite sua <strong>API key de ambiente de testes</strong> ao engenheiro de integração.
-                </div>
+                Envie <code>api_key</code> no <strong>cabeçalho</strong>. O corpo traz sobretudo o array <code>records</code>:
+                cada objeto representa um produto na loja. A API pode aceitar outros campos (nome, descrição, EAN etc.),
+                porém apenas <strong><code>price</code></strong>, <strong><code>discount_price</code></strong> e
+                <strong><code>stock</code></strong> atualizam esses valores efetivamente do lado da Rappi conforme seu
+                contrato.
+              </p>
 
               <h3>Uma loja por requisição</h3>
               <p>
@@ -86,21 +90,23 @@
               </p>
 
               <div class="doc-note doc-note--warn">
-                🚧 Se <strong>mais de uma loja</strong> for enviada na mesma solicitação, o endpoint poderá retornar
+                🚧 Se <strong>mais de uma loja</strong> for enviada incorretamente na mesma solicitação, o endpoint poderá retornar
                 erro.
               </div>
 
-              
+              <div class="doc-note">
+                👍 Solicite sua <strong>API key de ambiente de testes</strong> ao engenheiro de integração.
+              </div>
             </section>
 
             <section class="section-anchor" id="section-endpoints" aria-labelledby="h-endpoints">
               <h2 id="h-endpoints">Endpoints</h2>
 
               <article class="endpoint-block section-anchor" id="endpoint-datasets-ingest">
-                <h3><span class="method-badge">POST</span> /datasets</h3>
+                <h3><span class="method-badge">POST</span> /api/cpgs-integration/datasets</h3>
                 <p>
-                  URL:
-                  <code> https://services.grability.rappi.com/api/cpgs-integration/datasets</code>.
+                  Ingestão em lote de inventário (<code>datasets</code>). Base exemplo:
+                  <code>https://services.grability.rappi.com/api/cpgs-integration/datasets</code>.
                 </p>
 
                 <div class="code-block-wrap">
@@ -110,7 +116,7 @@
                   </div>
                   <pre><code class="language-bash">curl --location --request POST 'https://services.grability.rappi.com/api/cpgs-integration/datasets' \
 --header 'Content-Type: application/json' \
---header 'api_key: {api_key}' \
+--header 'api_key: {test_api_key}' \
 --data-raw '{
     "type": "",
     "records": [
@@ -133,10 +139,16 @@
                 </div>
 
                 <p class="muted">
-                  📘 Coleção Postman com exemplos básicos — <b>Solicite a coleção no Postman ao engenheiro de integração</b>
+                  📘 Coleção Postman com exemplos básicos —
+                  <a
+                    href="https://api.postman.com/collections/15370950-1f11e34a-815d-42af-b1cc-3d254c1a43fa"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    >abrir no Postman</a
+                  >.
                 </p>
 
-                <h3>Glossário</h3>
+                <h3>Registros (campos esperados)</h3>
                 <p>
                   Tabela referência para cabeçalho e objetos dentro de <code>records[]</code>. Mantenha os nomes alinhados ao
                   contrato com o seu engenheiro de integração.
@@ -157,15 +169,15 @@
                         <td><code>api_key</code></td>
                         <td>Obrigatório</td>
                         <td>string</td>
-                        <td>Header</td>
-                        <td>Token de autorização exclusivo da integração.</td>
+                        <td>Cabeçalho</td>
+                        <td>Token exclusivo de integração.</td>
                       </tr>
                       <tr>
                         <td><code>type</code></td>
                         <td>Opcional</td>
                         <td>string</td>
-                        <td>Body</td>
-                        <td>Tipo conforme combinado (<code>string</code> vazia ou <code>delta</code>).</td>
+                        <td>Corpo</td>
+                        <td>Tipo conforme combinado (<code>string</code> vazia ou <code>full</code>/<code>delta</code>).</td>
                       </tr>
                       <tr>
                         <td><code>id</code></td>
@@ -273,7 +285,7 @@
                   A carga deve refletir o catálogo completo disponível na loja. Produtos ausentes ficam como indisponíveis (além
                   dos marcados assim no payload).
                 </p>
-                <p class="muted">Use corpo equivalente com <code>"type": ""</p>
+                <p class="muted">Em muitos casos use corpo equivalente com <code>"type": ""</code> — valide os detalhes com o seu time.</p>
 
                 <div class="code-block-wrap">
                   <div class="code-block__bar">
@@ -306,7 +318,7 @@
 
                 <h3>Carga delta</h3>
                 <p>
-                  Envie somente itens com alteração relevante desde a última sincronização. Inclua
+                  Envie somente itens com alteração relevante desde a última sincronização. Demais permanecem como estão. Inclua
                   <code>"type": "delta"</code> no corpo raiz como abaixo.
                 </p>
 
@@ -340,11 +352,11 @@
                 </div>
 
                 <div class="doc-note doc-note--warn">
-                  ❗️ <strong>Não é permitido operar somente com cargas 'delta'</strong>. É necessário enviar
-                  ao menos <strong>uma carga 'full' por dia</strong>, preferencialmente no início do dia útil.
+                  ❗️ Assim como no SFTP, <strong>não é permitido operar somente com cargas delta</strong>. Combine com
+                  <strong>ao menos uma carga completa por dia</strong>, preferencialmente no início do dia útil.
                 </div>
 
-                <h3>Exemplo volumoso</h3>
+                <h3>Exemplo volumoso (homologação)</h3>
                 <p>
                   Exemplo com vários SKUs e um único <code>store_id</code> — útil para validar performance de payload com a
                   <code>api_key</code> de testes.
@@ -507,7 +519,7 @@
                 <h3>Resposta de sucesso</h3>
                 <div class="doc-note">
                   👍 <strong>HTTP 201 Created:</strong> o corpo traz um <code>job_id</code>, <code>status</code> e
-                  um timestamp.
+                  carimbo de tempo — outros canais (e-mail/notificações internas) seguem o combinado no projeto.
                 </div>
 
                 <div class="code-block-wrap">
@@ -540,7 +552,7 @@
                 </div>
 
                 <p class="muted">
-                  💡 ❗ Token ou fonte inativa — <strong>HTTP 400</strong> (Bucket / data source não ativo ou inexistente) ] - contate o engenheiro de integração:
+                  💡 ❗ Token ou fonte inativa — <strong>HTTP 400</strong> (Bucket / data source não ativo ou inexistente):
                 </p>
                 <div class="code-block-wrap">
                   <div class="code-block__bar">
@@ -561,13 +573,18 @@
             <section class="section-anchor" id="section-sftp-intro" aria-labelledby="h-sftp-intro">
               <h2 id="h-sftp-intro">Início — via SFTP</h2>
 
+              <h3>O que é a Integração de Inventário?</h3>
+              <p>
+                A integração de inventário existe para facilitar a atualização do estoque e dos preços de um varejista na Rappi.
+              </p>
+
               <h3>Requisitos de integração</h3>
               <ul>
                 <li>Catálogo de produtos já cadastrado na Rappi.</li>
                 <li>Lista de lojas com equivalência de IDs de loja entre varejista e Rappi.</li>
                 <li>Arquivo PPK (chave SSH) para autenticação SFTP.</li>
-                <li>Acesso ao FileZilla.</li>
-                <li>Capacidade técnica e operacional de integrar pelo menos uma vez ao dia uma <strong>carga full</strong>.</li>
+                <li>Acesso ao FileZilla ou a outro cliente SFTP compatível.</li>
+                <li>Capacidade técnica e operacional de integrar pelo menos uma vez ao dia uma <strong>carga completa</strong>.</li>
               </ul>
 
               <h3>A solicitação (envio por arquivo)</h3>
@@ -613,77 +630,77 @@
                       <td><code>id</code></td>
                       <td>Obrigatório</td>
                       <td>string</td>
-                      <td>Body (linha)</td>
+                      <td>Corpo (linha)</td>
                       <td>ID do produto do parceiro (SKU, PLU).</td>
                     </tr>
                     <tr>
                       <td><code>store_id</code></td>
                       <td>Obrigatório</td>
                       <td>string</td>
-                      <td>Body (linha)</td>
+                      <td>Corpo (linha)</td>
                       <td>Código de identificação da loja do parceiro ou da Rappi.</td>
                     </tr>
                     <tr>
                       <td><code>ean</code></td>
                       <td>Obrigatório</td>
                       <td>string</td>
-                      <td>Body (linha)</td>
+                      <td>Corpo (linha)</td>
                       <td>Código de barras (pode ser UPC).</td>
                     </tr>
                     <tr>
                       <td><code>name</code></td>
                       <td>Obrigatório</td>
                       <td>string</td>
-                      <td>Body (linha)</td>
+                      <td>Corpo (linha)</td>
                       <td>Nome do produto.</td>
                     </tr>
                     <tr>
                       <td><code>trademark</code></td>
                       <td>Obrigatório</td>
                       <td>string</td>
-                      <td>Body (linha)</td>
+                      <td>Corpo (linha)</td>
                       <td>Marca registrada do produto.</td>
                     </tr>
                     <tr>
                       <td><code>description</code></td>
                       <td>Obrigatório</td>
                       <td>string</td>
-                      <td>Body (linha)</td>
+                      <td>Corpo (linha)</td>
                       <td>Descrição do produto (evite vírgulas que quebrem o CSV).</td>
                     </tr>
                     <tr>
                       <td><code>price</code></td>
                       <td>Obrigatório</td>
                       <td>número</td>
-                      <td>Body (linha)</td>
+                      <td>Corpo (linha)</td>
                       <td>Preço cheio na moeda local.</td>
                     </tr>
                     <tr>
                       <td><code>discount_price</code></td>
                       <td>Opcional</td>
                       <td>número</td>
-                      <td>Body (linha)</td>
+                      <td>Corpo (linha)</td>
                       <td>Preço com desconto aplicado (preço final).</td>
                     </tr>
                     <tr>
                       <td><code>stock</code></td>
                       <td>Obrigatório</td>
                       <td>inteiro</td>
-                      <td>Body (linha)</td>
+                      <td>Corpo (linha)</td>
                       <td>Unidades reais em estoque.</td>
                     </tr>
                     <tr>
                       <td><code>sale_type</code></td>
                       <td>Obrigatório</td>
                       <td>string</td>
-                      <td>Body (linha)</td>
+                      <td>Corpo (linha)</td>
                       <td>Tipo de venda.</td>
                     </tr>
                     <tr>
                       <td><code>image_url</code></td>
                       <td>Obrigatório</td>
                       <td>string</td>
-                      <td>Body (linha)</td>
+                      <td>Corpo (linha)</td>
                       <td>URL da imagem.</td>
                     </tr>
                   </tbody>
@@ -744,13 +761,6 @@ SKU-DEMO-1,900408633,7891234567890,Produto exemplo,Marca exemplo,Descrição sem
                 Cargas completas <strong>não precisam de prefixo especial no arquivo</strong>, mas você também pode usar
                 o prefixo convenido pela integração, por exemplo <code>full:</code>.
               </p>
-              <figure class="content-figure">
-                <img
-                  src="../assets/img/inventory-full-files-example.png"
-                  alt="Exemplo de arquivos de carga completa no FileZilla"
-                />
-                <figcaption>Exemplo de arquivos de carga completa (FULL) enviados via SFTP.</figcaption>
-              </figure>
 
               <h4>DELTA</h4>
               <p>
@@ -762,13 +772,6 @@ SKU-DEMO-1,900408633,7891234567890,Produto exemplo,Marca exemplo,Descrição sem
                 <strong>prefixo <code>delta</code> no nome ou no envio</strong>; confirme o padrão exato com o engenheiro
                 de integração.
               </p>
-              <figure class="content-figure">
-                <img
-                  src="../assets/img/inventory-delta-files-example.png"
-                  alt="Exemplo de arquivos de carga delta no FileZilla"
-                />
-                <figcaption>Exemplo de arquivos de carga delta (DELTA) enviados via SFTP.</figcaption>
-              </figure>
 
               <div class="doc-note doc-note--warn">
                 ❗️ Os parceiros <strong>não podem</strong> trabalhar apenas com cargas delta. Se optarem por deltas,
@@ -776,12 +779,46 @@ SKU-DEMO-1,900408633,7891234567890,Produto exemplo,Marca exemplo,Descrição sem
                 dia útil.
               </div>
 
+              <h3>Testando o SFTP</h3>
+              <p>
+                Seu engenheiro de integração compartilhará com você o PPK de ambiente de testes para experimentar a
+                conexão. Em testes utilize sempre os <strong>mesmos produtos e a mesma loja</strong> combinados entre as
+                partes.
+              </p>
+
+              <div class="doc-note">
+                📘 <strong>Modelo</strong>: seu engenheiro de integração disponibiliza um link de download (por exemplo
+                <strong>«Baixar aqui»</strong>) com o arquivo exemplo usado nos testes.
+              </div>
+
+              <p>
+                Após o upload, informe o engenheiro de integração para que ele verifique no pipeline se o processamento
+                ocorreu corretamente.
+              </p>
+
               <div class="doc-note doc-note--warn">
                 ❗ <strong>Importante</strong>: ao contrário da API, você <strong>não receberá resposta dentro do FileZilla
                 apenas por concluir o upload</strong> — o resultado da integração segue pelo fluxo assíncrono notificado pela
                 Rappi.
               </div>
             </section>
+
+            <section class="section-anchor" id="section-guide" aria-labelledby="h-guide">
+              <h2 id="h-guide">Notas importantes</h2>
+
+              <h3>Primeira atualização via API (produção)</h3>
+              <p>
+                Antes do go-live, confirme requisitos, testes SFTP/API e payloads com o seu engenheiro. Em produção utilize a
+                <strong><code>API_KEY</code></strong> liberada apenas após autorização formal.
+              </p>
+
+              <h3>Uso combinado FULL + delta</h3>
+              <p>
+                Tanto pela API como pelo SFTP, evite trabalhar apenas com cargas delta: combine com pelo menos uma carga
+                completa diária, de preferência pela manhã.
+              </p>
+            </section>
+
 
           </div>
         </main>
@@ -827,10 +864,11 @@ SKU-DEMO-1,900408633,7891234567890,Produto exemplo,Marca exemplo,Descrição sem
       </p>
     </div>
 
-    <script src="../assets/js/credentials.js"></script>
+    <script src="../../assets/js/credentials.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js" crossorigin="anonymous"></script>
-    <script src="../assets/js/main.js"></script>
+    <script defer src="../../assets/js/lang-switcher.js"></script>
+    <script src="../../assets/js/main.js"></script>
   </body>
 </html>

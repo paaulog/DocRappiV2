@@ -177,7 +177,7 @@
     ensureCopyButtonDataAttrs(root);
     bindCopyButtons(root);
     initScrollSpy();
-    root.querySelectorAll('pre code.language-json').forEach((el) => {
+    root.querySelectorAll('pre code.language-json, pre code.language-bash').forEach((el) => {
       if (window.Prism && typeof Prism.highlightElement === 'function') {
         Prism.highlightElement(el);
       }

@@ -8,31 +8,32 @@
         document.documentElement.setAttribute('data-theme', localStorage.getItem('docs-theme') || 'light');
       } catch (e) {}
     </script>
-    <title>Loyalty — Documentação</title>
+    <title>Open Orders — Documentação</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../../assets/css/style.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
       crossorigin="anonymous"
     />
   </head>
-  <body data-page="api" data-api="loyalty" data-static-api>
+  <body data-page="api" data-api="open-orders" data-static-api>
     <div class="page-shell" id="page-shell">
       <div class="api-layout">
         <div class="sidebar-shell">
           <aside class="sidebar" aria-label="Documentação">
             <a href="../index.html" class="sidebar__logo" data-page-link
-              ><img src="../assets/img/logo.png" alt="Rappi"
+              ><img src="../../assets/img/logo.png" alt="Rappi"
             /></a>
             <div class="sidebar__top">
+              <div class="docs-lang-switch sidebar__langs" data-docs-lang-switch aria-label="Idioma"></div>
               <button type="button" class="btn btn--theme" data-theme-toggle aria-label="Alternar tema">
                 Modo escuro
               </button>
               <nav class="sidebar__nav" aria-label="Nesta página">
-                <a href="#section-loyalty-requirements">Requisitos para programa de fidelidade</a>
+                <a href="#section-orders-requirements">Requisitos para recebimento de pedidos</a>
                 <a href="#section-endpoints">Endpoints</a>
                 <a href="#section-relevant-flows">Fluxos relevantes</a>
                 <a href="#section-guide">Guia</a>
@@ -49,17 +50,19 @@
         <main class="api-main" id="main">
           <div id="api-content-root">
             <header class="api-main__header">
-              <h1>Loyalty</h1>
-              <p class="lead">Programa de fidelidade vinculado às compras feitas via Rappi.</p>
+              <h1>Open Orders</h1>
+              <p class="lead">
+                Receba e acompanhe pedidos da Rappi diretamente no seu sistema de gestão.
+              </p>
             </header>
 
-            <section class="section-anchor" id="section-loyalty-requirements" aria-labelledby="h-loyalty-requirements">
-              <h2 id="h-loyalty-requirements">Requisitos para programa de fidelidade</h2>
-              <p>Para integrar o programa de fidelidade na Rappi, existem alguns pontos importantes:</p>
+            <section class="section-anchor" id="section-orders-requirements" aria-labelledby="h-orders-requirements">
+              <h2 id="h-orders-requirements">Requisitos para recebimento de pedidos</h2>
+              <p>Para receber e acompanhar pedidos da Rappi no seu sistema, existem alguns pontos importantes:</p>
               <ul>
-                <li>Open Orders ou Payless já em produção.</li>
+                <li>Inventário integrado: pedidos só são gerados sobre produtos com estoque/preço sincronizados.</li>
                 <li>Credenciais Bearer válidas.</li>
-                <li>Regras de pontuação e resgate definidas com o time comercial.</li>
+                <li>Webhook ativo para receber notificações de novos pedidos.</li>
               </ul>
             </section>
 
@@ -69,7 +72,7 @@
               <article class="endpoint-block section-anchor" id="endpoint-example">
                 <h3>
                   <span class="method-badge">GET</span>
-                  /v1/loyalty/example
+                  /v1/orders/example
                 </h3>
                 <p>Endpoint de exemplo. Substitua pelo contrato real assim que disponível.</p>
                 <p class="muted">Sem corpo de requisição.</p>
@@ -88,15 +91,18 @@
 
             <section class="section-anchor" id="section-relevant-flows" aria-labelledby="h-flows">
               <h2 id="h-flows">Fluxos relevantes</h2>
-              <p>Fluxo de pontuação: a cada compra elegível, registre os pontos atribuídos ao cliente.</p>
-              <p>Fluxo de resgate: valide saldo, debite pontos e confirme o benefício liberado.</p>
+              <p>
+                Fluxo de pedido: notificação chega via webhook → você confirma/aceita → envia atualizações de status
+                (preparando, pronto, enviado).
+              </p>
+              <p>Fluxo de cancelamento: cancele com motivo padronizado para garantir reembolso correto ao cliente.</p>
             </section>
 
             <section class="section-anchor" id="section-guide" aria-labelledby="h-guide">
               <h2 id="h-guide">Guia</h2>
-              <p>Fidelidade depende de um histórico de pedidos confiável — por isso pressupõe Open Orders ou Payless.</p>
-              <p>Comunique claramente as regras (validade, taxas, exclusões) ao cliente final.</p>
-              <p>Monitore taxas de resgate para ajustar a economia do programa.</p>
+              <p>Open Orders e Payless são exclusivos: cada parceiro escolhe um dos dois para o ciclo de pedido.</p>
+              <p>Confirme cada pedido dentro do SLA combinado — atrasos prejudicam a experiência do cliente final.</p>
+              <p>Mantenha o status sempre atualizado: o app do entregador depende dessas atualizações.</p>
             </section>
           </div>
         </main>
@@ -142,9 +148,10 @@
       </p>
     </div>
 
-    <script src="../assets/js/credentials.js"></script>
+    <script src="../../assets/js/credentials.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" crossorigin="anonymous"></script>
-    <script src="../assets/js/main.js"></script>
+    <script defer src="../../assets/js/lang-switcher.js"></script>
+    <script src="../../assets/js/main.js"></script>
   </body>
 </html>

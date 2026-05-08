@@ -8,31 +8,32 @@
         document.documentElement.setAttribute('data-theme', localStorage.getItem('docs-theme') || 'light');
       } catch (e) {}
     </script>
-    <title>Payless — Documentação</title>
+    <title>Loyalty — Documentação</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../../assets/css/style.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
       crossorigin="anonymous"
     />
   </head>
-  <body data-page="api" data-api="payless" data-static-api>
+  <body data-page="api" data-api="loyalty" data-static-api>
     <div class="page-shell" id="page-shell">
       <div class="api-layout">
         <div class="sidebar-shell">
           <aside class="sidebar" aria-label="Documentação">
             <a href="../index.html" class="sidebar__logo" data-page-link
-              ><img src="../assets/img/logo.png" alt="Rappi"
+              ><img src="../../assets/img/logo.png" alt="Rappi"
             /></a>
             <div class="sidebar__top">
+              <div class="docs-lang-switch sidebar__langs" data-docs-lang-switch aria-label="Idioma"></div>
               <button type="button" class="btn btn--theme" data-theme-toggle aria-label="Alternar tema">
                 Modo escuro
               </button>
               <nav class="sidebar__nav" aria-label="Nesta página">
-                <a href="#section-payless-requirements">Requisitos para integração Payless</a>
+                <a href="#section-loyalty-requirements">Requisitos para programa de fidelidade</a>
                 <a href="#section-endpoints">Endpoints</a>
                 <a href="#section-relevant-flows">Fluxos relevantes</a>
                 <a href="#section-guide">Guia</a>
@@ -49,19 +50,17 @@
         <main class="api-main" id="main">
           <div id="api-content-root">
             <header class="api-main__header">
-              <h1>Payless</h1>
-              <p class="lead">
-                Modelo de pagamento integrado em que a Rappi gerencia a cobrança ao cliente final.
-              </p>
+              <h1>Loyalty</h1>
+              <p class="lead">Programa de fidelidade vinculado às compras feitas via Rappi.</p>
             </header>
 
-            <section class="section-anchor" id="section-payless-requirements" aria-labelledby="h-payless-requirements">
-              <h2 id="h-payless-requirements">Requisitos para integração Payless</h2>
-              <p>Para operar com o modelo Payless na Rappi, existem alguns pontos importantes:</p>
+            <section class="section-anchor" id="section-loyalty-requirements" aria-labelledby="h-loyalty-requirements">
+              <h2 id="h-loyalty-requirements">Requisitos para programa de fidelidade</h2>
+              <p>Para integrar o programa de fidelidade na Rappi, existem alguns pontos importantes:</p>
               <ul>
-                <li>Inventário integrado.</li>
+                <li>Open Orders ou Payless já em produção.</li>
                 <li>Credenciais Bearer válidas.</li>
-                <li>Acordo comercial Payless ativo com a Rappi.</li>
+                <li>Regras de pontuação e resgate definidas com o time comercial.</li>
               </ul>
             </section>
 
@@ -71,7 +70,7 @@
               <article class="endpoint-block section-anchor" id="endpoint-example">
                 <h3>
                   <span class="method-badge">GET</span>
-                  /v1/payless/example
+                  /v1/loyalty/example
                 </h3>
                 <p>Endpoint de exemplo. Substitua pelo contrato real assim que disponível.</p>
                 <p class="muted">Sem corpo de requisição.</p>
@@ -90,17 +89,15 @@
 
             <section class="section-anchor" id="section-relevant-flows" aria-labelledby="h-flows">
               <h2 id="h-flows">Fluxos relevantes</h2>
-              <p>
-                Fluxo de venda: cliente paga na Rappi → Rappi consolida valores e repassa ao parceiro conforme contrato.
-              </p>
-              <p>Fluxo de reconciliação financeira: utilize os relatórios periódicos para conferir repasses.</p>
+              <p>Fluxo de pontuação: a cada compra elegível, registre os pontos atribuídos ao cliente.</p>
+              <p>Fluxo de resgate: valide saldo, debite pontos e confirme o benefício liberado.</p>
             </section>
 
             <section class="section-anchor" id="section-guide" aria-labelledby="h-guide">
               <h2 id="h-guide">Guia</h2>
-              <p>Payless e Open Orders são exclusivos — cada parceiro adota apenas um.</p>
-              <p>Não exija pagamento adicional na entrega: o cliente já pagou pela plataforma.</p>
-              <p>Acompanhe o ciclo financeiro junto ao time comercial Rappi para evitar divergências.</p>
+              <p>Fidelidade depende de um histórico de pedidos confiável — por isso pressupõe Open Orders ou Payless.</p>
+              <p>Comunique claramente as regras (validade, taxas, exclusões) ao cliente final.</p>
+              <p>Monitore taxas de resgate para ajustar a economia do programa.</p>
             </section>
           </div>
         </main>
@@ -146,9 +143,10 @@
       </p>
     </div>
 
-    <script src="../assets/js/credentials.js"></script>
+    <script src="../../assets/js/credentials.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" crossorigin="anonymous"></script>
-    <script src="../assets/js/main.js"></script>
+    <script defer src="../../assets/js/lang-switcher.js"></script>
+    <script src="../../assets/js/main.js"></script>
   </body>
 </html>

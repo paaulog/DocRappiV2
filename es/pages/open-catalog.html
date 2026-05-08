@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      try {
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('docs-theme') || 'light');
+      } catch (e) {}
+    </script>
+    <title>Open Catalog - Documentación</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../../assets/css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body data-page="api" data-api="open-catalog" data-static-api>
+    <div class="page-shell" id="page-shell">
+      <div class="api-layout">
+        <div class="sidebar-shell">
+          <aside class="sidebar" aria-label="Documentación">
+            <a href="../index.html" class="sidebar__logo" data-page-link
+              ><img src="../../assets/img/logo.png" alt="Rappi"
+            /></a>
+            <div class="sidebar__top">
+              <div class="docs-lang-switch sidebar__langs" data-docs-lang-switch aria-label="Idioma"></div>
+              <button type="button" class="btn btn--theme" data-theme-toggle aria-label="Cambiar tema">
+                Modo oscuro
+              </button>
+              <nav class="sidebar__nav" aria-label="En esta página">
+                <a href="#section-product-requirements">Inicio</a>
+                <a href="#section-endpoints">Endpoints</a>
+                <a href="#section-guide">Notas importantes</a>
+              </nav>
+            </div>
+            <div class="sidebar__bottom">
+              <div class="sidebar__cred-wrap">
+                <span class="credentials-badge" data-credentials-badge hidden>Credentials set</span>
+              </div>
+              <a href="../index.html" class="btn btn--ghost" data-page-link style="text-align: center">← Todas las APIs</a>
+            </div>
+          </aside>
+        </div>
+        <main class="api-main" id="main">
+          <div id="api-content-root">
+            <header class="api-main__header">
+              <h1>Open Catalog</h1>
+              <p class="lead">
+                Registra tus productos en Rappi.
+              </p>
+            </header>
+
+            <section class="section-anchor" id="section-product-requirements" aria-labelledby="h-product-requirements">
+              <h2 id="h-product-requirements">Requisitos para la creación de productos</h2>
+              <p>Para publicar tus productos en Rappi, hay algunos puntos importantes:</p>
+              <ul>
+                <li>Autenticación</li>
+                <li>Categorías de productos</li>
+                <li>Variaciones</li>
+              </ul>
+
+              <h3>Autenticación</h3>
+              <p>
+                Rappi utiliza el Bearer Token generado en el endpoint de login para autenticar las solicitudes.
+                Para obtener el token, debes autenticarte en el endpoint de login y usar ese token en el
+                encabezado <code>Authorization</code> en todas las solicitudes siguientes.
+              </p>
+
+              <h3>Categorías de productos</h3>
+              <p>
+                Se usan en la aplicación para ofrecer al usuario una buena experiencia de navegación y
+                facilitar la búsqueda del producto deseado. Piensa en los pasillos y estanterías de un supermercado o en las secciones de ropa de una tienda por
+                departamentos. Para crear un producto, es obligatorio definir categorías. Esto determinará qué atributos el producto
+                debe tener para pertenecer a esa categoría.
+              </p>
+
+              <h3>Variaciones</h3>
+              <p>
+                Las variaciones se usan principalmente para el mismo artículo con características diferentes, como color,
+                talla, etc.
+              </p>
+
+              <h3>Flujo de creación de producto</h3>
+              <figure class="content-figure">
+                <img
+                  src="../../assets/img/product-creation-flow.png"
+                  alt="Flujo de creación y publicación de producto: seleccionar categoría, crear producto (con o sin variaciones)"
+                />
+              </figure>
+            </section>
+
+            <section class="section-anchor" id="section-endpoints" aria-labelledby="h-endpoints">
+              <h2 id="h-endpoints">Endpoints</h2>
+
+              <article class="endpoint-block section-anchor" id="endpoint-list-categories">
+                <h3><span class="method-badge">POST</span>
+                  /login</h3>
+                <p>Proporciona el Bearer de autenticación para las solicitudes siguientes.</p>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Solicitud (cURL)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-bash">curl --location 'https://services.rappi.com.br/api/open-api/login' 
+                    --data '{
+                      "client_id": "Solicitar al equipo de Rappi",
+                      "client_secret": "Solicitar al equipo de Rappi"
+                    }'</code></pre>
+                </div>
+                <h3>
+                  <span class="method-badge">GET</span>
+                 /categories
+                </h3>
+                <p>
+                 Lista las categorías de <strong>nivel 1</strong>, la parte superior del árbol.
+                  Combínalo con <strong>category-tree</strong> para bajar hasta la más específica.
+                </p>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Solicitud (cURL)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-bash">curl --location 'https://services.rappi.com.br/api/open-api/v1/catalog/categories' \
+--header 'Authorization: Bearer {bearer_token}'</code></pre>
+                </div>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Ejemplo de respuesta (JSON)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{
+  "data": [
+    { "id": 3569, "name": "Accesorios para bebés y niños" },
+    { "id": 2900, "name": "Mascotas" },
+    { "id": 4190, "name": "Arte y manualidades" }
+  ]
+}</code></pre>
+                </div>
+                <div class="try-soon">
+                  <button type="button" class="btn btn--ghost" disabled title="Em breve">Probar (próximamente)</button>
+                </div>
+              </article>
+
+              <article class="endpoint-block section-anchor" id="endpoint-category-tree">
+                <h3>
+                  <span class="method-badge">GET</span>
+                  /category-tree
+                </h3>
+                <p>
+                  Devuelve el árbol completo en una sola llamada. Usa siempre el id más específico (hoja) para crear el producto.
+                </p>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Solicitud (cURL)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-bash">curl --location 'https://services.rappi.com.br/api/open-api/v1/catalog/category-tree' \
+--header 'Authorization: Bearer {bearer_token}'</code></pre>
+                </div>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Ejemplo de respuesta (JSON)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{
+  "id": 2896,
+  "name": "category-tree-br",
+  "parentId": null,
+  "children": [
+    {
+      "id": 2900,
+      "name": "animais-de-estimação",
+      "parentId": 2896,
+      "children": [
+        {
+          "id": 2958,
+          "name": "alimentos-para-animais-de-estimação",
+          "parentId": 2900,
+          "children": [
+            { "id": 2962, "name": "alimento-para-cachorros", "parentId": 2958 },
+            { "id": 3680, "name": "alimento-para-gatos", "parentId": 2958 },
+            { "id": 3959, "name": "petiscos", "parentId": 2958 }
+          ]
+        }
+      ]
+    }
+  ]
+}</code></pre>
+                </div>
+                <div class="try-soon">
+                  <button type="button" class="btn btn--ghost" disabled title="Em breve">Probar (próximamente)</button>
+                </div>
+              </article>
+
+              <article class="endpoint-block section-anchor" id="endpoint-category-by-id">
+                <h3>
+                  <span class="method-badge">GET</span>
+                  /categories/{id_categoria}
+                </h3>
+                <p>
+                  Detalles de la categoría, incluyendo la lista de <strong>atributos</strong>. Llama siempre con el
+                  id del último nivel de categoría (la propiedad 'code' de cada atributo que entrará en el
+                  payload de creación).
+                </p>
+                <p class="muted">Sin cuerpo de solicitud.</p>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Solicitud (cURL)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-bash">curl --location 'https://services.rappi.com.br/api/open-api/v1/catalog/categories/3093' \
+--header 'Authorization: Bearer {bearer_token}'</code></pre>
+                </div>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Ejemplo de respuesta (JSON)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{
+  "id": 3093,
+  "name": "Dolor de garganta",
+  "attributes": [
+    {
+      "id": 9,
+      "name": "Tipo de empaque",
+      "code": "packaging",
+      "validation": { "type": "string" },
+      "description": "Indicates the type of beverage packaging",
+      "isRequired": false
+    },
+    {
+      "id": 1058,
+      "name": "Principio activo",
+      "code": "active_ingredient",
+      "validation": { "type": "string" },
+      "description": "The active ingredient in a medication...",
+      "isRequired": false
+    }
+  ],
+  "hasProducts": false,
+  "totalProducts": 0
+}</code></pre>
+                </div>
+                <p class="muted">
+                  💡 Ejemplo de jerarquía hasta la hoja:
+                  <code>Farmacia &gt; Gripe-y-tos &gt; Dolor de garganta (3093)</code>.
+                </p>
+                <div class="try-soon">
+                  <button type="button" class="btn btn--ghost" disabled title="Em breve">Probar (próximamente)</button>
+                </div>
+              </article>
+
+              <article class="endpoint-block section-anchor" id="endpoint-list-stores">
+                <h3>
+                  <span class="method-badge">GET</span>
+                  /stores
+                </h3>
+                <p>
+                  Lista todas las tiendas de Rappi del socio con <strong>id</strong>, nombre,
+                  dirección y coordenadas. Mapea cada <strong>id</strong> al código de tienda en tu sistema antes de enviar
+                  inventario o precio (API de inventario).
+                </p>
+                <p class="muted">
+                  Sin cuerpo de solicitud. Soporta paginación mediante <code>limit</code> y <code>offset</code> - itera hasta
+                  que la respuesta llegue vacía para garantizar cobertura total.
+                </p>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Solicitud (cURL)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-bash">curl --location 'https:services.rappi.com.br/api/open-api/v1/catalog/stores
+--header 'Authorization: Bearer {bearer_token}'</code></pre>
+                </div>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Ejemplo de respuesta (JSON)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{
+  "data": [
+    {
+      "id": 1234,
+      "country": "BR",
+      "status": "published",
+      "name": "Nombre de la tienda",
+      "lat": "4.678318",
+      "long": "-74.05496",
+      "address": "R. rappi, 123, Ciudad, Estado, Código postal, País"
+    }
+  ]
+}</code></pre>
+                </div>
+                <p class="muted">
+                  📘 Las configuraciones de tienda (dirección, horarios, etc.) son gestionadas por el equipo KAM de Rappi.
+                </p>
+                <div class="try-soon">
+                  <button type="button" class="btn btn--ghost" disabled title="Em breve">Probar (próximamente)</button>
+                </div>
+              </article>
+
+              <article class="endpoint-block section-anchor" id="endpoint-publish-product">
+                <h3>
+                  <span class="method-badge">POST</span>
+                  /products
+                </h3>
+                <p>
+                  Crea un producto en Rappi a nivel de marca.
+                </p>
+                <ul>
+                  <li><strong>Sin variación</strong>: 1 SKU → 1 <code>id</code>.</li>
+                  <li>
+                    <strong>Con variación</strong>: define <code>has_variation: true</code>. Cada item de
+                    <code>product[]</code> recibe su propio <code>id</code> y todos comparten el mismo
+                    <code>parent_id</code>.
+                  </li>
+                </ul>
+
+                <p><strong>Campos generales</strong></p>
+                <ul>
+                  <li>
+                    <code>category_id</code> — ID de la categoría <strong>hoja</strong> (la categoría más específica).
+                  </li>
+                  <li><code>name</code> — nombre mostrado en la navegación y en la búsqueda.</li>
+                  <li><code>description</code> — descripción mostrada en la página de detalle.</li>
+                  <li>
+                    <code>has_variation</code> — <code>false</code> para artículo unitario, <code>true</code> para
+                    múltiples variaciones.
+                  </li>
+                </ul>
+
+                <p><strong>Presentation</strong></p>
+                <ul>
+                  <li><code>quantity</code> — cantidad contenida en una unidad.</li>
+                  <li>
+                    <code>unitType</code> — unidad de medida: <code>"Und"</code>, <code>"Kg"</code>,
+                    <code>"g"</code>, <code>"mg"</code>, <code>"L"</code>, <code>"mL"</code>, <code>"m"</code> ou
+                    <code>"cm"</code>.
+                  </li>
+                </ul>
+                <p>Ejemplos de presentación de productos:</p>
+                <figure class="content-figure">
+                <img
+                  src="../../assets/img/unidades-img.png"
+                  alt="Flujo de creación y publicación de producto: seleccionar categoría, crear producto (con o sin variaciones)"
+                />
+              </figure>
+
+                <p><strong>Sell type</strong></p>
+                <ul>
+                  <li>
+                    <code>type</code> — forma de venta: <code>"U"</code> (unitario), <code>"WB"</code> (peso estimado
+                    por unidade) ou <code>"WW"</code> (peso fraccionado).
+                  </li>
+                  <li>
+                    <code>minQuantity</code> — cantidad mínima por compra (en <code>"WB"</code>, la estimación de
+                    peso por unidad).
+                  </li>
+                  <li><code>maxQuantity</code> — cantidad máxima por compra.</li>
+                  <li>
+                    <code>stepQuantity</code> — incremento por adición (ex.: <code>100g</code> solo permite sumar de 100
+                    en 100g).
+                  </li>
+                </ul>
+                <p>Ejemplos de presentación de productos:</p>
+                <figure class="content-figure">
+                <img
+                  src="../../assets/img/selltype-img.png"
+                  alt="Flujo de creación y publicación de producto: seleccionar categoría, crear producto (con o sin variaciones)"
+                />
+              </figure>
+                <p><strong>Product[]</strong></p>
+                <ul>
+                  <li><code>sku</code> — código interno del retailer.</li>
+                  <li>
+                    <code>ean</code> — código de barras válido (8, 12, 13 ou 14 dígitos) o <code>null</code> para
+                    productos caseros.
+                  </li>
+                  <li><code>images</code> — arreglo de objetos <code>{ path, position }</code> con URL pública HTTPS.</li>
+                  <li>
+                    <code>attributes</code> — pares <code>code: valor</code> alineados con los atributos de la categoría hoja.
+                  </li>
+                </ul>
+
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Solicitud (cURL - producto sin variación)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-bash">curl --location 'https://services.rappi.com.br/api/open-api/v1/catalog/products' \
+--header 'Authorization: Bearer {bearer_token}' \
+--data-raw '{
+  "category_id": 13,
+  "name": "Rappi Shoes",
+  "description": "Rappi Shoes",
+  "has_variation": false,
+  "presentation": { "quantity": 1, "unitType": "Und" },
+  "sellType": { "type": "U", "minQuantity": 1, "maxQuantity": 10, "stepQuantity": 1 },
+  "product": [
+    {
+      "sku": "1335",
+      "ean": 7702122343494,
+      "name": "Rappi Shoes",
+      "images": [
+        { "path": "https://rappi.com/product_0.jpg", "position": 1 },
+        { "path": "https://rappi.com/product_1.jpg", "position": 2 }
+      ],
+      "attributes": { "color_alt": "white" }
+    }
+  ]
+}'</code></pre>
+                </div>
+
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Respuesta (sin variación)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{
+  "category_id": 13,
+  "name": "Rappi Shoes",
+  "has_variation": false,
+  "product": {
+    "successful": [
+      {
+        "id": 2147484292,
+        "parent_id": 151139,
+        "sku": "1335",
+        "ean": 730170648596,
+        "images": [
+          { "path": "https://rappi.com/product_0.jpg", "position": 1 }
+        ],
+        "attributes": { "color_alt": "white" }
+      }
+    ]
+  }
+}</code></pre>
+                </div>
+
+                <p><strong>Ejemplo con variaciones</strong></p>
+                <p>
+                  Para artículos con variaciones (cor, tamanho, memória, etc.), envía múltiples objetos en
+                  <code>product[]</code> com <code>has_variation: true</code>. Cada variación recibe su propio <code>id</code>
+                  y todas comparten el mismo <code>parent_id</code> — este vínculo permite que la app
+                  las muestre agrupadas en la página del producto.
+                </p>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Cuerpo de la solicitud (con variaciones)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{
+  "category_id": 12,
+  "name": "Rappi Shirt",
+  "description": "Rappi Really Cool Shirt",
+  "has_variation": true,
+  "presentation": { "quantity": 1, "unitType": "Und" },
+  "sellType": { "type": "U", "minQuantity": 1, "maxQuantity": 10, "stepQuantity": 1 },
+  "product": [
+    { "sku": "NSD1235", "ean": "7730197002190", "attributes": { "color": "blue" } },
+    { "sku": "NSD1236", "ean": "7730197002191", "attributes": { "color": "green" } }
+  ]
+}</code></pre>
+                </div>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Respuesta (con variaciones)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{
+  "product": {
+    "successful": [
+      {
+        "id": 2147484329,
+        "parent_id": 151192,
+        "sku": "NSD1235",
+        "ean": "7730197002190",
+        "attributes": { "color": "blue" }
+      },
+      {
+        "id": 2147484330,
+        "parent_id": 151192,
+        "sku": "NSD1236",
+        "ean": "7730197002191",
+        "attributes": { "color": "green" }
+      }
+    ]
+  }
+}</code></pre>
+                </div>
+
+                <p class="muted">
+                  📘 <strong>Imágenes</strong>: PNG ou JPG, URL <strong>estática y pública por HTTPS</strong>,
+                  idealmente por debajo de 1 MB.
+                  ✅ Válido: <code>https://example.com/images/product.png</code>.
+                  ❌ Inválido: <code>/index.php?option=imagens_capa&amp;barras=...</code>.
+                </p>
+                <p class="muted">
+                  🚧 <strong>No es posible agregar una variación a un producto ya creado</strong>. La funcionalidad llegará
+                  via <code>parent_id</code>.
+                </p>
+
+                <div class="try-soon">
+                  <button type="button" class="btn btn--ghost" disabled title="Em breve">Probar (próximamente)</button>
+                </div>
+              </article>
+
+              <article class="endpoint-block section-anchor" id="endpoint-list-products">
+                <h3>
+                  <span class="method-badge">GET</span>
+                  /products
+                </h3>
+                <p>
+                  Lista los productos ya creados para tu retailer. Útil para
+                  verificación y conciliación. Pagina con <code>limit</code> (predeterminado <code>20</code>, máximo
+                  <code>50</code>) e <code>offset</code> (predeterminado <code>0</code>).
+                </p>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Solicitud (cURL)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-bash">curl --location 'https://services.rappi.com.br/api/open-api/v1/catalog/products?limit=50&amp;offset=0' \
+--header 'Authorization: Bearer {bearer_token}'</code></pre>
+                </div>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Ejemplo de respuesta (JSON)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{
+  "data": [
+    {
+      "images": [{ "path": "0570b4e7-dc01-47b7-a47f-2d92ac1e6c12.png", "position": 1 }],
+      "id": 2147653816,
+      "ean": "2200000312075",
+      "sku": "31201",
+      "name": "Refresco Open",
+      "longDescription": "Producto de prueba para la tienda de open orders",
+      "productId": 151268,
+      "status": "published",
+      "country": "CO",
+      "presentation": { "description": "1 und", "quantity": 1, "unitType": "Und" },
+      "sellType": { "minQuantity": 1, "stepQuantity": 1, "type": "U" }
+    }
+  ],
+  "limit": 50,
+  "offset": 0
+}</code></pre>
+                </div>
+                <div class="try-soon">
+                  <button type="button" class="btn btn--ghost" disabled title="Em breve">Probar (próximamente)</button>
+                </div>
+              </article>
+
+              <article class="endpoint-block section-anchor" id="endpoint-products-by-sku">
+                <h3>
+                  <span class="method-badge">GET</span>
+                  /products/sku?skus=SKU1,SKU2
+                </h3>
+                <p>
+                  Búsqueda masiva por SKUs internos. Límite de <strong>200 SKUs</strong>
+                  por llamada, separados por coma (estándar para todos los países). Devuelve un resumen; para los campos
+                  completos, usa <code>GET /products</code>.
+                </p>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Solicitud (cURL)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-bash">curl --location 'https://services.rappi.com.br/api/open-api/v1/catalog/products/sku?skus=Rappi13350,Rappi13351' \
+--header 'Authorization: Bearer {bearer_token}'</code></pre>
+                </div>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Ejemplo de respuesta (JSON)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">[
+  {
+    "images": [{ "path": "https://files.readme.io/...", "position": 1 }],
+    "id": 905397117,
+    "sku": "13350",
+    "name": "Rappi Shoes",
+    "longDescription": "Rappi Shoes",
+    "productId": 123,
+    "status": "published",
+    "country": "BR"
+  }
+]</code></pre>
+                </div>
+                <div class="try-soon">
+                  <button type="button" class="btn btn--ghost" disabled title="Em breve">Probar (próximamente)</button>
+                </div>
+              </article>
+
+              <h3>Dominios de imágenes por país</h3>
+              <p>
+                Los endpoints devuelven solo el <code>path</code> de la imagen. Para construir la URL final, agrega como prefijo el
+                dominio del país correspondiente:
+              </p>
+              <ul>
+                <li><strong>ARG</strong> — <code>https://images.rappi.com.ar/products/</code></li>
+                <li><strong>BRA</strong> — <code>https://images.rappi.com.br/products/</code></li>
+                <li><strong>CHL</strong> — <code>https://images.rappi.cl/products/</code></li>
+                <li><strong>COL</strong> — <code>https://images.rappi.com/products/</code></li>
+                <li><strong>CRI</strong> — <code>https://images.rappi.com.cr/products/</code></li>
+                <li><strong>ECU</strong> — <code>https://images.rappi.com.ec/products/</code></li>
+                <li><strong>MEX</strong> — <code>https://images.rappi.com.mx/products/</code></li>
+                <li><strong>PER</strong> — <code>https://images.rappi.pe/products/</code></li>
+                <li><strong>URY</strong> — <code>https://images.rappi.com.uy/products/</code></li>
+              </ul>
+            </section>
+
+          
+
+            <section class="section-anchor" id="section-guide" aria-labelledby="h-guide">
+              <h2 id="h-guide">Notas importantes</h2>
+
+              <h3>Creando un producto desde cero</h3>
+              <ol>
+                <li>
+                  <p>Las categorías son obligatorias para crear un producto. Usa siempre el id más específico (hoja) para crear el producto.</p>
+                </li>
+                <li>
+                  <p>Si el producto no tiene EAN, usa <code>null</code>.</p>
+                </li>
+                <li>
+                  <p>
+                    Asegúrate de que el tipo de unidad sea adecuado al tipo de producto - pesables frente a unidades vendidas
+                    por unidad.
+                  </p>
+                </li>
+                <li>
+                  <p></p>
+                </li>
+                
+              </ol>
+
+              
+
+
+        
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <div id="modal-backdrop" class="modal-backdrop" data-close-credentials tabindex="-1" aria-hidden="true"></div>
+    <script src="../../assets/js/credentials.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js" crossorigin="anonymous"></script>
+    <script defer src="../../assets/js/lang-switcher.js"></script>
+    <script src="../../assets/js/main.js"></script>
+  </body>
+</html>

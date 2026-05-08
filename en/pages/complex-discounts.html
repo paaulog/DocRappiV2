@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,11 +8,11 @@
         document.documentElement.setAttribute('data-theme', localStorage.getItem('docs-theme') || 'light');
       } catch (e) {}
     </script>
-    <title>Complex Discounts — Documentação</title>
+    <title>Complex Discounts — Documentation</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../../assets/css/style.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
@@ -23,26 +23,27 @@
     <div class="page-shell" id="page-shell">
       <div class="api-layout">
         <div class="sidebar-shell">
-          <aside class="sidebar" aria-label="Documentação">
+          <aside class="sidebar" aria-label="Documentation">
             <a href="../index.html" class="sidebar__logo" data-page-link
-              ><img src="../assets/img/logo.png" alt="Rappi"
+              ><img src="../../assets/img/logo.png" alt="Rappi"
             /></a>
             <div class="sidebar__top">
-              <button type="button" class="btn btn--theme" data-theme-toggle aria-label="Alternar tema">
-                Modo escuro
+              <div class="docs-lang-switch sidebar__langs" data-docs-lang-switch aria-label="Language"></div>
+              <button type="button" class="btn btn--theme" data-theme-toggle aria-label="Toggle theme">
+                Dark mode
               </button>
-              <nav class="sidebar__nav" aria-label="Nesta página">
-                <a href="#section-discount-requirements">Requisitos para criação de descontos</a>
+              <nav class="sidebar__nav" aria-label="On this page">
+                <a href="#section-discount-requirements">Requirements for creating discounts</a>
                 <a href="#section-endpoints">Endpoints</a>
-                <a href="#section-relevant-flows">Fluxos relevantes</a>
-                <a href="#section-guide">Guia</a>
+                <a href="#section-relevant-flows">Relevant flows</a>
+                <a href="#section-guide">Guide</a>
               </nav>
             </div>
             <div class="sidebar__bottom">
               <div class="sidebar__cred-wrap">
                 <span class="credentials-badge" data-credentials-badge hidden>Credentials set</span>
               </div>
-              <a href="../index.html" class="btn btn--ghost" data-page-link style="text-align: center">← Todas as APIs</a>
+              <a href="../index.html" class="btn btn--ghost" data-page-link style="text-align: center">← All APIs</a>
             </div>
           </aside>
         </div>
@@ -51,17 +52,17 @@
             <header class="api-main__header">
               <h1>Complex Discounts</h1>
               <p class="lead">
-                Crie promoções e descontos com regras avançadas (combos, escalonados, por público).
+                Create promotions and discounts with advanced rules (combos, tiered offers, by audience).
               </p>
             </header>
 
             <section class="section-anchor" id="section-discount-requirements" aria-labelledby="h-discount-requirements">
-              <h2 id="h-discount-requirements">Requisitos para criação de descontos</h2>
-              <p>Para criar promoções e descontos avançados na Rappi, existem alguns pontos importantes:</p>
+              <h2 id="h-discount-requirements">Requirements for creating discounts</h2>
+              <p>To create advanced promotions and discounts in Rappi, keep these key points in mind:</p>
               <ul>
-                <li>Inventário ativo e estável — descontos só fazem sentido sobre produtos com preço base atualizado.</li>
-                <li>Credenciais Bearer válidas.</li>
-                <li>Definição prévia das regras de negócio (vigência, segmento, limite por pedido).</li>
+                <li>Inventory ativo e estável — descontos só fazem sentido sobre produtos com preço base atualizado.</li>
+                <li>Valid Bearer credentials.</li>
+                <li>Definition prévia das regras de negócio (vigência, segmento, limite por pedido).</li>
               </ul>
             </section>
 
@@ -73,29 +74,29 @@
                   <span class="method-badge">POST</span>
                   /v1/discounts/example
                 </h3>
-                <p>Endpoint de exemplo. Substitua pelo contrato real assim que disponível.</p>
+                <p>Example endpoint. Replace it with the actual contract as soon as it is available.</p>
                 <div class="code-block-wrap">
                   <div class="code-block__bar">
-                    <span>Corpo da requisição (JSON)</span>
-                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                    <span>Body da requisição (JSON)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copy</button>
                   </div>
                   <pre><code class="language-json">{}</code></pre>
                 </div>
                 <div class="code-block-wrap">
                   <div class="code-block__bar">
-                    <span>Exemplo de resposta (JSON)</span>
-                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                    <span>Response example (JSON)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copy</button>
                   </div>
                   <pre><code class="language-json">{}</code></pre>
                 </div>
                 <div class="try-soon">
-                  <button type="button" class="btn btn--ghost" disabled title="Em breve">Experimentar (em breve)</button>
+                  <button type="button" class="btn btn--ghost" disabled title="Coming soon">Try it (coming soon)</button>
                 </div>
               </article>
             </section>
 
             <section class="section-anchor" id="section-relevant-flows" aria-labelledby="h-flows">
-              <h2 id="h-flows">Fluxos relevantes</h2>
+              <h2 id="h-flows">Relevant flows</h2>
               <p>
                 Fluxo de criação de promoção: defina regra → publique no escopo (loja/produto) → monitore ativações.
               </p>
@@ -105,13 +106,13 @@
             </section>
 
             <section class="section-anchor" id="section-guide" aria-labelledby="h-guide">
-              <h2 id="h-guide">Guia</h2>
+              <h2 id="h-guide">Guide</h2>
               <p>
                 Descontos complexos rodam sobre o preço já carregado no inventário; se o preço base estiver
                 desatualizado, o desconto também ficará.
               </p>
-              <p>Sempre teste a promoção em ambiente de homologação antes de ativar em produção.</p>
-              <p>Documente vigência e regras junto da KAM — facilita auditoria e suporte ao parceiro.</p>
+              <p>Always test the promotion in staging before enabling it in production.</p>
+              <p>Document validity windows and rules with the KAM — this makes audits and partner support easier.</p>
             </section>
           </div>
         </main>
@@ -127,39 +128,40 @@
       aria-labelledby="cred-title"
       aria-hidden="true"
     >
-      <h2 id="cred-title">Definir credenciais</h2>
-      <p class="muted">Valores opcionais para exemplos nesta página.</p>
+      <h2 id="cred-title">Set credentials</h2>
+      <p class="muted">Optional values for examples on this page.</p>
       <form id="credentials-form">
         <div class="modal__field">
-          <label for="field-api-key">Chave de API</label>
-          <input type="password" id="field-api-key" name="apiKey" autocomplete="off" spellcheck="false" placeholder="Sua chave" />
+          <label for="field-api-key">API key</label>
+          <input type="password" id="field-api-key" name="apiKey" autocomplete="off" spellcheck="false" placeholder="Your key" />
         </div>
         <div class="modal__field">
-          <label for="field-store-id">ID da loja</label>
-          <input type="text" id="field-store-id" name="storeId" autocomplete="off" placeholder="Identificador da loja" />
+          <label for="field-store-id">Store ID</label>
+          <input type="text" id="field-store-id" name="storeId" autocomplete="off" placeholder="Store identifier" />
         </div>
         <div class="modal__field">
           <label for="field-merchant">ID do merchant</label>
           <input type="text" id="field-merchant" name="merchantId" autocomplete="off" placeholder="Merchant" />
         </div>
         <div class="modal__field">
-          <label for="field-webhook">URL do webhook</label>
+          <label for="field-webhook">Webhook URL</label>
           <input type="url" id="field-webhook" name="webhookUrl" autocomplete="off" placeholder="https://" />
         </div>
         <div class="modal__actions">
-          <button type="submit" class="btn btn--primary">Salvar</button>
-          <button type="button" class="btn btn--ghost" data-close-credentials>Cancelar</button>
-          <button type="button" class="btn btn--ghost" id="credentials-clear">Limpar credenciais</button>
+          <button type="submit" class="btn btn--primary">Save</button>
+          <button type="button" class="btn btn--ghost" data-close-credentials>Cancel</button>
+          <button type="button" class="btn btn--ghost" id="credentials-clear">Clear credentials</button>
         </div>
       </form>
       <p class="modal__note">
-        Armazenado apenas em sessionStorage nesta aba. Nada é enviado a servidores externos por este site.
+        Stored only in sessionStorage in this tab. Nothing is sent to external servers by this site.
       </p>
     </div>
 
-    <script src="../assets/js/credentials.js"></script>
+    <script src="../../assets/js/credentials.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" crossorigin="anonymous"></script>
-    <script src="../assets/js/main.js"></script>
+    <script defer src="../../assets/js/lang-switcher.js"></script>
+    <script src="../../assets/js/main.js"></script>
   </body>
 </html>
