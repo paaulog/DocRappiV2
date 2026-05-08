@@ -30,6 +30,16 @@
     return path.split('/').filter(Boolean);
   }
 
+  function joinPath(segments) {
+    if (!segments.length) return '/';
+    return '/' + segments.join('/');
+  }
+
+  /**
+   * GitHub Pages (site de projeto) usa prefixo no pathname, ex.: /DocRappiV2/.
+   * Sem locale na URL, o fallback antigo gerava /en/index.html e quebrava o site.
+   * Aqui preservamos todos os segmentos antes de inserir pt-br|en|es.
+   */
   function pathnameForLocale(targetLocale, loc) {
     var parts = pathParts(loc);
     var ix = localeIndex(parts);
@@ -37,9 +47,14 @@
     var hash = loc && typeof loc.hash === 'string' ? loc.hash : '';
     if (ix !== -1) {
       parts[ix] = targetLocale;
-      return '/' + parts.join('/') + search + hash;
+      return joinPath(parts) + search + hash;
     }
-    return '/' + targetLocale + '/index.html' + search + hash;
+    var p = parts.slice();
+    if (p.length && p[p.length - 1].toLowerCase() === 'index.html') {
+      p.pop();
+    }
+    p.push(targetLocale, 'index.html');
+    return joinPath(p) + search + hash;
   }
 
   function currentLocale(loc) {
