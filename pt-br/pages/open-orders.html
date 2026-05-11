@@ -33,10 +33,15 @@
                 Modo escuro
               </button>
               <nav class="sidebar__nav" aria-label="Nesta página">
-                <a href="#section-orders-requirements">Requisitos para recebimento de pedidos</a>
-                <a href="#section-endpoints">Endpoints</a>
-                <a href="#section-relevant-flows">Fluxos relevantes</a>
-                <a href="#section-guide">Guia</a>
+                <a href="#section-intro">Introdução</a>
+                <a href="#section-checklist">Checklist e modelos</a>
+                <a href="#section-lifecycle-overview">Ciclo de vida</a>
+                <a href="#section-receiving">Recebimento</a>
+                <a href="#section-management">Gerenciamento</a>
+                <a href="#section-full">Orders FULL</a>
+                <a href="#section-handshake">Handshake</a>
+                <a href="#section-lite">Orders LITE</a>
+                <a href="#section-cancel-ref">Cancelamento</a>
               </nav>
             </div>
             <div class="sidebar__bottom">
@@ -52,57 +57,1333 @@
             <header class="api-main__header">
               <h1>Open Orders</h1>
               <p class="lead">
-                Receba e acompanhe pedidos da Rappi diretamente no seu sistema de gestão.
+                Primeiros passos com a API de Pedidos: receba pedidos da Rappi no seu sistema, acompanhe o ciclo de vida e
+                integre webhooks, polling e eventos operacionais.
               </p>
             </header>
 
-            <section class="section-anchor" id="section-orders-requirements" aria-labelledby="h-orders-requirements">
-              <h2 id="h-orders-requirements">Requisitos para recebimento de pedidos</h2>
-              <p>Para receber e acompanhar pedidos da Rappi no seu sistema, existem alguns pontos importantes:</p>
+            <section class="section-anchor" id="section-intro" aria-labelledby="h-intro">
+              <h2 id="h-intro">Primeiros passos com a API de Pedidos</h2>
+
+              <h3 id="h-what-is">O que é o Open Orders?</h3>
+              <p>
+                O Open Orders é uma solução que permite aos varejistas receberem, em seus próprios sistemas, os pedidos
+                realizados pelos clientes na plataforma da Rappi. Com isso, o varejista pode utilizar sua própria estrutura
+                logística e operacional para realizar a separação (picking) e a entrega dos pedidos.
+              </p>
+              <p>
+                A integração funciona em tempo real, conectando automaticamente os novos pedidos aos sistemas do
+                varejista e gerenciando a troca de notificações entre a Rappi e a operação ao longo de todo o ciclo de vida
+                do pedido. Além disso, o recebimento antecipado de pedidos agendados contribui para uma melhor distribuição
+                da carga operacional, aumentando a produtividade das equipes durante períodos de menor demanda.
+              </p>
+
+              <h3 id="h-is-it-for-you">O Open Orders é adequado para a sua operação?</h3>
+              <p>
+                Antes de iniciar a integração, é importante avaliar se sua operação possui a estrutura necessária para
+                suportar o modelo Open Orders. Considere os seguintes pontos:
+              </p>
               <ul>
-                <li>Inventário integrado: pedidos só são gerados sobre produtos com estoque/preço sincronizados.</li>
-                <li>Credenciais Bearer válidas.</li>
-                <li>Webhook ativo para receber notificações de novos pedidos.</li>
+                <li>Sua empresa já possui uma integração de estoque funcional com a Rappi?</li>
+                <li>O controle de estoque das lojas é eficiente o suficiente para minimizar rupturas?</li>
+                <li>Seu sistema POS/ERP consegue processar pedidos oriundos de canais externos?</li>
+                <li>
+                  Sua equipe operacional está preparada para lidar com ações sensíveis ao tempo, garantindo o correto
+                  cumprimento dos pedidos?
+                </li>
+                <li>
+                  Você possui uma equipe de desenvolvimento — interna ou terceirizada — capaz de implementar, manter e
+                  oferecer suporte à integração com a Rappi?
+                </li>
+              </ul>
+
+              <div class="doc-note doc-note--warn">
+                🚧 <strong>Importante:</strong> Novos recursos são lançados constantemente pela equipe do Open Orders para
+                aprimorar a experiência dos usuários nas lojas integradas. Como parceiro integrado, é necessário implementar
+                essas atualizações em até <strong>8 semanas</strong> após o lançamento.
+              </div>
+            </section>
+
+            <section class="section-anchor" id="section-checklist" aria-labelledby="h-checklist">
+              <h2 id="h-checklist">Checklist de Integração</h2>
+              <p>Para garantir uma implementação eficiente do Open Orders, recomenda-se seguir os passos abaixo:</p>
+              <ul>
+                <li>
+                  Compreender o ciclo de vida dos pedidos e os impactos de cada evento na experiência do usuário dentro do
+                  aplicativo.
+                </li>
+                <li>Identificar quais eventos internos da sua operação devem ser mapeados para os eventos da Rappi.</li>
+                <li>
+                  Avaliar possíveis limitações do ERP ou do sistema de separação (picking) que possam dificultar processos
+                  avançados de tratamento de exceções — além de definir estratégias para contorná-las.
+                </li>
+                <li>Desenvolver webhooks capazes de receber os eventos relacionados aos pedidos enviados pela Rappi.</li>
+                <li>
+                  Garantir o envio de todas as atualizações do fluxo operacional para a Rappi, mantendo a sincronização
+                  completa do pedido.
+                </li>
+              </ul>
+
+              <h2 id="h-operation-models">Modelos de Operação do Open Orders</h2>
+              <p>O Open Orders oferece dois modelos de integração:</p>
+
+              <h3>Orders Lite</h3>
+              <p>
+                No modelo <strong>Orders Lite</strong>, apenas os eventos da Rappi são implementados. Isso significa que
+                todas as atualizações de status do pedido — como início da separação ou emissão da nota fiscal — são
+                iniciadas e notificadas pela própria Rappi.
+              </p>
+              <p>Esse modelo é compatível com as soluções de picking disponibilizadas pela plataforma.</p>
+
+              <h3>Orders Full</h3>
+              <p>
+                No modelo <strong>Orders Full</strong>, tanto os eventos da Rappi quanto os eventos do varejista são
+                implementados. Nesse cenário, as atualizações de status do pedido passam a ser iniciadas e notificadas
+                diretamente pelo varejista.
+              </p>
+              <p>Esse modelo oferece maior autonomia operacional, porém não é compatível com as soluções de picking da Rappi.</p>
+            </section>
+
+            <section class="section-anchor" id="section-lifecycle-overview" aria-labelledby="h-lifecycle-overview">
+              <h2 id="h-lifecycle-overview">Entendendo o Ciclo de Vida do Pedido</h2>
+
+              <h3 id="h-orders-overview">Visão Geral dos Pedidos</h3>
+              <p>
+                Todos os pedidos na Rappi são tratados como um fluxo sequencial de eventos. Um pedido comum passa por
+                diferentes etapas desde sua criação até a entrega ao cliente final.
+              </p>
+
+              <figure class="content-figure">
+                <img
+                  src="../../assets/img/open-orders-flow-full.png"
+                  alt="Fluxo do pedido entre Rappi e varejista no modelo Full: criação, picking, nota fiscal, solicitação de entregador, handshake e entrega"
+                />
+                <figcaption>Fluxo ilustrativo do ciclo de pedido (modelo com eventos do varejista e da Rappi).</figcaption>
+              </figure>
+
+              <p>Os eventos do fluxo são divididos em dois tipos principais:</p>
+
+              <h4>Eventos da Rappi</h4>
+              <p>São eventos gerados diretamente pela plataforma da Rappi durante o processamento do pedido.</p>
+              <ul>
+                <li>
+                  <strong><code>order_created</code></strong> — Notifica a criação de um novo pedido e envia todas as
+                  informações relacionadas a ele.
+                </li>
+                <li>
+                  <strong><code>courier_assigned</code></strong> — Informa que um entregador (RT) foi atribuído ao pedido
+                  e está a caminho da loja.
+                </li>
+                <li>
+                  <strong><code>order_finished</code></strong> — Indica que o pedido foi entregue com sucesso ao cliente
+                  final.
+                </li>
+              </ul>
+
+              <h4>Eventos do Varejista</h4>
+              <p>
+                São eventos gerados pelo sistema de gerenciamento de pedidos (OMS) do varejista ou pela solução de picking
+                utilizada na operação.
+              </p>
+              <ul>
+                <li>
+                  <strong><code>start_picking</code></strong> — Notifica que a equipe da loja iniciou a separação dos
+                  produtos do pedido.
+                </li>
+                <li>
+                  <strong><code>report_invoice</code></strong> — Informa que a separação foi concluída e que a nota ou
+                  comprovante da compra foi gerado.
+                </li>
+                <li>
+                  <strong><code>request_courier</code></strong> — Solicita à Rappi o início do processo de atribuição de
+                  entregador para o pedido.
+                </li>
               </ul>
             </section>
 
-            <section class="section-anchor" id="section-endpoints" aria-labelledby="h-endpoints">
-              <h2 id="h-endpoints">Endpoints</h2>
-
-              <article class="endpoint-block section-anchor" id="endpoint-example">
-                <h3>
-                  <span class="method-badge">GET</span>
-                  /v1/orders/example
-                </h3>
-                <p>Endpoint de exemplo. Substitua pelo contrato real assim que disponível.</p>
-                <p class="muted">Sem corpo de requisição.</p>
-                <div class="code-block-wrap">
-                  <div class="code-block__bar">
-                    <span>Exemplo de resposta (JSON)</span>
-                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
-                  </div>
-                  <pre><code class="language-json">{}</code></pre>
-                </div>
-                <div class="try-soon">
-                  <button type="button" class="btn btn--ghost" disabled title="Em breve">Experimentar (em breve)</button>
-                </div>
-              </article>
-            </section>
-
-            <section class="section-anchor" id="section-relevant-flows" aria-labelledby="h-flows">
-              <h2 id="h-flows">Fluxos relevantes</h2>
+            <section class="section-anchor" id="section-receiving" aria-labelledby="h-receiving">
+              <h2 id="h-receiving">Recebimento de Pedidos</h2>
               <p>
-                Fluxo de pedido: notificação chega via webhook → você confirma/aceita → envia atualizações de status
-                (preparando, pronto, enviado).
+                A Rappi disponibiliza duas formas principais para que os varejistas recebam pedidos e atualizações em tempo
+                real:
               </p>
-              <p>Fluxo de cancelamento: cancele com motivo padronizado para garantir reembolso correto ao cliente.</p>
+              <ul>
+                <li><strong>Webhook de Eventos de Pedido</strong></li>
+                <li><strong>Endpoint de Polling</strong></li>
+              </ul>
+              <p>Esses métodos podem ser utilizados separadamente ou em conjunto, garantindo maior confiabilidade no recebimento dos eventos.</p>
+
+              <h3>Webhook de Eventos de Pedido</h3>
+              <p>
+                Ao configurar um webhook para pedidos da Rappi, sua operação poderá receber os pedidos automaticamente
+                assim que forem criados na plataforma.
+              </p>
+              <p>
+                A criação do pedido ocorre através de uma requisição <code>POST</code> enviada para a URL configurada pelo
+                varejista, utilizando o endpoint:
+              </p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Webhook (URL configurada pelo parceiro)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-bash">POST https://your-url.com/orders</code></pre>
+              </div>
+              <p>O identificador do pedido (<code>order_id</code>) não é enviado na URL, mas sim no corpo da requisição.</p>
+              <p>O payload enviado contém todas as informações relevantes do pedido, incluindo:</p>
+              <ul>
+                <li>Dados da loja</li>
+                <li>Informações do cliente</li>
+                <li>Endereço de entrega</li>
+                <li>Produtos e combos</li>
+                <li>Forma de pagamento</li>
+                <li>Informações do entregador</li>
+                <li>Status do pedido</li>
+                <li>Data de criação</li>
+                <li>Eventos relacionados ao pedido</li>
+              </ul>
+
+              <h4>Pedidos Agendados — campo <code>place_at</code></h4>
+              <p>O campo <code>place_at</code> é utilizado para identificar pedidos agendados.</p>
+              <p><strong>Pedidos Imediatos (NOW Orders)</strong></p>
+              <p>Quando o pedido não é agendado, o campo será enviado vazio ou nulo:</p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Exemplo (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">"place_at": ""</code></pre>
+              </div>
+              <p>ou</p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Exemplo (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">"place_at": null</code></pre>
+              </div>
+              <p><strong>Pedidos Agendados</strong></p>
+              <p>Para pedidos programados, o campo conterá a data e horário agendados:</p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Exemplo (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">"place_at": "2025-04-03T12:00:00Z"</code></pre>
+              </div>
+
+              <h4>Informações de Identificação Pessoal</h4>
+              <p>
+                Quando necessário, informações pessoais — como CPF — podem ser enviadas no campo
+                <code>identification.number</code>, capturado diretamente no fluxo de checkout do aplicativo.
+              </p>
+
+              <h3>Endpoint de Polling</h3>
+              <p>
+                O método de polling permite consultar de forma proativa os pedidos e eventos ativos na plataforma da
+                Rappi.
+              </p>
+              <p>
+                Ao realizar uma requisição <code>GET</code> para o endpoint abaixo, serão retornados todos os pedidos
+                pendentes ainda não confirmados pelo varejista:
+              </p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Pedidos pendentes</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-bash">GET {country_url}/api/open-api/v1/orders</code></pre>
+              </div>
+              <p>Também é possível consultar um pedido específico utilizando:</p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Pedido por ID</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-bash">GET {country_url}/api/open-api/v1/orders/{order_id}</code></pre>
+              </div>
+              <p>O retorno seguirá exatamente o mesmo formato JSON enviado pelo webhook.</p>
+
+              <h4>Limite de Requisições (Rate Limit)</h4>
+              <p>Por padrão, os varejistas possuem um limite de:</p>
+              <p><strong>100 requisições por minuto</strong></p>
+              <p>Esse limite pode ser ajustado mediante solicitação à Rappi.</p>
+
+              <h3>Status do Pedido</h3>
+              <p>
+                O campo <code>status</code> presente tanto no webhook quanto no endpoint de polling indica a etapa atual do
+                pedido dentro do fluxo operacional.
+              </p>
+              <p>Os possíveis valores são:</p>
+              <div class="table-wrap">
+                <table class="api-doc-table">
+                  <thead>
+                    <tr>
+                      <th>Status</th>
+                      <th>Descrição</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>created</code></td>
+                      <td>Pedido ativo, aguardando separação ou em processo de separação</td>
+                    </tr>
+                    <tr>
+                      <td><code>invoice_reported</code></td>
+                      <td>Separação concluída e cesta final de produtos definida</td>
+                    </tr>
+                    <tr>
+                      <td><code>finished</code></td>
+                      <td>Pedido entregue ao cliente final</td>
+                    </tr>
+                    <tr>
+                      <td><code>canceled</code></td>
+                      <td>Pedido cancelado pela Rappi ou pelo varejista</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>Qual modelo de integração utilizar?</h3>
+              <p>
+                A escolha do método ideal depende diretamente da infraestrutura operacional e das capacidades do OMS
+                utilizado pelo varejista.
+              </p>
+              <p>No entanto, a recomendação da Rappi é utilizar:</p>
+              <ul>
+                <li><strong>Webhook</strong> como principal mecanismo de recebimento de eventos</li>
+                <li><strong>Polling</strong> como mecanismo complementar e de contingência</li>
+              </ul>
+              <p>
+                Dessa forma, caso algum evento não seja recebido via webhook, o polling pode ser utilizado para validar e
+                recuperar informações pendentes.
+              </p>
             </section>
 
-            <section class="section-anchor" id="section-guide" aria-labelledby="h-guide">
-              <h2 id="h-guide">Guia</h2>
-              <p>Open Orders e Payless são exclusivos: cada parceiro escolhe um dos dois para o ciclo de pedido.</p>
-              <p>Confirme cada pedido dentro do SLA combinado — atrasos prejudicam a experiência do cliente final.</p>
-              <p>Mantenha o status sempre atualizado: o app do entregador depende dessas atualizações.</p>
+            <section class="section-anchor" id="section-management" aria-labelledby="h-management">
+              <h2 id="h-management">Gerenciamento de Pedidos</h2>
+              <p>Existem dois modelos de gerenciamento de pedidos disponíveis no Open Orders:</p>
+
+              <h3>FULL</h3>
+              <p>
+                No modelo <strong>FULL</strong>, o varejista utiliza suas próprias ferramentas e sistemas (OMS) para
+                realizar a separação dos pedidos.
+              </p>
+              <p>Nesse cenário, o varejista é responsável por enviar atualizações à Rappi sobre cada etapa do processo operacional.</p>
+
+              <h3>LITE</h3>
+              <p>
+                No modelo <strong>LITE</strong>, a separação dos pedidos é realizada utilizando as soluções disponibilizadas
+                pela própria Rappi.
+              </p>
+              <p>Nesse caso, as atualizações dos eventos operacionais são enviadas pela própria plataforma ao varejista.</p>
+
+              <h3>Pedido Entregue</h3>
+              <p>
+                Assim como ocorre no processo de atribuição de entregador, a finalização do pedido também é enviada via
+                <code>POST</code> para o webhook configurado.
+              </p>
+              <p>Quando o pedido é concluído:</p>
+              <ul>
+                <li>o campo <code>status</code> passa a possuir o valor <code>finished</code></li>
+                <li>o campo <code>delivered_at</code> recebe a data e horário da entrega</li>
+              </ul>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Exemplo (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">{
+  "delivered_at": "2023-02-10T12:34:07Z"
+}</code></pre>
+              </div>
+            </section>
+
+            <section class="section-anchor" id="section-full" aria-labelledby="h-full">
+              <h2 id="h-full">Eventos no Open Orders FULL</h2>
+
+              <h3 id="h-full-lifecycle">Ciclo de Vida do Pedido — Orders FULL</h3>
+              <p>
+                O modelo Orders FULL foi desenvolvido para operações que utilizam uma solução própria de separação
+                (picking). Nesse cenário, a equipe da loja gerencia os pedidos diretamente no sistema do varejista (OMS),
+                desde o recebimento até a entrega ao entregador da Rappi.
+              </p>
+
+              <h4>Características do Orders FULL</h4>
+              <p>Essa integração exige que o varejista possua:</p>
+              <ul>
+                <li>Um sistema próprio de gerenciamento de pedidos (OMS)</li>
+                <li>Uma solução interna de picking</li>
+                <li>Equipes treinadas para visualizar, processar e atualizar pedidos em tempo real</li>
+              </ul>
+              <p>Nesse modelo, o varejista é responsável por enviar à Rappi as atualizações referentes aos eventos operacionais do pedido.</p>
+
+              <h3>Confirmação de Eventos (Acknowledgement)</h3>
+              <p>
+                Todos os eventos enviados pela Rappi precisam ser confirmados pelo varejista. Isso garante que o pedido foi
+                recebido e processado corretamente.
+              </p>
+              <p>Existem duas formas de confirmação:</p>
+
+              <h4>Confirmação Implícita</h4>
+              <p>
+                A confirmação implícita ocorre através da resposta do webhook. Sempre que o varejista responder ao webhook
+                com um código HTTP de sucesso (200 a 299), o evento será automaticamente considerado confirmado.
+              </p>
+              <p>Exemplo de resposta válida:</p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Exemplo (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">{
+  "status": 200
+}</code></pre>
+              </div>
+              <p>ou simplesmente:</p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Exemplo (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">{}</code></pre>
+              </div>
+
+              <h4>Confirmação Explícita</h4>
+              <p>A confirmação explícita é utilizada quando:</p>
+              <ul>
+                <li>Não existe webhook configurado</li>
+                <li>O webhook falha</li>
+                <li>A resposta HTTP não é recebida corretamente</li>
+              </ul>
+              <p>Nesse caso, é necessário enviar manualmente uma requisição para o endpoint de confirmação.</p>
+              <p><strong>Endpoint de confirmação</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>ACK</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/acknowledge</code></pre>
+              </div>
+              <p><strong>Payload</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Payload (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">{
+  "acknowledgments": [
+    {
+      "order_id": 1234567,
+      "event_uuid": "00000000-0000-0000-0000-000000000000"
+    }
+  ]
+}</code></pre>
+              </div>
+              <div class="doc-note">
+                📘 Caso um evento já tenha sido confirmado anteriormente, a API retornará o erro
+                <code>not_found_acknowledgements</code> com status <strong>406 Not Acceptable</strong>.
+              </div>
+
+              <h3>UUID dos Eventos</h3>
+              <p>
+                Cada evento gerado pela Rappi possui um identificador único chamado <code>event_uuid</code>. Todos os
+                eventos enviados pelo varejista devem utilizar o UUID mais recente no cabeçalho da requisição. Isso garante
+                que o estado do pedido esteja sincronizado antes de qualquer alteração operacional.
+              </p>
+              <div class="table-wrap">
+                <table class="api-doc-table">
+                  <thead>
+                    <tr>
+                      <th>Evento</th>
+                      <th>Status do Pedido</th>
+                      <th>Identificação</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Order Created</td>
+                      <td><code>created</code></td>
+                      <td>Primeira notificação</td>
+                    </tr>
+                    <tr>
+                      <td>Product Modifications</td>
+                      <td><code>created</code></td>
+                      <td>Alterações no array <code>products</code></td>
+                    </tr>
+                    <tr>
+                      <td>Courier Assigned</td>
+                      <td><code>created</code> ou <code>invoice_reported</code></td>
+                      <td>Campos do objeto <code>courier</code> preenchidos</td>
+                    </tr>
+                    <tr>
+                      <td>Order Canceled</td>
+                      <td><code>canceled</code></td>
+                      <td>Campo <code>status</code></td>
+                    </tr>
+                    <tr>
+                      <td>Order Finished</td>
+                      <td><code>finished</code></td>
+                      <td>Campo <code>status</code></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                Os eventos <strong>Order Canceled</strong> e <strong>Order Finished</strong> encerram o fluxo do pedido e
+                não precisam ser confirmados.
+              </p>
+
+              <h3>Eventos Não Confirmados</h3>
+              <p>Alguns eventos são considerados críticos para a operação.</p>
+              <p>
+                Caso a Rappi identifique que um evento importante não foi confirmado dentro do tempo configurado (por
+                padrão, <strong>20 minutos</strong>), o pedido poderá ser cancelado automaticamente.
+              </p>
+              <p>Os principais eventos críticos são:</p>
+              <ul>
+                <li><code>order_created</code></li>
+                <li>Eventos de modificação de produtos</li>
+                <li><code>remove_product</code></li>
+                <li><code>remove_product_units</code></li>
+              </ul>
+
+              <h3>Atualização do Estado do Pedido</h3>
+              <p>
+                Após o recebimento do pedido, o varejista deve atualizar o progresso operacional através dos endpoints
+                apropriados.
+              </p>
+
+              <h4>Início da Separação (<code>start_picking</code>)</h4>
+              <p>Esse evento deve ser enviado quando a equipe da loja iniciar a separação dos produtos.</p>
+              <p><strong>Endpoint</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Endpoint</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/start_picking</code></pre>
+              </div>
+              <p><strong>Payload</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Payload (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">{
+  "picking_time": 15
+}</code></pre>
+              </div>
+              <p>
+                O campo <code>picking_time</code> representa o tempo estimado de separação em minutos. Caso não exista
+                estimativa disponível, recomenda-se utilizar o valor padrão de <strong>15 minutos</strong>.
+              </p>
+
+              <h4>Finalização da Separação (<code>report_invoice</code>)</h4>
+              <p>
+                Esse evento informa que a separação foi concluída e que a nota fiscal ou comprovante da compra foi emitido.
+              </p>
+              <p><strong>Endpoint</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Endpoint</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/report_invoice</code></pre>
+              </div>
+              <p><strong>Payload</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Payload (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">{
+  "total_price": 12.5,
+  "image_url": "image.com"
+}</code></pre>
+              </div>
+              <p><strong>Observações</strong></p>
+              <ul>
+                <li>O separador decimal deve ser <code>"."</code></li>
+                <li>Não utilizar separador de milhares</li>
+                <li>O campo <code>image_url</code> é opcional</li>
+              </ul>
+              <div class="doc-note doc-note--warn">
+                🚧 Após o envio do <code>report_invoice</code>, a cesta de produtos é bloqueada e não poderá mais sofrer
+                alterações.
+              </div>
+
+              <h4>Cancelamento de Pedido</h4>
+              <p>Caso seja necessário cancelar um pedido após sua criação, utilize o endpoint abaixo:</p>
+              <p><strong>Endpoint</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Endpoint</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/cancel</code></pre>
+              </div>
+              <p><strong>Payload</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Payload (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">{
+  "type": "reason",
+  "details": {}
+}</code></pre>
+              </div>
+
+              <h4>Remoção de Produtos (Cancelamento Parcial)</h4>
+              <p>Durante a separação, pode ocorrer indisponibilidade de produtos no estoque.</p>
+              <p><strong>Remoção Total de Produto</strong> — quando não há nenhuma unidade disponível do produto.</p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Endpoint</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-bash">DELETE {country_url}/api/open-api/v1/orders/{order_id}/products/{product_id}</code></pre>
+              </div>
+              <p>O endpoint aceita corpo vazio.</p>
+              <p><strong>Remoção Parcial de Unidades</strong> — quando existe quantidade inferior à solicitada pelo cliente.</p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Endpoint</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-bash">PATCH {country_url}/api/open-api/v1/orders/{order_id}/products/{product_id}/quantity</code></pre>
+              </div>
+              <p><strong>Payload para produtos unitários</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Payload (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">{
+  "units": 2
+}</code></pre>
+              </div>
+              <p><strong>Payload para produtos por peso</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Payload (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">{
+  "grams": 250
+}</code></pre>
+              </div>
+              <div class="doc-note doc-note--warn">
+                🚧 Remover todos os produtos do pedido resultará no cancelamento automático do pedido. Além disso, remover
+                mais de 50% dos itens pode gerar intervenção do suporte da Rappi.
+              </div>
+
+              <h4>Substituições de Produtos</h4>
+              <p>
+                Atualmente, o modelo Open Orders FULL não possui suporte nativo para substituições de produtos. Caso sua
+                operação dependa desse fluxo, será necessário utilizar outra solução de picking.
+              </p>
+
+              <h4>Atribuição de Entregador</h4>
+              <p>Para continuar o fluxo logístico, é necessário solicitar um entregador da Rappi.</p>
+              <p><strong>Solicitação de Entregador (<code>request_courier</code>)</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Endpoint</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/request_courier</code></pre>
+              </div>
+              <p><strong>Payload</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Payload (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">{
+  "store_id": 10,
+  "vehicle_type": "car"
+}</code></pre>
+              </div>
+              <p><strong>Tipos de veículo disponíveis</strong></p>
+              <ul>
+                <li><code>motorbike</code></li>
+                <li><code>car</code></li>
+                <li><code>bicycle</code></li>
+              </ul>
+              <div class="doc-note doc-note--warn">
+                🚧 Solicitar o entregador muito cedo pode aumentar o tempo de espera na loja e impactar negativamente os
+                indicadores operacionais.
+              </div>
+
+              <h4>Evento <code>courier_assigned</code></h4>
+              <p>
+                Quando o entregador for atribuído, a Rappi enviará uma atualização via webhook preenchendo o objeto
+                <code>courier</code> do pedido.
+              </p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Exemplo (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">"courier": {
+  "phone": "18003334444",
+  "last_name": "Johnson",
+  "first_name": "Jane",
+  "vehicle_type": "motorbike"
+}</code></pre>
+              </div>
+            </section>
+
+            <section class="section-anchor" id="section-handshake" aria-labelledby="h-handshake">
+              <h2 id="h-handshake">Processo de Handshake</h2>
+              <p>
+                O handshake é o processo de validação utilizado para confirmar que o entregador correto está retirando o
+                pedido.
+              </p>
+
+              <figure class="content-figure">
+                <img
+                  src="../../assets/img/open-orders-handshake.png"
+                  alt="Diagrama de sequência: varejista solicita início do handshake, Rappi retorna três códigos possíveis, varejista envia código para validação e Rappi retorna resultado"
+                />
+                <figcaption>Fluxo de handshake entre varejista e Rappi.</figcaption>
+              </figure>
+
+              <h3>Solicitação de Handshake</h3>
+              <p><strong>Endpoint</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Endpoint</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/handshake</code></pre>
+              </div>
+              <p><strong>Resposta</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Resposta (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">{
+  "codes": [
+    "033903",
+    "286928",
+    "788069"
+  ],
+  "expires_at": "2021-06-18T16:42:03Z"
+}</code></pre>
+              </div>
+              <p>Apenas um dos códigos é válido e será enviado ao entregador no aplicativo da Rappi.</p>
+
+              <h3>Regras do Handshake</h3>
+              <p>O handshake deve ser iniciado somente quando:</p>
+              <ul>
+                <li>O pedido estiver totalmente separado</li>
+                <li>A nota fiscal tiver sido emitida</li>
+                <li>Um entregador estiver atribuído ao pedido</li>
+                <li>O entregador já estiver presente na loja</li>
+              </ul>
+              <p>Além disso:</p>
+              <ul>
+                <li>Os códigos expiram em <strong>5 minutos</strong></li>
+                <li>Após a expiração, novos códigos precisam ser gerados</li>
+              </ul>
+
+              <h3>Validação do Handshake</h3>
+              <p><strong>Endpoint</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Endpoint</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/handshake/validate</code></pre>
+              </div>
+              <p><strong>Payload</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Payload (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">{
+  "code": "788069"
+}</code></pre>
+              </div>
+              <p>Se o código estiver correto:</p>
+              <ul>
+                <li>A API retornará status <strong>204</strong></li>
+                <li>O pedido poderá ser entregue ao entregador</li>
+              </ul>
+              <p>Caso contrário, será retornado erro <strong>400</strong> contendo:</p>
+              <ul>
+                <li>Novos códigos disponíveis</li>
+                <li>Tempo de expiração</li>
+                <li>Quantidade restante de tentativas</li>
+              </ul>
+
+              <h3>Principais Códigos de Erro</h3>
+              <div class="table-wrap">
+                <table class="api-doc-table">
+                  <thead>
+                    <tr>
+                      <th>Código</th>
+                      <th>Status</th>
+                      <th>Descrição</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>invalid_handshake_code</code></td>
+                      <td>400</td>
+                      <td>Código de handshake inválido</td>
+                    </tr>
+                    <tr>
+                      <td><code>order_not_found</code></td>
+                      <td>404</td>
+                      <td>Pedido não encontrado</td>
+                    </tr>
+                    <tr>
+                      <td><code>invalid_status</code></td>
+                      <td>409</td>
+                      <td>Status atual não permite a operação</td>
+                    </tr>
+                    <tr>
+                      <td><code>handshake_already_started</code></td>
+                      <td>208</td>
+                      <td>Processo de handshake já iniciado</td>
+                    </tr>
+                    <tr>
+                      <td><code>no_validation_retries_left</code></td>
+                      <td>406</td>
+                      <td>Limite de tentativas excedido</td>
+                    </tr>
+                    <tr>
+                      <td><code>no_courier_assigned</code></td>
+                      <td>406</td>
+                      <td>Nenhum entregador atribuído</td>
+                    </tr>
+                    <tr>
+                      <td><code>product_not_found_in_order</code></td>
+                      <td>404</td>
+                      <td>Produto não encontrado no pedido</td>
+                    </tr>
+                    <tr>
+                      <td><code>price_difference_exceeds_percentage_limit</code></td>
+                      <td>400</td>
+                      <td>Diferença de preço acima do limite permitido</td>
+                    </tr>
+                    <tr>
+                      <td><code>substitutions_not_configured</code></td>
+                      <td>403</td>
+                      <td>Substituições não configuradas</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="section-anchor" id="section-lite" aria-labelledby="h-lite">
+              <h2 id="h-lite">Eventos no Open Orders LITE</h2>
+
+              <h3 id="h-lite-lifecycle">Ciclo de Vida do Pedido — Orders LITE</h3>
+              <figure class="content-figure">
+                <img
+                  src="../../assets/img/open-orders-flow-lite.png"
+                  alt="Fluxo Lite: Rappi cria pedido, picking e checkout na Rappi, notificações de integração, modificações e entregador para o varejista, e pedido entregue"
+                />
+                <figcaption>Fluxo ilustrativo do modelo Orders LITE (eventos predominantes da Rappi).</figcaption>
+              </figure>
+              <p>
+                O modelo Orders LITE foi desenvolvido para varejistas que desejam uma integração predominantemente
+                informativa ou que utilizam soluções específicas de separação (picking) e checkout.
+              </p>
+              <p>
+                Diferentemente do modelo FULL, o Orders LITE não permite alterações operacionais nos pedidos através da
+                API, funcionando principalmente como um mecanismo de consulta e monitoramento dos eventos gerados pela
+                Rappi.
+              </p>
+
+              <h3>Características do Orders LITE</h3>
+              <p>O Orders LITE é compatível com diferentes soluções disponibilizadas pela Rappi, incluindo:</p>
+              <ul>
+                <li>Shopper App</li>
+                <li>Mi Tienda</li>
+                <li>RT Picking</li>
+                <li>Cashless</li>
+              </ul>
+              <p>Nesse modelo:</p>
+              <ul>
+                <li>É possível utilizar webhooks para receber notificações de pedidos</li>
+                <li>É possível consultar pedidos via polling</li>
+                <li>Não é permitido atualizar, cancelar ou modificar pedidos pela API</li>
+              </ul>
+
+              <h3>Comparativo — Orders FULL vs Orders LITE</h3>
+              <div class="table-wrap">
+                <table class="api-doc-table">
+                  <thead>
+                    <tr>
+                      <th>Funcionalidade</th>
+                      <th>FULL</th>
+                      <th>LITE</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Consulta de Pedidos via Polling</td>
+                      <td>✅</td>
+                      <td>✅</td>
+                    </tr>
+                    <tr>
+                      <td>Início de Picking</td>
+                      <td>✅</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td>Remoção de Produtos</td>
+                      <td>✅</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td>Remoção de Quantidades</td>
+                      <td>✅</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td>Cancelamento de Pedido</td>
+                      <td>✅</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td>Reporte de Nota Fiscal</td>
+                      <td>✅</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td>Notificação de Pedido Criado (Webhook)</td>
+                      <td>✅</td>
+                      <td>✅</td>
+                    </tr>
+                    <tr>
+                      <td>Notificação de Entregador Atribuído</td>
+                      <td>✅</td>
+                      <td>✅</td>
+                    </tr>
+                    <tr>
+                      <td>Notificação de Pedido Entregue</td>
+                      <td>✅</td>
+                      <td>✅</td>
+                    </tr>
+                    <tr>
+                      <td>Notificação de Invoice Reported</td>
+                      <td>❌</td>
+                      <td>✅</td>
+                    </tr>
+                    <tr>
+                      <td>Notificações Internas de Modificação de Pedido</td>
+                      <td>✅</td>
+                      <td>✅</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>Webhook de Eventos de Pedido (LITE)</h3>
+              <p>
+                Ao configurar um webhook para pedidos da Rappi, os pedidos serão enviados automaticamente assim que forem
+                criados na plataforma. A criação ocorre via <code>POST</code> para a URL configurada:
+              </p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Webhook</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-bash">POST https://your-url.com/orders</code></pre>
+              </div>
+              <p>O identificador do pedido (<code>order_id</code>) não faz parte da URL e é enviado no corpo da requisição.</p>
+              <p>O payload inclui dados da loja, cliente, endereço, produtos, entregador, pagamento, status, criação e <code>event_uuid</code>.</p>
+
+              <h4>Pedidos Agendados</h4>
+              <p>O campo <code>place_at</code> indica se o pedido foi agendado.</p>
+              <p><strong>Pedidos Imediatos (NOW Orders)</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Exemplo (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">"place_at": ""</code></pre>
+              </div>
+              <p><strong>Pedidos Agendados</strong> — quando programado, o campo trará data e horário agendados para entrega.</p>
+
+              <h4>Informações de Identificação Pessoal</h4>
+              <p>
+                Quando necessário, dados como CPF podem ser enviados em <code>identification.number</code>, coletados no
+                checkout do app da Rappi.
+              </p>
+
+              <h4>Evento <code>courier_assigned</code></h4>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Exemplo (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">"courier": {
+  "phone": "18003334444",
+  "last_name": "Johnson",
+  "first_name": "Jane",
+  "vehicle_type": "motorbike"
+}</code></pre>
+              </div>
+
+              <h4>Pedido Entregue</h4>
+              <p>
+                Quando o pedido for entregue, a Rappi enviará atualização via webhook: <code>status</code> como
+                <code>finished</code> e <code>delivered_at</code> preenchido.
+              </p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Exemplo (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">{
+  "delivered_at": "2023-02-10T12:34:07Z"
+}</code></pre>
+              </div>
+
+              <h3>Endpoint de Polling (LITE)</h3>
+              <p>
+                Além do webhook, há endpoint de polling para consulta proativa. Cada país possui URL base diferente; é
+                obrigatório autenticar antes de consumir os endpoints.
+              </p>
+              <p><strong>Consulta de Pedidos Pendentes</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Endpoint</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-bash">GET {country_url}/api/open-api/v1/orders</code></pre>
+              </div>
+              <p>Retorna pedidos pendentes e não confirmados do varejista autenticado.</p>
+              <p><strong>Consulta de Pedido Específico</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Endpoint</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-bash">GET {country_url}/api/open-api/v1/orders/{order_id}</code></pre>
+              </div>
+              <p>O retorno segue o mesmo schema JSON do webhook.</p>
+              <p><strong>Rate limit:</strong> por padrão, 100 requisições por minuto (ajustável mediante solicitação).</p>
+
+              <h3>Status do Pedido (LITE)</h3>
+              <p>O campo <code>status</code> representa a etapa atual. No modelo LITE, os possíveis valores são:</p>
+              <div class="table-wrap">
+                <table class="api-doc-table">
+                  <thead>
+                    <tr>
+                      <th>Status</th>
+                      <th>Descrição</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>created</code></td>
+                      <td>Pedido ativo aguardando separação ou em processo de separação</td>
+                    </tr>
+                    <tr>
+                      <td><code>invoice_reported</code></td>
+                      <td>Separação concluída e cesta final definida</td>
+                    </tr>
+                    <tr>
+                      <td><code>finished</code></td>
+                      <td>Pedido entregue ao cliente final</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>Qual modelo de integração utilizar? (LITE)</h3>
+              <p>
+                A escolha depende da infraestrutura e do OMS. A recomendação permanece: <strong>webhook</strong> como
+                principal e <strong>polling</strong> como complemento e contingência.
+              </p>
+            </section>
+
+            <section class="section-anchor" id="section-cancel-ref" aria-labelledby="h-cancel-ref">
+              <h2 id="h-cancel-ref">Referência de Cancelamento</h2>
+
+              <h3>Estrutura Básica de Cancelamento</h3>
+              <p>Para cancelar um pedido no Open Orders, utilize o seguinte endpoint:</p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Endpoint</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/cancel</code></pre>
+              </div>
+              <p>Exemplo utilizando cURL:</p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>cURL</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-bash">curl --location 'https://{COUNTRY}/api/open-api/v1/orders/{YOUR_ORDER}/cancel' \
+--header 'Authorization: Bearer {YOUR_TOKEN}' \
+--header 'event_uuid: {LAST_EVENT_UUID}' \
+--header 'Content-Type: application/json' \
+--data '{
+  "type": "technical_issues",
+  "details": {}
+}'</code></pre>
+              </div>
+
+              <h3>Estrutura do Payload</h3>
+              <div class="table-wrap">
+                <table class="api-doc-table">
+                  <thead>
+                    <tr>
+                      <th>Campo</th>
+                      <th>Descrição</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>type</code></td>
+                      <td>Motivo do cancelamento</td>
+                    </tr>
+                    <tr>
+                      <td><code>details</code></td>
+                      <td>Informações adicionais relacionadas ao motivo</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="doc-note">
+                📘 Para a maioria dos motivos, <code>details</code> pode ser <code>{}</code>. Alguns tipos exigem informações adicionais.
+              </div>
+
+              <h3>Motivos de Cancelamento</h3>
+              <div class="table-wrap">
+                <table class="api-doc-table">
+                  <thead>
+                    <tr>
+                      <th>Motivo (<code>type</code>)</th>
+                      <th>Descrição</th>
+                      <th>Requer <code>details</code>?</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>technical_issues</code></td>
+                      <td>Problemas técnicos no sistema do varejista impedem o avanço do pedido</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td><code>total_products_removed</code></td>
+                      <td>Todos os produtos do pedido foram removidos</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td><code>order_id_duplicated</code></td>
+                      <td>O pedido já foi criado anteriormente no sistema do varejista</td>
+                      <td>✅</td>
+                    </tr>
+                    <tr>
+                      <td><code>products_not_found</code></td>
+                      <td>Produtos do pedido não correspondem aos IDs do catálogo do varejista</td>
+                      <td>✅</td>
+                    </tr>
+                    <tr>
+                      <td><code>products_stock_out</code></td>
+                      <td>Todos os produtos do pedido estão sem estoque</td>
+                      <td>✅</td>
+                    </tr>
+                    <tr>
+                      <td><code>products_price_difference</code></td>
+                      <td>Diferença de preço identificada nos produtos do pedido</td>
+                      <td>✅</td>
+                    </tr>
+                    <tr>
+                      <td><code>store_not_found</code></td>
+                      <td>ID da loja inválido ou não reconhecido</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td><code>total_value_inconsistent</code></td>
+                      <td>Soma dos preços dos produtos não corresponde ao valor total do pedido</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td><code>user_first_name</code></td>
+                      <td>Nome do cliente inválido ou ausente</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td><code>user_last_name</code></td>
+                      <td>Sobrenome do cliente inválido ou ausente</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td><code>user_identification</code></td>
+                      <td>Documento do cliente inválido ou ausente</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td><code>user_email</code></td>
+                      <td>E-mail do cliente inválido ou ausente</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td><code>user_phone_number</code></td>
+                      <td>Telefone do cliente inválido ou ausente</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td><code>address_street_address</code></td>
+                      <td>Endereço inválido ou ausente</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td><code>address_number</code></td>
+                      <td>Número do endereço inválido ou ausente</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td><code>address_neighborhood</code></td>
+                      <td>Bairro inválido ou ausente</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td><code>address_city</code></td>
+                      <td>Cidade inválida ou ausente</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td><code>address_state</code></td>
+                      <td>Estado inválido ou ausente</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td><code>address_zip_code</code></td>
+                      <td>CEP inválido ou ausente</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td><code>delivery_time</code></td>
+                      <td>Horário de entrega inválido</td>
+                      <td>❌</td>
+                    </tr>
+                    <tr>
+                      <td><code>departure_time</code></td>
+                      <td>Horário de saída inválido</td>
+                      <td>❌</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3>Exemplos de <code>details</code> por tipo</h3>
+              <p><strong>Pedido Duplicado (<code>order_id_duplicated</code>)</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Payload (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">{
+  "type": "order_id_duplicated",
+  "details": {
+    "retail_order_id": "12345",
+    "created_at": "2023-01-01T00:00:00Z"
+  }
+}</code></pre>
+              </div>
+
+              <p><strong>Produtos Não Encontrados (<code>products_not_found</code>)</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Payload (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">{
+  "type": "products_not_found",
+  "details": {
+    "products": [
+      "0001",
+      "0002",
+      "0003"
+    ]
+  }
+}</code></pre>
+              </div>
+
+              <p><strong>Produtos Sem Estoque (<code>products_stock_out</code>)</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Payload (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">{
+  "type": "products_stock_out",
+  "details": {
+    "products": [
+      {
+        "product_id": "0001",
+        "available": 0
+      },
+      {
+        "product_id": "0002",
+        "available": 1
+      }
+    ]
+  }
+}</code></pre>
+              </div>
+              <p>O campo <code>available</code> representa a quantidade ainda disponível do produto.</p>
+
+              <p><strong>Diferença de Preço (<code>products_price_difference</code>)</strong></p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Payload (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">{
+  "type": "products_price_difference",
+  "details": {
+    "difference_threshold": 15,
+    "products": [
+      {
+        "product_id": "0001",
+        "price_difference": 2
+      },
+      {
+        "product_id": "0002",
+        "price_difference": 3
+      }
+    ]
+  }
+}</code></pre>
+              </div>
+              <div class="table-wrap">
+                <table class="api-doc-table">
+                  <thead>
+                    <tr>
+                      <th>Campo</th>
+                      <th>Descrição</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>difference_threshold</code></td>
+                      <td>Limite percentual permitido para diferença de preço</td>
+                    </tr>
+                    <tr>
+                      <td><code>price_difference</code></td>
+                      <td>Diferença entre o preço real e o preço informado no pedido</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </section>
           </div>
         </main>
@@ -151,6 +1432,7 @@
     <script src="../../assets/js/credentials.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js" crossorigin="anonymous"></script>
     <script defer src="../../assets/js/lang-switcher.js"></script>
     <script src="../../assets/js/main.js"></script>
   </body>
