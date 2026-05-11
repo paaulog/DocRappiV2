@@ -522,7 +522,7 @@
               <p><strong>Endpoint de confirmação</strong></p>
               <div class="code-block-wrap">
                 <div class="code-block__bar">
-                  <span>ACK</span>
+                  <span>Requisição (cURL)</span>
                   <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                 </div>
                 <pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/acknowledge</code></pre>
@@ -623,7 +623,7 @@
               <p><strong>Endpoint</strong></p>
               <div class="code-block-wrap">
                 <div class="code-block__bar">
-                  <span>Endpoint</span>
+                  <span>Requisição (cURL)</span>
                   <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                 </div>
                 <pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/start_picking</code></pre>
@@ -651,7 +651,7 @@
               <p><strong>Endpoint</strong></p>
               <div class="code-block-wrap">
                 <div class="code-block__bar">
-                  <span>Endpoint</span>
+                  <span>Requisição (cURL)</span>
                   <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                 </div>
                 <pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/report_invoice</code></pre>
@@ -683,7 +683,7 @@
               <p><strong>Endpoint</strong></p>
               <div class="code-block-wrap">
                 <div class="code-block__bar">
-                  <span>Endpoint</span>
+                  <span>Requisição (cURL)</span>
                   <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                 </div>
                 <pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/cancel</code></pre>
@@ -705,7 +705,7 @@
               <p><strong>Remoção Total de Produto</strong> — quando não há nenhuma unidade disponível do produto.</p>
               <div class="code-block-wrap">
                 <div class="code-block__bar">
-                  <span>Endpoint</span>
+                  <span>Requisição (cURL)</span>
                   <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                 </div>
                 <pre><code class="language-bash">DELETE {country_url}/api/open-api/v1/orders/{order_id}/products/{product_id}</code></pre>
@@ -714,7 +714,7 @@
               <p><strong>Remoção Parcial de Unidades</strong> — quando existe quantidade inferior à solicitada pelo cliente.</p>
               <div class="code-block-wrap">
                 <div class="code-block__bar">
-                  <span>Endpoint</span>
+                  <span>Requisição (cURL)</span>
                   <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                 </div>
                 <pre><code class="language-bash">PATCH {country_url}/api/open-api/v1/orders/{order_id}/products/{product_id}/quantity</code></pre>
@@ -755,7 +755,7 @@
               <p><strong>Solicitação de Entregador (<code>request_courier</code>)</strong></p>
               <div class="code-block-wrap">
                 <div class="code-block__bar">
-                  <span>Endpoint</span>
+                  <span>Requisição (cURL)</span>
                   <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                 </div>
                 <pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/request_courier</code></pre>
@@ -824,7 +824,7 @@
               <p><strong>Endpoint</strong></p>
               <div class="code-block-wrap">
                 <div class="code-block__bar">
-                  <span>Endpoint</span>
+                  <span>Requisição (cURL)</span>
                   <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                 </div>
                 <pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/handshake</code></pre>
@@ -832,7 +832,7 @@
               <p><strong>Resposta</strong></p>
               <div class="code-block-wrap">
                 <div class="code-block__bar">
-                  <span>Resposta (JSON)</span>
+                  <span>Exemplo de resposta (JSON)</span>
                   <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                 </div>
                 <pre><code class="language-json">{
@@ -864,7 +864,7 @@
               <p><strong>Endpoint</strong></p>
               <div class="code-block-wrap">
                 <div class="code-block__bar">
-                  <span>Endpoint</span>
+                  <span>Requisição (cURL)</span>
                   <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                 </div>
                 <pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/handshake/validate</code></pre>
@@ -1132,7 +1132,7 @@
               <p><strong>Consulta de Pedidos Pendentes</strong></p>
               <div class="code-block-wrap">
                 <div class="code-block__bar">
-                  <span>Endpoint</span>
+                  <span>Requisição (cURL)</span>
                   <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                 </div>
                 <pre><code class="language-bash">GET {country_url}/api/open-api/v1/orders</code></pre>
@@ -1141,7 +1141,7 @@
               <p><strong>Consulta de Pedido Específico</strong></p>
               <div class="code-block-wrap">
                 <div class="code-block__bar">
-                  <span>Endpoint</span>
+                  <span>Requisição (cURL)</span>
                   <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                 </div>
                 <pre><code class="language-bash">GET {country_url}/api/open-api/v1/orders/{order_id}</code></pre>
@@ -1191,7 +1191,7 @@
               <p>Para cancelar um pedido no Open Orders, utilize o seguinte endpoint:</p>
               <div class="code-block-wrap">
                 <div class="code-block__bar">
-                  <span>Endpoint</span>
+                  <span>Requisição (cURL)</span>
                   <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                 </div>
                 <pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/cancel</code></pre>
