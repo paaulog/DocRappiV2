@@ -1,164 +1,1232 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script>
+<html data-theme="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<script>
       try {
         document.documentElement.setAttribute('data-theme', localStorage.getItem('docs-theme') || 'light');
       } catch (e) {}
     </script>
-    <title>Open Orders — Documentation</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="../../assets/css/style.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
-      crossorigin="anonymous"
-    />
-  </head>
-  <body data-page="api" data-api="open-orders" data-static-api>
-    <div class="page-shell" id="page-shell">
-      <div class="api-layout">
-        <div class="sidebar-shell">
-          <aside class="sidebar" aria-label="Documentation">
-            <a href="../index.html" class="sidebar__logo" data-page-link
-              ><img src="../../assets/img/logo.png" alt="Rappi"
-            /></a>
-            <div class="sidebar__top">
-              <div class="docs-lang-switch sidebar__langs" data-docs-lang-switch aria-label="Language"></div>
-              <button type="button" class="btn btn--theme" data-theme-toggle aria-label="Toggle theme">
-                Dark mode
-              </button>
-              <nav class="sidebar__nav" aria-label="On this page">
-                <a href="#section-orders-requirements">Requirements for receiving orders</a>
-                <a href="#section-endpoints">Endpoints</a>
-                <a href="#section-relevant-flows">Relevant flows</a>
-                <a href="#section-guide">Guide</a>
-              </nav>
-            </div>
-            <div class="sidebar__bottom">
-              <div class="sidebar__cred-wrap">
-                <span class="credentials-badge" data-credentials-badge hidden>Credentials set</span>
-              </div>
-              <a href="../index.html" class="btn btn--ghost" data-page-link style="text-align: center">← All APIs</a>
-            </div>
-          </aside>
-        </div>
-        <main class="api-main" id="main">
-          <div id="api-content-root">
-            <header class="api-main__header">
-              <h1>Open Orders</h1>
-              <p class="lead">
-                Receive and track Rappi orders directly in your management system.
-              </p>
-            </header>
-
-            <div class="doc-note">
-              📘 The full Open Orders guide (lifecycle, webhooks, polling, FULL/LITE, handshake, and cancellation
-              reference) is maintained in <strong>Portuguese</strong>.
-              <a href="../../pt-br/pages/open-orders.html" data-page-link>Open the PT-BR documentation</a>
-              — or use the language switcher above.
-            </div>
-
-            <section class="section-anchor" id="section-orders-requirements" aria-labelledby="h-orders-requirements">
-              <h2 id="h-orders-requirements">Requirements for receiving orders</h2>
-              <p>To receive and track Rappi orders in your system, there are some important points:</p>
-              <ul>
-                <li>Integrated inventory: orders are only generated for products with synchronized stock/pricing.</li>
-                <li>Valid Bearer credentials.</li>
-                <li>Active webhook to receive notifications of new orders.</li>
-              </ul>
-            </section>
-
-            <section class="section-anchor" id="section-endpoints" aria-labelledby="h-endpoints">
-              <h2 id="h-endpoints">Endpoints</h2>
-
-              <article class="endpoint-block section-anchor" id="endpoint-example">
-                <h3>
-                  <span class="method-badge">GET</span>
-                  /v1/orders/example
-                </h3>
-                <p>Example endpoint. Replace with the real contract as soon as it is available.</p>
-                <p class="muted">No request body.</p>
-                <div class="code-block-wrap">
-                  <div class="code-block__bar">
-                    <span>Response example (JSON)</span>
-                    <button type="button" class="btn btn--ghost copy-btn">Copy</button>
-                  </div>
-                  <pre><code class="language-json">{}</code></pre>
-                </div>
-                <div class="try-soon">
-                  <button type="button" class="btn btn--ghost" disabled title="Coming soon">Try it (coming soon)</button>
-                </div>
-              </article>
-            </section>
-
-            <section class="section-anchor" id="section-relevant-flows" aria-labelledby="h-flows">
-              <h2 id="h-flows">Relevant flows</h2>
-              <p>
-                Order flow: notification arrives via webhook → you confirm/accept → send status updates
-                (preparing, ready, dispatched).
-              </p>
-              <p>Cancellation flow: cancel using a standardized reason to ensure the correct customer refund.</p>
-            </section>
-
-            <section class="section-anchor" id="section-guide" aria-labelledby="h-guide">
-              <h2 id="h-guide">Guide</h2>
-              <p>Open Orders and Payless are exclusive: each partner chooses one of the two for the order cycle.</p>
-              <p>Confirm each order within the agreed SLA — delays harm the end-customer experience.</p>
-              <p>Keep statuses always up to date: the courier app depends on these updates.</p>
-            </section>
-          </div>
-        </main>
-      </div>
-    </div>
-
-    <div id="modal-backdrop" class="modal-backdrop" data-close-credentials tabindex="-1" aria-hidden="true"></div>
-    <div
-      id="credentials-modal"
-      class="modal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="cred-title"
-      aria-hidden="true"
-    >
-      <h2 id="cred-title">Set credentials</h2>
-      <p class="muted">Optional values for examples on this page.</p>
-      <form id="credentials-form">
-        <div class="modal__field">
-          <label for="field-api-key">API key</label>
-          <input type="password" id="field-api-key" name="apiKey" autocomplete="off" spellcheck="false" placeholder="Your key" />
-        </div>
-        <div class="modal__field">
-          <label for="field-store-id">Store ID</label>
-          <input type="text" id="field-store-id" name="storeId" autocomplete="off" placeholder="Store identifier" />
-        </div>
-        <div class="modal__field">
-          <label for="field-merchant">Merchant ID</label>
-          <input type="text" id="field-merchant" name="merchantId" autocomplete="off" placeholder="Merchant" />
-        </div>
-        <div class="modal__field">
-          <label for="field-webhook">Webhook URL</label>
-          <input type="url" id="field-webhook" name="webhookUrl" autocomplete="off" placeholder="https://" />
-        </div>
-        <div class="modal__actions">
-          <button type="submit" class="btn btn--primary">Save</button>
-          <button type="button" class="btn btn--ghost" data-close-credentials>Cancel</button>
-          <button type="button" class="btn btn--ghost" id="credentials-clear">Clear credentials</button>
-        </div>
-      </form>
-      <p class="modal__note">
-        Stored only in sessionStorage in this tab. Nothing is sent to external servers by this site.
-      </p>
-    </div>
-
-    <script src="../../assets/js/credentials.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" crossorigin="anonymous"></script>
-    <script defer src="../../assets/js/lang-switcher.js"></script>
-    <script src="../../assets/js/main.js"></script>
-  </body>
+<title>Open Orders — Documentation</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="../../assets/css/style.css" rel="stylesheet"/>
+<link crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet"/>
+</head>
+<body data-api="open-orders" data-page="api" data-static-api="">
+<div class="page-shell" id="page-shell">
+<div class="api-layout">
+<div class="sidebar-shell">
+<aside aria-label="Documentation" class="sidebar">
+<a class="sidebar__logo" data-page-link="" href="../index.html"><img alt="Rappi" src="../../assets/img/logo.png"/></a>
+<div class="sidebar__top">
+<div aria-label="Language" class="docs-lang-switch sidebar__langs" data-docs-lang-switch=""></div>
+<button aria-label="Switch theme" class="btn btn--theme" data-theme-toggle="" type="button">Dark Mode</button>
+<nav aria-label="On this page" class="sidebar__nav">
+<a href="#section-intro">Introduction</a>
+<a href="#section-checklist">Checklist and templates</a>
+<a href="#section-lifecycle-overview">Life cycle</a>
+<a href="#section-receiving">Receiving</a>
+<a href="#section-management">Management</a>
+<a href="#section-full">Orders FULL</a>
+<a href="#section-handshake">Handshake</a>
+<a href="#section-lite">Orders LITE</a>
+<a href="#section-cancel-ref">Cancellation</a>
+</nav>
+</div>
+<div class="sidebar__bottom">
+<div class="sidebar__cred-wrap">
+<span class="credentials-badge" data-credentials-badge="" hidden="">Credentials set</span>
+</div>
+<a class="btn btn--ghost" data-page-link="" href="../index.html" style="text-align: center">← All APIs</a>
+</div>
+</aside>
+</div>
+<main class="api-main" id="main">
+<div id="api-content-root">
+<header class="api-main__header">
+<h1>Open Orders</h1>
+<p class="lead">First steps with the Orders API: receive orders from Rappi in your system, track the life cycle and
+                integrate Webhooks, polling and operational events.</p>
+</header>
+<section aria-labelledby="h-intro" class="section-anchor" id="section-intro">
+<h2 id="h-intro">Getting started with the Orders API</h2>
+<h3 id="h-what-is">What is Open Orders?</h3>
+<p>Open Orders is a solution that allows retailers to receive orders in their own systems
+                carried out by customers on the Rappi platform. With this, the retailer can use its own structure
+                logistics and operational to carry out the picking and delivery of orders.</p>
+<p>The integration works in real time, automatically connecting new orders to the company's systems.
+                retailer and managing the exchange of notifications between Rappi and the operation throughout the entire life cycle
+                of the request. Additionally, early receipt of scheduled orders contributes to better distribution
+                operational load, increasing team productivity during periods of lower demand.</p>
+<h3 id="h-is-it-for-you">Is Open Orders suitable for your operation?</h3>
+<p>Before starting integration, it is important to assess whether your operation has the necessary structure to
+                support the Open Orders model. Consider the following points:</p>
+<ul>
+<li>Does your company already have a functional inventory integration with Rappi?</li>
+<li>Is store inventory control efficient enough to minimize stockouts?</li>
+<li>Can your POS/ERP system process orders from external channels?</li>
+<li>Your operational team is prepared to handle time-sensitive actions, ensuring the correct
+                  fulfilling orders?</li>
+<li>Do you have a development team — in-house or outsourced — capable of implementing, maintaining and
+                  support integration with Rappi?</li>
+</ul>
+<div class="doc-note doc-note--warn">🚧<strong>Important:</strong>New features are constantly being released by the Open Orders team to
+                improve user experience in integrated stores. As an integrated partner, you need to implement
+                these updates within<strong>8 weeks</strong>after launch.</div>
+</section>
+<section aria-labelledby="h-checklist" class="section-anchor" id="section-checklist">
+<h2 id="h-checklist">Integration Checklist</h2>
+<p>To ensure an efficient implementation of Open Orders, it is recommended to follow the steps below:</p>
+<ul>
+<li>Understand the order lifecycle and the impacts of each event on the user experience within the
+                  application.</li>
+<li>Identify which internal events in your operation should be mapped to Rappi events.</li>
+<li>Assess possible limitations of the ERP or picking system that could hinder processes
+                  advanced exception handling — in addition to defining strategies to work around them.</li>
+<li>Develop Webhooks capable of receiving events related to requests sent by Rappi.</li>
+<li>Ensure all operational flow updates are sent to Rappi, maintaining synchronization
+                  complete order.</li>
+</ul>
+<h2 id="h-operation-models">Open Orders Operating Models</h2>
+<p>Open Orders offers two integration models:</p>
+<h3>Orders Lite</h3>
+<p>In the model<strong>Orders Lite</strong>, only Rappi events are implemented. This means that
+                All order status updates — such as starting picking or issuing an invoice — are
+                initiated and notified by Rappi itself.</p>
+<p>This model is compatible with the picking solutions provided by the platform.</p>
+<h3>Orders Full</h3>
+<p>In the model<strong>Orders Full</strong>, both Rappi events and retailer events are
+                implemented. In this scenario, order status updates are initiated and notified
+                directly by the retailer.</p>
+<p>This model offers greater operational autonomy, but is not compatible with Rappi's picking solutions.</p>
+</section>
+<section aria-labelledby="h-lifecycle-overview" class="section-anchor" id="section-lifecycle-overview">
+<h2 id="h-lifecycle-overview">Understanding the Order Lifecycle</h2>
+<h3 id="h-orders-overview">Order Overview</h3>
+<p>All orders at Rappi are treated as a sequential flow of events. A common request goes through
+                different stages from its creation to delivery to the end customer.</p>
+<figure class="content-figure">
+<img alt="Order flow between Rappi and retailer in the Full model: creation, picking, invoice, delivery driver request, handshake and delivery" src="../../assets/img/open-orders-flow-full.png"/>
+<figcaption>Illustrative flow of the order cycle (model with retailer and Rappi events).</figcaption>
+</figure>
+<p>Flow events are divided into two main types:</p>
+<h4>Rappi Events</h4>
+<p>These are events generated directly by the Rappi platform during order processing.</p>
+<ul>
+<li>
+<strong><code>order_created</code></strong>— Notifies the creation of a new order and sends all
+                  information related to it.</li>
+<li>
+<strong><code>courier_assigned</code></strong>— Informs that a delivery person (RT) has been assigned to the order
+                  and he's on his way to the store.</li>
+<li>
+<strong><code>order_finished</code></strong>— Indicates that the order was successfully delivered to the customer
+                  end.</li>
+</ul>
+<h4>Retailer Events</h4>
+<p>These are events generated by the retailer's order management system (OMS) or picking solution
+                used in the operation.</p>
+<ul>
+<li>
+<strong><code>start_picking</code></strong>— Notifies that the store team has started separating the
+                  order products.</li>
+<li>
+<strong><code>report_invoice</code></strong>— Informs that the separation has been completed and that the note or
+                  Proof of purchase has been generated.</li>
+<li>
+<strong><code>request_courier</code></strong>— Requests Rappi to begin the process of attributing
+                  delivery person for the order.</li>
+</ul>
+</section>
+<section aria-labelledby="h-receiving" class="section-anchor" id="section-receiving">
+<h2 id="h-receiving">Order Receiving</h2>
+<p>Rappi provides two main ways for retailers to receive orders and updates on time
+                actual:</p>
+<ul>
+<li><strong>Order Event Webhook</strong></li>
+<li><strong>Polling Endpoint</strong></li>
+</ul>
+<p>These methods can be used separately or together, ensuring greater reliability in receiving events.</p>
+<h3>Order Event Webhook</h3>
+<p>By configuring a Webhook for Rappi orders, your operation can receive orders automatically
+                as soon as they are created on the platform.</p>
+<p>The order is created through a request <code>POST</code> sent to the URL configured by
+                retailer, using the endpoint:</p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Webhook (URL configured by partner)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-bash">POST https://your-url.com/orders</code></pre>
+</div>
+<p>The order identifier (<code>order_id</code>) is not sent in the URL, but in the body of the request.</p>
+<p>The sent payload contains all relevant order information, including:</p>
+<ul>
+<li>Store details</li>
+<li>Customer Information</li>
+<li>Delivery address</li>
+<li>Products and combos</li>
+<li>Payment method</li>
+<li>Delivery person information</li>
+<li>Order status</li>
+<li>Creation date</li>
+<li>Events related to the order</li>
+</ul>
+<h4>Scheduled Orders — field <code>place_at</code></h4>
+<p>The field <code>place_at</code> is used to identify scheduled requests.</p>
+<p><strong>NOW Orders</strong></p>
+<p>When the order is not scheduled, the field will be sent empty or null:</p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Example (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">"place_at": ""</code></pre>
+</div>
+<p>or</p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Example (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">"place_at": null</code></pre>
+</div>
+<p><strong>Scheduled Orders</strong></p>
+<p>For scheduled orders, the field will contain the scheduled date and time:</p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Example (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">"place_at": "2025-04-03T12:00:00Z"</code></pre>
+</div>
+<h4>Personally Identifiable Information</h4>
+<p>When necessary, personal information — such as CPF — can be sent in the field <code>identification.number</code>, captured directly in the app's checkout flow.</p>
+<h3>Polling Endpoint</h3>
+<p>The polling method allows you to proactively consult active requests and events on the platform
+                Rappi.</p>
+<p>When making a request <code>GET</code> to the endpoint below, all requests will be returned
+                pending issues not yet confirmed by the retailer:</p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Pending orders</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-bash">GET {country_url}/api/open-api/v1/orders</code></pre>
+</div>
+<p>It is also possible to consult a specific order using:</p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Order by ID</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-bash">GET {country_url}/api/open-api/v1/orders/{order_id}</code></pre>
+</div>
+<p>The return will follow exactly the same JSON format sent by the Webhook.</p>
+<h4>Request Limit (Rate Limit)</h4>
+<p>By default, retailers have a limit of:</p>
+<p><strong>100 requests per minute</strong></p>
+<p>This limit can be adjusted upon request to Rappi.</p>
+<h3>Order Status</h3>
+<p>The field <code>status</code> present in both the Webhook and the polling endpoint indicates the current step of the
+                request within the operational flow.</p>
+<p>Possible values are:</p>
+<div class="table-wrap">
+<table class="api-doc-table">
+<thead>
+<tr>
+<th>Status</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>created</code></td>
+<td>Active order, awaiting separation or in the process of separation</td>
+</tr>
+<tr>
+<td><code>invoice_reported</code></td>
+<td>Separation completed and final basket of products defined</td>
+</tr>
+<tr>
+<td><code>finished</code></td>
+<td>Order delivered to the end customer</td>
+</tr>
+<tr>
+<td><code>canceled</code></td>
+<td>Order canceled by Rappi or the retailer</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>Which integration model to use?</h3>
+<p>The choice of the ideal method directly depends on the operational infrastructure and capabilities of the OMS
+                used by the retailer.</p>
+<p>However, Rappi's recommendation is to use:</p>
+<ul>
+<li><strong>Webhook</strong>as the main mechanism for receiving events</li>
+<li><strong>Polling</strong>as a complementary and contingency mechanism</li>
+</ul>
+<p>This way, if an event is not received via Webhook, polling can be used to validate and
+                retrieve pending information.</p>
+</section>
+<section aria-labelledby="h-management" class="section-anchor" id="section-management">
+<h2 id="h-management">Order Management</h2>
+<p>There are two order management models available on Open Orders:</p>
+<h3>FULL</h3>
+<p>In the model<strong>FULL</strong>, the retailer uses its own tools and systems (OMS) to
+                carry out the separation of orders.</p>
+<p>In this scenario, the retailer is responsible for sending Rappi updates about each stage of the operational process.</p>
+<h3>LITE</h3>
+<p>In the model<strong>LITE</strong>, order separation is carried out using the solutions available
+                by Rappi itself.</p>
+<p>In this case, updates on operational events are sent by the platform itself to the retailer.</p>
+<h3>Order Delivered</h3>
+<p>As with the delivery driver assignment process, the order completion is also sent via <code>POST</code> for the configured Webhook.</p>
+<p>When the order is completed:</p>
+<ul>
+<li>the field <code>status</code> takes on the value <code>finished</code></li>
+<li>the field <code>delivered_at</code> receive the delivery date and time</li>
+</ul>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Example (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">{
+  "delivered_at": "2023-02-10T12:34:07Z"
+}</code></pre>
+</div>
+</section>
+<section aria-labelledby="h-full" class="section-anchor" id="section-full">
+<h2 id="h-full">Events at Open Orders FULL</h2>
+<h3 id="h-full-lifecycle">Order Lifecycle — Orders FULL</h3>
+<p>The Orders FULL model was developed for operations that use their own picking solution
+                (picking). In this scenario, the store team manages orders directly in the retailer's system (OMS),
+                from receipt to delivery to the Rappi delivery person.</p>
+<h4>Features of Orders FULL</h4>
+<p>This integration requires the retailer to have:</p>
+<ul>
+<li>Your own order management system (OMS)</li>
+<li>An in-house picking solution</li>
+<li>Teams trained to view, process and update orders in real time</li>
+</ul>
+<p>In this model, the retailer is responsible for sending Rappi updates regarding the order's operational events.</p>
+<h3>Event Confirmation (Acknowledgement)</h3>
+<p>All events sent by Rappi must be confirmed by the retailer. This ensures that the order has been
+                received and processed correctly.</p>
+<p>There are two ways of confirmation:</p>
+<h4>Implicit Confirmation</h4>
+<p>Implicit confirmation occurs through the Webhook response. Whenever the retailer responds to the Webhook
+                with a successful HTTP code (200 to 299), the event will automatically be considered confirmed.</p>
+<p>Example of a valid response:</p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Example (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">{
+  "status": 200
+}</code></pre>
+</div>
+<p>or simply:</p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Example (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">{}</code></pre>
+</div>
+<h4>Explicit Confirmation</h4>
+<p>Explicit confirmation is used when:</p>
+<ul>
+<li>There is no Webhook configured</li>
+<li>Webhook fails</li>
+<li>HTTP response is not received correctly</li>
+</ul>
+<p>In this case, you must manually send a request to the confirmation endpoint.</p>
+<p><strong>Confirmation endpoint</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>ACK</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/acknowledge</code></pre>
+</div>
+<p><strong>Payload</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Payload (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">{
+  "acknowledgments": [
+    {
+      "order_id": 1234567,
+      "event_uuid": "00000000-0000-0000-0000-000000000000"
+    }
+  ]
+}</code></pre>
+</div>
+<div class="doc-note">📘 If an event has already been confirmed previously, the API will return the error <code>not_found_acknowledgements</code> with status<strong>406 Not Acceptable</strong>.</div>
+<h3>Event UUID</h3>
+<p>Each event generated by Rappi has a unique identifier called <code>event_uuid</code>. All
+                Events sent by the retailer must use the most recent UUID in the request header. This guarantees
+                that the order status is synchronized before any operational changes.</p>
+<div class="table-wrap">
+<table class="api-doc-table">
+<thead>
+<tr>
+<th>Event</th>
+<th>Order Status</th>
+<th>Identification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Order Created</td>
+<td><code>created</code></td>
+<td>First notification</td>
+</tr>
+<tr>
+<td>Product Modifications</td>
+<td><code>created</code></td>
+<td>Array changes <code>products</code></td>
+</tr>
+<tr>
+<td>Courier Assigned</td>
+<td><code>created</code> or <code>invoice_reported</code></td>
+<td>Object fields <code>courier</code> filled</td>
+</tr>
+<tr>
+<td>Order Canceled</td>
+<td><code>canceled</code></td>
+<td>Field <code>status</code></td>
+</tr>
+<tr>
+<td>Order Finished</td>
+<td><code>finished</code></td>
+<td>Field <code>status</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The events<strong>Order Canceled</strong>and<strong>Order Finished</strong>close the order flow and
+                do not need to be confirmed.</p>
+<h3>Unconfirmed Events</h3>
+<p>Some events are considered critical to the operation.</p>
+<p>If Rappi identifies that an important event was not confirmed within the configured time (for example,
+                pattern,<strong>20 minutes</strong>), the order may be canceled automatically.</p>
+<p>The main critical events are:</p>
+<ul>
+<li><code>order_created</code></li>
+<li>Product modification events</li>
+<li><code>remove_product</code></li>
+<li><code>remove_product_units</code></li>
+</ul>
+<h3>Order Status Update</h3>
+<p>Upon receipt of the order, the retailer must update the operational progress through the endpoints
+                appropriate.</p>
+<h4>Beginning of Separation (<code>start_picking</code>)</h4>
+<p>This event must be sent when the store team starts sorting the products.</p>
+<p><strong>Endpoint</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Endpoint</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/start_picking</code></pre>
+</div>
+<p><strong>Payload</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Payload (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">{
+  "picking_time": 15
+}</code></pre>
+</div>
+<p>The field <code>picking_time</code> represents the estimated separation time in minutes. If it does not exist
+                available estimate, it is recommended to use the standard value of<strong>15 minutes</strong>.</p>
+<h4>Finalization of the Separation (<code>report_invoice</code>)</h4>
+<p>This event informs that the separation has been completed and that the invoice or proof of purchase has been issued.</p>
+<p><strong>Endpoint</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Endpoint</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/report_invoice</code></pre>
+</div>
+<p><strong>Payload</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Payload (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">{
+  "total_price": 12.5,
+  "image_url": "image.com"
+}</code></pre>
+</div>
+<p><strong>Observations</strong></p>
+<ul>
+<li>The decimal separator must be <code>"."</code></li>
+<li>Do not use thousands separator</li>
+<li>The field <code>image_url</code> is optional</li>
+</ul>
+<div class="doc-note doc-note--warn">🚧 After sending the <code>report_invoice</code>, the product basket is locked and will no longer be subject to
+                changes.</div>
+<h4>Order Cancellation</h4>
+<p>If it is necessary to cancel an order after it has been created, use the endpoint below:</p>
+<p><strong>Endpoint</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Endpoint</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/cancel</code></pre>
+</div>
+<p><strong>Payload</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Payload (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">{
+  "type": "reason",
+  "details": {}
+}</code></pre>
+</div>
+<h4>Product Removal (Partial Cancellation)</h4>
+<p>During separation, products may be unavailable in stock.</p>
+<p><strong>Total Product Removal</strong>— when there are no units of the product available.</p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Endpoint</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-bash">DELETE {country_url}/api/open-api/v1/orders/{order_id}/products/{product_id}</code></pre>
+</div>
+<p>The endpoint accepts empty body.</p>
+<p><strong>Partial Removal of Units</strong>— when there is less quantity than requested by the customer.</p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Endpoint</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-bash">PATCH {country_url}/api/open-api/v1/orders/{order_id}/products/{product_id}/quantity</code></pre>
+</div>
+<p><strong>Payload for unit products</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Payload (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">{
+  "units": 2
+}</code></pre>
+</div>
+<p><strong>Payload for products by weight</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Payload (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">{
+  "grams": 250
+}</code></pre>
+</div>
+<div class="doc-note doc-note--warn">🚧 Removing all products from the order will result in automatic order cancellation. Additionally, remove
+                More than 50% of items may require intervention from Rappi support.</div>
+<h4>Product Substitutions</h4>
+<p>Currently, the Open Orders FULL model does not have native support for product substitutions. If your
+                operation depends on this flow, it will be necessary to use another picking solution.</p>
+<h4>Delivery Boy Assignment</h4>
+<p>To continue the logistics flow, it is necessary to request a Rappi delivery person.</p>
+<p><strong>Delivery Person Request (<code>request_courier</code>)</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Endpoint</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/request_courier</code></pre>
+</div>
+<p><strong>Payload</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Payload (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">{
+  "store_id": 10,
+  "vehicle_type": "car"
+}</code></pre>
+</div>
+<p><strong>Available vehicle types</strong></p>
+<ul>
+<li><code>motorbike</code></li>
+<li><code>car</code></li>
+<li><code>bicycle</code></li>
+</ul>
+<div class="doc-note doc-note--warn">🚧 Requesting the delivery person too early can increase waiting time in the store and negatively impact sales
+                operational indicators.</div>
+<h4>Event <code>courier_assigned</code></h4>
+<p>When the delivery person is assigned, Rappi will send an update via Webhook filling in the object <code>courier</code> of the request.</p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Example (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">"courier": {
+  "phone": "18003334444",
+  "last_name": "Johnson",
+  "first_name": "Jane",
+  "vehicle_type": "motorbike"
+}</code></pre>
+</div>
+</section>
+<section aria-labelledby="h-handshake" class="section-anchor" id="section-handshake">
+<h2 id="h-handshake">Handshake Process</h2>
+<p>The handshake is the validation process used to confirm that the correct delivery person is picking up the
+                request.</p>
+<figure class="content-figure">
+<img alt="Sequence diagram: retailer requests start of handshake, Rappi returns three possible codes, retailer sends code for validation and Rappi returns result" src="../../assets/img/open-orders-handshake.png"/>
+<figcaption>Handshake flow between retailer and Rappi.</figcaption>
+</figure>
+<h3>Handshake Request</h3>
+<p><strong>Endpoint</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Endpoint</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/handshake</code></pre>
+</div>
+<p><strong>Answer</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Response (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">{
+  "codes": [
+    "033903",
+    "286928",
+    "788069"
+  ],
+  "expires_at": "2021-06-18T16:42:03Z"
+}</code></pre>
+</div>
+<p>Only one of the codes is valid and will be sent to the delivery person in the Rappi app.</p>
+<h3>Handshake Rules</h3>
+<p>The handshake should only be initiated when:</p>
+<ul>
+<li>The order is completely separate</li>
+<li>The invoice has been issued</li>
+<li>A delivery person is assigned to the order</li>
+<li>The delivery person is already present in the store</li>
+</ul>
+<p>Additionally:</p>
+<ul>
+<li>Codes expire in<strong>5 minutes</strong></li>
+<li>After expiration, new codes need to be generated</li>
+</ul>
+<h3>Handshake Validation</h3>
+<p><strong>Endpoint</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Endpoint</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/handshake/validate</code></pre>
+</div>
+<p><strong>Payload</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Payload (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">{
+  "code": "788069"
+}</code></pre>
+</div>
+<p>If the code is correct:</p>
+<ul>
+<li>The API will return status<strong>204</strong></li>
+<li>The order can be handed over to the delivery person</li>
+</ul>
+<p>Otherwise, an error will be returned<strong>400</strong>containing:</p>
+<ul>
+<li>New codes available</li>
+<li>Expiration time</li>
+<li>Remaining number of attempts</li>
+</ul>
+<h3>Main Error Codes</h3>
+<div class="table-wrap">
+<table class="api-doc-table">
+<thead>
+<tr>
+<th>Code</th>
+<th>Status</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>invalid_handshake_code</code></td>
+<td>400</td>
+<td>Invalid handshake code</td>
+</tr>
+<tr>
+<td><code>order_not_found</code></td>
+<td>404</td>
+<td>Order not found</td>
+</tr>
+<tr>
+<td><code>invalid_status</code></td>
+<td>409</td>
+<td>Current status does not allow operation</td>
+</tr>
+<tr>
+<td><code>handshake_already_started</code></td>
+<td>208</td>
+<td>Handshake process already started</td>
+</tr>
+<tr>
+<td><code>no_validation_retries_left</code></td>
+<td>406</td>
+<td>Attempt limit exceeded</td>
+</tr>
+<tr>
+<td><code>no_courier_assigned</code></td>
+<td>406</td>
+<td>No delivery person assigned</td>
+</tr>
+<tr>
+<td><code>product_not_found_in_order</code></td>
+<td>404</td>
+<td>Product not found in order</td>
+</tr>
+<tr>
+<td><code>price_difference_exceeds_percentage_limit</code></td>
+<td>400</td>
+<td>Price difference above the permitted limit</td>
+</tr>
+<tr>
+<td><code>substitutions_not_configured</code></td>
+<td>403</td>
+<td>Overrides not configured</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section aria-labelledby="h-lite" class="section-anchor" id="section-lite">
+<h2 id="h-lite">Events in Open Orders LITE</h2>
+<h3 id="h-lite-lifecycle">Order Lifecycle — Orders LITE</h3>
+<figure class="content-figure">
+<img alt="Flow Lite: Rappi creates order, picking and checkout in Rappi, integration notifications, modifications and delivery person for the retailer, and order delivered" src="../../assets/img/open-orders-flow-lite.png"/>
+<figcaption>Illustrative flow of the Orders LITE model (Rappi's predominant events).</figcaption>
+</figure>
+<p>The Orders LITE model was developed for retailers who want predominantly integration
+                informative or that use specific picking and checkout solutions.</p>
+<p>Unlike the FULL model, Orders LITE does not allow operational changes to orders through the
+                API, functioning mainly as a query and monitoring mechanism for events generated by the
+                Rappi.</p>
+<h3>Features of Orders LITE</h3>
+<p>Orders LITE is compatible with different solutions provided by Rappi, including:</p>
+<ul>
+<li>Shopper App</li>
+<li>Mi Store</li>
+<li>RT Picking</li>
+<li>Cashless</li>
+</ul>
+<p>In this model:</p>
+<ul>
+<li>It is possible to use Webhooks to receive order notifications</li>
+<li>It is possible to consult orders via polling</li>
+<li>It is not allowed to update, cancel or modify orders via the API</li>
+</ul>
+<h3>Comparison — Orders FULL vs Orders LITE</h3>
+<div class="table-wrap">
+<table class="api-doc-table">
+<thead>
+<tr>
+<th>Functionality</th>
+<th>FULL</th>
+<th>LITE</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Order Consultation via Polling</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Picking Start</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>Product Removal</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>Removal of Quantities</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>Order Cancellation</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>Invoice Report</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>Order Created Notification (Webhook)</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Assigned Delivery Person Notification</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Order Delivery Notification</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Invoice Reported Notification</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Internal Order Modification Notifications</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>Order Event Webhook (LITE)</h3>
+<p>When you set up a Webhook for Rappi orders, orders will be sent automatically as soon as they are
+                created on the platform. Creation occurs via <code>POST</code> for the configured URL:</p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Webhook</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-bash">POST https://your-url.com/orders</code></pre>
+</div>
+<p>The order identifier (<code>order_id</code>) is not part of the URL and is sent in the request body.</p>
+<p>The payload includes store data, customer, address, products, delivery person, payment, status, creation and <code>event_uuid</code>.</p>
+<h4>Scheduled Orders</h4>
+<p>The field <code>place_at</code> indicates whether the order has been scheduled.</p>
+<p><strong>NOW Orders</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Example (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">"place_at": ""</code></pre>
+</div>
+<p><strong>Scheduled Orders</strong>— when scheduled, the field will show the scheduled date and time for delivery.</p>
+<h4>Personally Identifiable Information</h4>
+<p>When necessary, data such as CPF can be sent in <code>identification.number</code>, collected in
+                Rappi app checkout.</p>
+<h4>Event <code>courier_assigned</code></h4>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Example (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">"courier": {
+  "phone": "18003334444",
+  "last_name": "Johnson",
+  "first_name": "Jane",
+  "vehicle_type": "motorbike"
+}</code></pre>
+</div>
+<h4>Order Delivered</h4>
+<p>When the order is delivered, Rappi will send an update via Webhook:<code>status</code> as <code>finished</code> and <code>delivered_at</code> filled.</p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Example (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">{
+  "delivered_at": "2023-02-10T12:34:07Z"
+}</code></pre>
+</div>
+<h3>Polling Endpoint (LITE)</h3>
+<p>In addition to the Webhook, there is a polling endpoint for proactive querying. Each country has a different base URL; is
+                Mandatory to authenticate before consuming the endpoints.</p>
+<p><strong>Pending Order Inquiry</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Endpoint</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-bash">GET {country_url}/api/open-api/v1/orders</code></pre>
+</div>
+<p>Returns pending and unconfirmed orders from the authenticated retailer.</p>
+<p><strong>Specific Order Inquiry</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Endpoint</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-bash">GET {country_url}/api/open-api/v1/orders/{order_id}</code></pre>
+</div>
+<p>The return follows the same JSON schema as the Webhook.</p>
+<p><strong>Rate limit:</strong>by default, 100 requests per minute (adjustable upon request).</p>
+<h3>Order Status (LITE)</h3>
+<p>The field <code>status</code> represents the current step. In the LITE model, the possible values are:</p>
+<div class="table-wrap">
+<table class="api-doc-table">
+<thead>
+<tr>
+<th>Status</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>created</code></td>
+<td>Active order awaiting picking or in the picking process</td>
+</tr>
+<tr>
+<td><code>invoice_reported</code></td>
+<td>Separation completed and final basket defined</td>
+</tr>
+<tr>
+<td><code>finished</code></td>
+<td>Order delivered to the end customer</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>Which integration model to use? (LITE)</h3>
+<p>The choice depends on the infrastructure and the OMS. The recommendation remains: <strong>Webhook</strong> as
+                main and<strong>polling</strong>as complement and contingency.</p>
+</section>
+<section aria-labelledby="h-cancel-ref" class="section-anchor" id="section-cancel-ref">
+<h2 id="h-cancel-ref">Cancellation Reference</h2>
+<h3>Basic Cancellation Structure</h3>
+<p>To cancel an order in Open Orders, use the following endpoint:</p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Endpoint</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-bash">POST {country_url}/api/open-api/v1/orders/{order_id}/cancel</code></pre>
+</div>
+<p>Example using cURL:</p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>cURL</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-bash">curl --location 'https://{COUNTRY}/api/open-api/v1/orders/{YOUR_ORDER}/cancel' \
+--header 'Authorization: Bearer {YOUR_TOKEN}' \
+--header 'event_uuid: {LAST_EVENT_UUID}' \
+--header 'Content-Type: application/json' \
+--data '{
+  "type": "technical_issues",
+  "details": {}
+}'</code></pre>
+</div>
+<h3>Payload Structure</h3>
+<div class="table-wrap">
+<table class="api-doc-table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>type</code></td>
+<td>Reason for cancellation</td>
+</tr>
+<tr>
+<td><code>details</code></td>
+<td>Additional information related to the reason</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="doc-note">📘 For most reasons,<code>details</code> can be <code>{}</code>. Some types require additional information.</div>
+<h3>Reasons for Cancellation</h3>
+<div class="table-wrap">
+<table class="api-doc-table">
+<thead>
+<tr>
+<th>Reason (<code>type</code>)</th>
+<th>Description</th>
+<th>Requires <code>details</code>?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>technical_issues</code></td>
+<td>Technical problems in the retailer's system prevent the order from progressing</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>total_products_removed</code></td>
+<td>All products in the order have been removed</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>order_id_duplicated</code></td>
+<td>The order has already been created previously in the retailer's system</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>products_not_found</code></td>
+<td>Order products do not match retailer catalog IDs</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>products_stock_out</code></td>
+<td>All products in the order are out of stock</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>products_price_difference</code></td>
+<td>Price difference identified in the order products</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>store_not_found</code></td>
+<td>Invalid or unrecognized store ID</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>total_value_inconsistent</code></td>
+<td>Sum of product prices does not correspond to the total order value</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>user_first_name</code></td>
+<td>Invalid or missing customer name</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>user_last_name</code></td>
+<td>Invalid or missing customer surname</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>user_identification</code></td>
+<td>Invalid or missing customer document</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>user_email</code></td>
+<td>Invalid or missing customer email</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>user_phone_number</code></td>
+<td>Invalid or missing customer phone number</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>address_street_address</code></td>
+<td>Invalid or missing address</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>address_number</code></td>
+<td>Invalid or missing address number</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>address_neighborhood</code></td>
+<td>Invalid or missing neighborhood</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>address_city</code></td>
+<td>Invalid or missing city</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>address_state</code></td>
+<td>Invalid or missing status</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>address_zip_code</code></td>
+<td>Invalid or missing zip code</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>delivery_time</code></td>
+<td>Invalid delivery time</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>departure_time</code></td>
+<td>Invalid departure time</td>
+<td>❌</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>Examples of <code>details</code> by type</h3>
+<p><strong>Duplicate Order (<code>order_id_duplicated</code>)</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Payload (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">{
+  "type": "order_id_duplicated",
+  "details": {
+    "retail_order_id": "12345",
+    "created_at": "2023-01-01T00:00:00Z"
+  }
+}</code></pre>
+</div>
+<p><strong>Products Not Found (<code>products_not_found</code>)</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Payload (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">{
+  "type": "products_not_found",
+  "details": {
+    "products": [
+      "0001",
+      "0002",
+      "0003"
+    ]
+  }
+}</code></pre>
+</div>
+<p><strong>Out of Stock Products (<code>products_stock_out</code>)</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Payload (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">{
+  "type": "products_stock_out",
+  "details": {
+    "products": [
+      {
+        "product_id": "0001",
+        "available": 0
+      },
+      {
+        "product_id": "0002",
+        "available": 1
+      }
+    ]
+  }
+}</code></pre>
+</div>
+<p>The field <code>available</code> represents the quantity of the product still available.</p>
+<p><strong>Price Difference (<code>products_price_difference</code>)</strong></p>
+<div class="code-block-wrap">
+<div class="code-block__bar">
+<span>Payload (JSON)</span>
+<button class="btn btn--ghost copy-btn" type="button">Copy</button>
+</div>
+<pre><code class="language-json">{
+  "type": "products_price_difference",
+  "details": {
+    "difference_threshold": 15,
+    "products": [
+      {
+        "product_id": "0001",
+        "price_difference": 2
+      },
+      {
+        "product_id": "0002",
+        "price_difference": 3
+      }
+    ]
+  }
+}</code></pre>
+</div>
+<div class="table-wrap">
+<table class="api-doc-table">
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>difference_threshold</code></td>
+<td>Percentage limit allowed for price difference</td>
+</tr>
+<tr>
+<td><code>price_difference</code></td>
+<td>Difference between the actual price and the price stated in the order</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</main>
+</div>
+</div>
+<div aria-hidden="true" class="modal-backdrop" data-close-credentials="" id="modal-backdrop" tabindex="-1"></div>
+<div aria-hidden="true" aria-labelledby="cred-title" aria-modal="true" class="modal" id="credentials-modal" role="dialog">
+<h2 id="cred-title">Set credentials</h2>
+<p class="muted">Optional values for examples on this page.</p>
+<form id="credentials-form">
+<div class="modal__field">
+<label for="field-api-key">API Key</label>
+<input autocomplete="off" id="field-api-key" name="apiKey" placeholder="Your key" spellcheck="false" type="password"/>
+</div>
+<div class="modal__field">
+<label for="field-store-id">store ID</label>
+<input autocomplete="off" id="field-store-id" name="storeId" placeholder="Store identifier" type="text"/>
+</div>
+<div class="modal__field">
+<label for="field-merchant">merchant ID</label>
+<input autocomplete="off" id="field-merchant" name="merchantId" placeholder="merchant" type="text"/>
+</div>
+<div class="modal__field">
+<label for="field-webhook">Webhook URL</label>
+<input autocomplete="off" id="field-webhook" name="webhookUrl" placeholder="https://" type="url"/>
+</div>
+<div class="modal__actions">
+<button class="btn btn--primary" type="submit">Save</button>
+<button class="btn btn--ghost" data-close-credentials="" type="button">Cancel</button>
+<button class="btn btn--ghost" id="credentials-clear" type="button">Clear credentials</button>
+</div>
+</form>
+<p class="modal__note">Stored only in sessionStorage in this tab. Nothing is sent to external servers by this website.</p>
+</div>
+<script src="../../assets/js/credentials.js"></script>
+<script crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+<script defer="" src="../../assets/js/lang-switcher.js"></script>
+<script src="../../assets/js/main.js"></script>
+</body>
 </html>
