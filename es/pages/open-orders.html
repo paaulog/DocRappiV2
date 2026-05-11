@@ -26,7 +26,8 @@
 <button aria-label="Cambiar tema" class="btn btn--theme" data-theme-toggle="" type="button">Modo oscuro</button>
 <nav aria-label="En esta página" class="sidebar__nav">
 <a href="#section-intro">Introducción</a>
-<a href="#section-checklist">Lista de verificación y plantillas</a>
+<a href="#section-checklist">Lista de verificación</a>
+<a href="#section-models">Modelos Lite/Completo</a>
 <a href="#section-lifecycle-overview">Ciclo vital</a>
 <a href="#section-receiving">Recibo</a>
 <a href="#section-management">Gestión</a>
@@ -48,61 +49,60 @@
 <div id="api-content-root">
 <header class="api-main__header">
 <h1>Órdenes abiertas</h1>
-<p class="lead">Primeros pasos con la API de Pedidos: recibe pedidos de Rappi en tu sistema, rastrea el ciclo de vida y
-                integrar Webhooks, encuestas y eventos operativos.</p>
+<p class="lead">Recibe pedidos de Rappi en tu OMS, sigue el ciclo de vida en tiempo real e integra <strong>webhooks</strong>, <strong>polling</strong> y los eventos operativos de los modos <strong>Lite</strong> o <strong>Full</strong>.</p>
 </header>
+<div aria-label="Guía de lectura" class="doc-page-outline" role="navigation">
+<span class="doc-page-outline__title">Cómo leer esta documentación</span>
+<ol>
+<li>Entiende el concepto, el checklist y la diferencia entre <strong>Lite</strong> y <strong>Full</strong>.</li>
+<li>Revisa el <strong>ciclo de vida</strong> y los tipos de evento (Rappi × retailer).</li>
+<li>Configura la <strong>ingesta</strong> (webhook + polling) y la <strong>gestión</strong> del pedido.</li>
+<li>Si operas en <strong>Full</strong>, sigue acuses de recibo (ACK), cambios de estado, repartidor y <strong>handshake</strong>.</li>
+<li>Si operas en <strong>Lite</strong>, usa la sección dedicada y la tabla comparativa.</li>
+<li>Consulta la <strong>referencia de cancelación</strong> cuando necesites cerrar un pedido con un motivo tipado.</li>
+</ol>
+</div>
 <section aria-labelledby="h-intro" class="section-anchor" id="section-intro">
 <h2 id="h-intro">Comenzando con la API de pedidos</h2>
 <h3 id="h-what-is">¿Qué son las órdenes abiertas?</h3>
-<p>Open Orders es una solución que permite a los minoristas recibir pedidos en sus propios sistemas
-                realizadas por clientes en la plataforma de Rappi. Con esto, el minorista puede utilizar su propia estructura.
-                logística y operativa para realizar el picking y entrega de pedidos.</p>
-<p>La integración funciona en tiempo real, conectando automáticamente los nuevos pedidos a los sistemas de la empresa.
-                minorista y gestionar el intercambio de notificaciones entre Rappi y la operación durante todo el ciclo de vida
-                de la solicitud. Además, la recepción temprana de los pedidos programados contribuye a una mejor distribución.
-                carga operativa, aumentando la productividad del equipo durante periodos de menor demanda.</p>
+<p>Open Orders permite al retailer <strong>recibir pedidos de Rappi en su propio sistema</strong> (OMS/ERP), sin depender solo de pantallas internas de la plataforma.</p>
+<p>Mantén <strong>tu logística y operación</strong> para picking y entrega, alineado con el mismo catálogo y gobierno de stock que ya usas con Rappi.</p>
+<p>La integración es <strong>en tiempo real</strong>: nuevos pedidos y cambios de estado viajan como eventos entre Rappi y tu backend. Los pedidos <strong>programados</strong> pueden llegar con antelación para repartir mejor la carga operativa.</p>
 <h3 id="h-is-it-for-you">¿Las Órdenes Abiertas son adecuadas para su operación?</h3>
-<p>Antes de iniciar la integración, es importante evaluar si su operación cuenta con la estructura necesaria para
-                Apoyar el modelo de Órdenes Abiertas. Considere los siguientes puntos:</p>
+<p>Antes de integrar, evalúa si tu operación tiene la estructura necesaria para soportar Open Orders. Considera lo siguiente:</p>
 <ul>
 <li>¿Tu empresa ya cuenta con una integración funcional de inventario con Rappi?</li>
 <li>¿Es el control de inventario de la tienda lo suficientemente eficiente como para minimizar los desabastecimientos?</li>
 <li>¿Puede su sistema POS/ERP procesar pedidos de canales externos?</li>
-<li>Su equipo operativo está preparado para manejar acciones urgentes, asegurando la correcta
-                  ¿cumpliendo pedidos?</li>
-<li>¿Tiene un equipo de desarrollo (interno o subcontratado) capaz de implementar, mantener y
-                  ¿Soporta integración con Rappi?</li>
+<li>¿Tu equipo operativo está listo para acciones urgentes y para cumplir pedidos correctamente?</li>
+<li>¿Tienes un equipo de desarrollo (interno o tercerizado) capaz de implementar, mantener y dar soporte a la integración con Rappi?</li>
 </ul>
-<div class="doc-note doc-note--warn">
-                🚧 <strong>Importante:</strong>El equipo de Órdenes Abiertas lanza constantemente nuevas funciones para
-                mejorar la experiencia del usuario en las tiendas integradas. Como socio integrado, debe implementar
-                estas actualizaciones dentro<strong>8 semanas</strong>después del lanzamiento.</div>
+<div class="doc-note doc-note--warn">🚧 <strong>Importante:</strong> el equipo de Open Orders publica mejoras de forma continua. Como partner integrado, debes adoptar esas actualizaciones en un plazo de <strong>8 semanas</strong> desde el lanzamiento.</div>
 </section>
 <section aria-labelledby="h-checklist" class="section-anchor" id="section-checklist">
 <h2 id="h-checklist">Lista de verificación de integración</h2>
-<p>Para garantizar una implementación eficiente de las Órdenes Abiertas, se recomienda seguir los pasos a continuación:</p>
+<p>Antes de pasar a los puntos finales, valide estos puntos con el equipo de producto, operaciones e ingeniería:</p>
 <ul>
-<li>Comprender el ciclo de vida del pedido y los impactos de cada evento en la experiencia del usuario dentro del
-                  aplicación.</li>
-<li>Identifique qué eventos internos en su operación deben asignarse a eventos de Rappi.</li>
-<li>Evaluar posibles limitaciones del ERP o sistema de picking que puedan dificultar los procesos
-                  manejo avanzado de excepciones, además de definir estrategias para solucionarlas.</li>
-<li>Desarrollar Webhooks capaces de recibir eventos relacionados con solicitudes enviadas por Rappi.</li>
-<li>Garantizar que todas las actualizaciones del flujo operativo se envíen a Rappi, manteniendo la sincronización
-                  orden completa.</li>
+<li>Mapear el<strong>ciclo vital</strong>del pedido y el impacto de cada evento en la app (cliente final y
+                  repartidor).</li>
+<li>Traduce eventos internos de tu OMS (WMS/POS) a <strong>eventos de Rappi</strong> y viceversa.</li>
+<li>Enumere las limitaciones de ERP/picking para<strong>excepciones</strong>(rotura, cambio, cancelación parcial) y
+                  Definir el plan B.</li>
+<li>Implementa un <strong>webhook</strong> idempotente (reintentos, firma si aplica, logs) para la ingesta de pedidos.</li>
+<li>Asegúrese de que<strong>cualquier cambio operativo relevante</strong>regresar a Rappi en la versión Full (y
+                  confirmar ACK cuando sea necesario).</li>
 </ul>
-<h2 id="h-operation-models">Modelos operativos de órdenes abiertas</h2>
-<p>Open Orders ofrece dos modelos de integración:</p>
-<h3>Pedidos Lite</h3>
-<p>en el modelo<strong>Pedidos Lite</strong>, solo se implementan eventos de Rappi. Esto significa que
-                Todas las actualizaciones del estado de los pedidos, como el inicio de la recolección o la emisión de una factura, son
-                iniciado y notificado por la propia Rappi.</p>
-<p>Este modelo es compatible con las soluciones de picking que proporciona la plataforma.</p>
-<h3>Pedidos completos</h3>
-<p>en el modelo<strong>Pedidos completos</strong>, tanto los eventos de Rappi como los eventos de minoristas son
-                implementado. En este escenario, las actualizaciones del estado del pedido se inician y notifican.
-                directamente por el minorista.</p>
-<p>Este modelo ofrece mayor autonomía operativa, pero no es compatible con las soluciones de picking de Rappi.</p>
+</section>
+<section aria-labelledby="h-operation-models" class="section-anchor" id="section-models">
+<h2 id="h-operation-models">Modelos de operación (Lite y Full)</h2>
+<p>Open Orders ofrece <strong>dos modos</strong>. La elección define <em>quién inicia</em> los cambios de estado y <em>qué acciones de API</em> están disponibles.</p>
+<h3>Orders Lite</h3>
+<p>En <strong>Lite</strong>, Rappi concentra el picking en sus soluciones. Tu sistema recibe notificaciones y sigue el pedido, pero <strong>no modifica</strong> el flujo operativo vía API de Open Orders.</p>
+<p>Compatible con picking de Rappi (p. ej., Shopper App, Mi Tienda, RT Picking, Cashless).</p>
+<h3>Orders Full</h3>
+<p>En <strong>Full</strong>, el retailer opera en su <strong>propio OMS</strong> y <strong>envía eventos</strong> a Rappi (picking, factura, repartidor, etc.). Hay más autonomía — y más responsabilidad de sincronización.</p>
+<p><strong>No es compatible</strong> con picking nativo de Rappi: la separación la conduce tu operación.</p>
+<div class="doc-note">👉 ¿Dudas? Ve a <a href="#section-lite">LITE</a>, <a href="#section-full">FULL</a> o la <a href="#h-comparativo-lite-full">tabla comparativa</a> más abajo.</div>
 </section>
 <section aria-labelledby="h-lifecycle-overview" class="section-anchor" id="section-lifecycle-overview">
 <h2 id="h-lifecycle-overview">Comprender el ciclo de vida del pedido</h2>
@@ -135,8 +135,8 @@
 <strong><code>start_picking</code></strong>— Notifica que el equipo de la tienda ha comenzado a separar el
                   ordenar productos.</li>
 <li>
-<strong><code>report_invoice</code></strong>— Informa que se ha producido la separación y que la nota o
-                  Se ha generado el comprobante de compra.</li>
+<strong><code>report_invoice</code></strong>— Informa que se ha completado la separación y que el
+                  La documentación tributaria (NF o recibo) ya está disponible según su proceso.</li>
 <li>
 <strong><code>request_courier</code></strong>— Solicita a Rappi iniciar el proceso de atribución
                   repartidor del pedido.</li>
@@ -151,6 +151,29 @@
 <li><strong>Punto final de sondeo</strong></li>
 </ul>
 <p>Estos métodos se pueden utilizar por separado o juntos, asegurando una mayor confiabilidad en la recepción de eventos.</p>
+<div class="table-wrap">
+<table class="api-doc-table">
+<thead>
+<tr>
+<th>Método</th>
+<th>Qué es</th>
+<th>cuando usar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Webhook</strong></td>
+<td>Rappi envía un <code>POST</code> a su URL cuando haya un nuevo evento.</td>
+<td>Como<strong>canal principal</strong>— menor latencia y mejor experiencia operativa.</td>
+</tr>
+<tr>
+<td><strong>Votación</strong></td>
+<td>Tu sistema consulta periódicamente la API de Rappi.</td>
+<td>Como<strong>contingencia</strong>(cola, fallo de red, reprocesamiento, auditoría).</td>
+</tr>
+</tbody>
+</table>
+</div>
 <h3>Solicitar Webhook de evento</h3>
 <p>Al configurar un Webhook para pedidos de Rappi, tu operación puede recibir pedidos automáticamente
                 tan pronto como se creen en la plataforma.</p>
@@ -263,26 +286,22 @@
 </tbody>
 </table>
 </div>
-<h3>¿Qué modelo de integración utilizar?</h3>
-<p>La elección del método ideal depende directamente de la infraestructura operativa y las capacidades del OMS.
-                utilizado por el minorista.</p>
-<p>Sin embargo, la recomendación de Rappi es utilizar:</p>
+<h3 id="h-receiving-model">¿Qué combinación utilizar en la práctica?</h3>
+<p>La elección depende de tu OMS y de la madurez de observabilidad (logs, alertas, colas). La recomendación de Rappi es clara:</p>
 <ul>
 <li><strong>Webhook</strong> como principal mecanismo para recibir eventos</li>
 <li><strong>Polling</strong> como mecanismo complementario y de contingencia</li>
 </ul>
-<p>De esta manera, si un evento no se recibe a través del Webhook, se puede utilizar el sondeo para validar y
-                recuperar información pendiente.</p>
+<p>Si un evento no llega por webhook, el polling ayuda a <strong>detectar huecos</strong> y recuperar el estado sin depender solo de reintentos a ciegas.</p>
 </section>
 <section aria-labelledby="h-management" class="section-anchor" id="section-management">
 <h2 id="h-management">Gestión de pedidos</h2>
 <p>Hay dos modelos de gestión de órdenes disponibles en Órdenes Abiertas:</p>
-<h3>LLENO</h3>
-<p>en el modelo<strong>LLENO</strong>, el minorista utiliza sus propias herramientas y sistemas (OMS) para
-                realizar la separación de pedidos.</p>
+<h3>FULL</h3>
+<p>En el modelo <strong>FULL</strong>, el retailer usa sus propias herramientas y sistemas (OMS) para realizar la separación de pedidos.</p>
 <p>En este escenario, el minorista es responsable de enviar a Rappi actualizaciones sobre cada etapa del proceso operativo.</p>
 <h3>LITE</h3>
-<p>en el modelo<strong>LITE</strong>, la separación de pedidos se realiza utilizando las soluciones disponibles
+<p>En el modelo <strong>LITE</strong>, la separación de pedidos se realiza utilizando las soluciones disponibles
                 por la propia Rappi.</p>
 <p>En este caso, las actualizaciones sobre eventos operativos las envía la propia plataforma al minorista.</p>
 <h3>Orden entregada</h3>
@@ -304,6 +323,11 @@
 </section>
 <section aria-labelledby="h-full" class="section-anchor" id="section-full">
 <h2 id="h-full">Eventos en Órdenes Abiertas COMPLETAS</h2>
+<p class="muted">Esta sección aplica al modelo <strong>Full</strong>: confirmas lo que recibiste de Rappi,
+                actualiza el estado de la solicitud en la API y completa con<strong>apretón de manos</strong>al momento de la recogida por parte del repartidor.</p>
+<div class="doc-note">
+<strong>Orden de lectura sugerido:</strong>reconocimiento de evento (ACK) → actualización de estado
+                (picking / NF / cancelaciones parciales) → solicitud de repartidor → apretón de manos.</div>
 <h3 id="h-full-lifecycle">Ciclo de vida del pedido: pedidos COMPLETOS</h3>
 <p>El modelo Orders FULL fue desarrollado para operaciones que utilizan su propia solución de preparación de pedidos.
                 (recogiendo). En este escenario, el equipo de la tienda gestiona los pedidos directamente en el sistema del minorista (OMS),
@@ -375,9 +399,10 @@
 <div class="doc-note">📘 Si un evento ya ha sido confirmado previamente, la API devolverá el error <code>not_found_acknowledgements</code> con estatus<strong>406 No Aceptable</strong>.
               </div>
 <h3>UUID del evento</h3>
-<p>Cada evento generado por Rappi tiene un identificador único llamado <code>event_uuid</code>. Todos
-                Los eventos enviados por el minorista deben utilizar el UUID más reciente en el encabezado de la solicitud. Esto garantiza
-                que el estado del pedido esté sincronizado antes de cualquier cambio operativo.</p>
+<p>Cada evento generado por Rappi tiene un identificador único:<code>event_uuid</code>.
+              </p>
+<p>en llamadas que<strong>alterar</strong>solicitud, utilice siempre el UUID más reciente en el encabezado; de esta manera,
+                Rappi se asegura de que estés reaccionando al estado actual, no a un evento antiguo.</p>
 <div class="table-wrap">
 <table class="api-doc-table">
 <thead>
@@ -456,7 +481,8 @@
                 estimación disponible, se recomienda utilizar el valor estándar de<strong>15 minutos</strong>.
               </p>
 <h4>Finalización de la Separación (<code>report_invoice</code>)</h4>
-<p>Este evento informa que se ha completado la separación y que se ha emitido la factura o comprobante de compra.</p>
+<p>Informa que se ha completado la separación y que el<strong>NF o recibo</strong>ahora está disponible como
+                tu proceso.</p>
 <p><strong>Punto final</strong></p>
 <div class="code-block-wrap">
 <div class="code-block__bar">
@@ -547,7 +573,7 @@
 <div class="doc-note doc-note--warn">🚧 Eliminar todos los productos del pedido dará lugar a la cancelación automática del pedido. Además, elimine
                 Más del 50% de los artículos pueden requerir intervención del soporte de Rappi.</div>
 <h4>Sustituciones de productos</h4>
-<p>Actualmente, el modelo Open Orders FULL no cuenta con soporte nativo para sustituciones de productos. Si tu
+<p>Actualmente, el modelo Open Orders FULL no cuenta con soporte nativo para sustituciones de productos. si tu
                 Si el funcionamiento depende de este flujo, será necesario utilizar otra solución de preparación de pedidos.</p>
 <h4>Asignación de repartidor</h4>
 <p>Para continuar con el flujo logístico es necesario solicitar un repartidor de Rappi.</p>
@@ -597,6 +623,8 @@
 <h2 id="h-handshake">Proceso de apretón de manos</h2>
 <p>El apretón de manos es el proceso de validación que se utiliza para confirmar que el repartidor correcto está recogiendo el
                 solicitud.</p>
+<p class="muted">Aplica al flujo <strong>Full</strong> después de picking, facturación y asignación del repartidor: es la última barrera
+                antes de liberar la mercancía en la tienda.</p>
 <figure class="content-figure">
 <img alt="Diagrama de secuencia: el minorista solicita el inicio del protocolo de enlace, Rappi devuelve tres códigos posibles, el minorista envía el código para validación y Rappi devuelve el resultado" src="../../assets/img/open-orders-handshake.png"/>
 <figcaption>Flujo de apretón de manos entre el minorista y Rappi.</figcaption>
@@ -755,7 +783,7 @@
 <li>Es posible consultar pedidos mediante sondeo</li>
 <li>No está permitido actualizar, cancelar o modificar pedidos a través de la API.</li>
 </ul>
-<h3>Comparación: pedidos COMPLETOS y pedidos LITE</h3>
+<h3 id="h-comparativo-lite-full">Comparación: pedidos COMPLETOS y pedidos LITE</h3>
 <div class="table-wrap">
 <table class="api-doc-table">
 <thead>
@@ -825,6 +853,9 @@
 </table>
 </div>
 <h3>Webhook de evento de pedido (LITE)</h3>
+<p>El contrato es el mismo que en el apartado<a href="#section-receiving">Recepción de pedidos</a>. A continuación se muestra un resumen de los
+                que el equipo debe recordar en contexto <strong>Lite</strong>:
+              </p>
 <p>Cuando configuras un Webhook para pedidos de Rappi, los pedidos se enviarán automáticamente tan pronto como sean
                 creado en la plataforma. La creación ocurre a través de <code>POST</code> para la URL configurada:</p>
 <div class="code-block-wrap">
@@ -922,9 +953,8 @@
 </tbody>
 </table>
 </div>
-<h3>¿Qué modelo de integración utilizar? (LITE)</h3>
-<p>La elección depende de la infraestructura y del OMS. La recomendación sigue siendo:<strong>Webhook</strong> como
-                principal y<strong>polling</strong> como complemento y contingencia.</p>
+<h3>Buenas prácticas de recepción en Lite</h3>
+<p>La misma recomendación que en <a href="#h-receiving-model">Recepción: qué combinación usar</a> aplica aquí: <strong>webhook</strong> como principal y <strong>polling</strong> como contingencia.</p>
 </section>
 <section aria-labelledby="h-cancel-ref" class="section-anchor" id="section-cancel-ref">
 <h2 id="h-cancel-ref">Referencia de cancelación</h2>

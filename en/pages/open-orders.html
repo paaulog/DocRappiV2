@@ -26,7 +26,8 @@
 <button aria-label="Switch theme" class="btn btn--theme" data-theme-toggle="" type="button">Dark Mode</button>
 <nav aria-label="On this page" class="sidebar__nav">
 <a href="#section-intro">Introduction</a>
-<a href="#section-checklist">Checklist and templates</a>
+<a href="#section-checklist">Checklist</a>
+<a href="#section-models">Lite/Full Models</a>
 <a href="#section-lifecycle-overview">Life cycle</a>
 <a href="#section-receiving">Receiving</a>
 <a href="#section-management">Management</a>
@@ -48,19 +49,25 @@
 <div id="api-content-root">
 <header class="api-main__header">
 <h1>Open Orders</h1>
-<p class="lead">First steps with the Orders API: receive orders from Rappi in your system, track the life cycle and
-                integrate Webhooks, polling and operational events.</p>
+<p class="lead">Receive Rappi orders in your OMS, track the order lifecycle in real time, and integrate <strong>webhooks</strong>, <strong>polling</strong>, and operational events for <strong>Lite</strong> or <strong>Full</strong> modes.</p>
 </header>
+<div aria-label="Reading guide" class="doc-page-outline" role="navigation">
+<span class="doc-page-outline__title">How to use this documentation</span>
+<ol>
+<li>Understand the concept, the checklist, and the difference between <strong>Lite</strong> and <strong>Full</strong>.</li>
+<li>Review the <strong>lifecycle</strong> and event types (Rappi × retailer).</li>
+<li>Set up <strong>ingestion</strong> (webhook + polling) and <strong>order management</strong>.</li>
+<li>If you are on <strong>Full</strong>, follow acknowledgements (ACK), status updates, courier assignment, and <strong>handshake</strong>.</li>
+<li>If you are on <strong>Lite</strong>, use the dedicated section and the comparison table.</li>
+<li>Use the <strong>cancellation reference</strong> when you need to close an order with a typed reason.</li>
+</ol>
+</div>
 <section aria-labelledby="h-intro" class="section-anchor" id="section-intro">
 <h2 id="h-intro">Getting started with the Orders API</h2>
 <h3 id="h-what-is">What is Open Orders?</h3>
-<p>Open Orders is a solution that allows retailers to receive orders in their own systems
-                carried out by customers on the Rappi platform. With this, the retailer can use its own structure
-                logistics and operational to carry out the picking and delivery of orders.</p>
-<p>The integration works in real time, automatically connecting new orders to the company's systems.
-                retailer and managing the exchange of notifications between Rappi and the operation throughout the entire life cycle
-                of the request. Additionally, early receipt of scheduled orders contributes to better distribution
-                operational load, increasing team productivity during periods of lower demand.</p>
+<p>Open Orders lets retailers <strong>receive Rappi orders in their own systems</strong> (OMS/ERP) instead of relying only on internal platform screens.</p>
+<p>You keep <strong>your logistics and operations</strong> for picking and delivery, while staying aligned with the same catalog and inventory governance you already use with Rappi.</p>
+<p>The integration is <strong>real-time</strong>: new orders and status changes flow as events between Rappi and your backend. <strong>Scheduled</strong> orders may arrive early, helping spread operational load across the day.</p>
 <h3 id="h-is-it-for-you">Is Open Orders suitable for your operation?</h3>
 <p>Before starting integration, it is important to assess whether your operation has the necessary structure to
                 support the Open Orders model. Consider the following points:</p>
@@ -68,40 +75,33 @@
 <li>Does your company already have a functional inventory integration with Rappi?</li>
 <li>Is store inventory control efficient enough to minimize stockouts?</li>
 <li>Can your POS/ERP system process orders from external channels?</li>
-<li>Your operational team is prepared to handle time-sensitive actions, ensuring the correct
-                  fulfilling orders?</li>
-<li>Do you have a development team — in-house or outsourced — capable of implementing, maintaining and
-                  support integration with Rappi?</li>
+<li>Is your operations team ready for time-sensitive actions to ensure orders are fulfilled correctly?</li>
+<li>Do you have a development team (in-house or outsourced) able to implement, maintain, and support the Rappi integration?</li>
 </ul>
-<div class="doc-note doc-note--warn">🚧<strong>Important:</strong>New features are constantly being released by the Open Orders team to
-                improve user experience in integrated stores. As an integrated partner, you need to implement
-                these updates within<strong>8 weeks</strong>after launch.</div>
+<div class="doc-note doc-note--warn">🚧 <strong>Important:</strong> The Open Orders team ships new capabilities regularly to improve the in-store experience. As an integrated partner, you should roll out those updates within <strong>8 weeks</strong> of release.</div>
 </section>
 <section aria-labelledby="h-checklist" class="section-anchor" id="section-checklist">
 <h2 id="h-checklist">Integration Checklist</h2>
-<p>To ensure an efficient implementation of Open Orders, it is recommended to follow the steps below:</p>
+<p>Before moving to endpoints, validate these points with the product, operations, and engineering team:</p>
 <ul>
-<li>Understand the order lifecycle and the impacts of each event on the user experience within the
-                  application.</li>
-<li>Identify which internal events in your operation should be mapped to Rappi events.</li>
-<li>Assess possible limitations of the ERP or picking system that could hinder processes
-                  advanced exception handling — in addition to defining strategies to work around them.</li>
-<li>Develop Webhooks capable of receiving events related to requests sent by Rappi.</li>
-<li>Ensure all operational flow updates are sent to Rappi, maintaining synchronization
-                  complete order.</li>
+<li>Map the <strong>lifecycle</strong> of the order and the impact of each event on the app (end customer and courier).</li>
+<li>Translate internal events from your OMS (WMS/POS) to <strong>Rappi events</strong> and vice versa.</li>
+<li>List ERP/picking limitations for <strong>exceptions</strong> (stockouts, swaps, partial cancellation) and define plan B.</li>
+<li>Implement<strong>Webhook</strong>idempotent (retries, signature if applicable, logs) for ingestion
+                  of orders.</li>
+<li>Ensure that <strong>any relevant operational change</strong> is reported back to Rappi in Full (and confirm ACK when required).</li>
 </ul>
-<h2 id="h-operation-models">Open Orders Operating Models</h2>
-<p>Open Orders offers two integration models:</p>
+</section>
+<section aria-labelledby="h-operation-models" class="section-anchor" id="section-models">
+<h2 id="h-operation-models">Operation models (Lite and Full)</h2>
+<p>Open Orders offers <strong>two modes</strong>. The choice defines <em>who initiates</em> status changes and <em>which API actions</em> are available.</p>
 <h3>Orders Lite</h3>
-<p>In the model<strong>Orders Lite</strong>, only Rappi events are implemented. This means that
-                All order status updates — such as starting picking or issuing an invoice — are
-                initiated and notified by Rappi itself.</p>
-<p>This model is compatible with the picking solutions provided by the platform.</p>
+<p>In <strong>Lite</strong>, Rappi runs picking on its own solutions. Your system receives notifications and tracks the order, but <strong>does not change</strong> the operational flow via the Open Orders API.</p>
+<p>Compatible with Rappi picking (e.g.: Shopper App, Mi Tienda, RT Picking, Cashless).</p>
 <h3>Orders Full</h3>
-<p>In the model<strong>Orders Full</strong>, both Rappi events and retailer events are
-                implemented. In this scenario, order status updates are initiated and notified
-                directly by the retailer.</p>
-<p>This model offers greater operational autonomy, but is not compatible with Rappi's picking solutions.</p>
+<p>In <strong>Full</strong>, the retailer operates in its <strong>own OMS</strong> and <strong>sends events back</strong> to Rappi (picking, invoice, courier, etc.). There is more autonomy — and more responsibility to stay in sync.</p>
+<p><strong>Not compatible</strong>with native picking from Rappi: your operation is responsible for the separation.</p>
+<div class="doc-note">👉 In doubt? Jump to <a href="#section-lite">LITE</a>, <a href="#section-full">FULL</a>, or the <a href="#h-comparativo-lite-full">comparison table</a> below.</div>
 </section>
 <section aria-labelledby="h-lifecycle-overview" class="section-anchor" id="section-lifecycle-overview">
 <h2 id="h-lifecycle-overview">Understanding the Order Lifecycle</h2>
@@ -134,8 +134,8 @@
 <strong><code>start_picking</code></strong>— Notifies that the store team has started separating the
                   order products.</li>
 <li>
-<strong><code>report_invoice</code></strong>— Informs that the separation has been completed and that the note or
-                  Proof of purchase has been generated.</li>
+<strong><code>report_invoice</code></strong>— Informs that the separation has been completed and that the
+                  tax documentation (NF or receipt) is now available according to your process.</li>
 <li>
 <strong><code>request_courier</code></strong>— Requests Rappi to begin the process of attributing
                   delivery person for the order.</li>
@@ -150,6 +150,29 @@
 <li><strong>Polling Endpoint</strong></li>
 </ul>
 <p>These methods can be used separately or together, ensuring greater reliability in receiving events.</p>
+<div class="table-wrap">
+<table class="api-doc-table">
+<thead>
+<tr>
+<th>Method</th>
+<th>What is</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Webhook</strong></td>
+<td>Rappi sends a <code>POST</code> to your URL when there is a new event.</td>
+<td>As the <strong>main channel</strong> — lower latency and a better operational experience.</td>
+</tr>
+<tr>
+<td><strong>Polling</strong></td>
+<td>Your system periodically consults the Rappi API.</td>
+<td>As <strong>contingency</strong> (queues, network failures, reprocessing, audits).</td>
+</tr>
+</tbody>
+</table>
+</div>
 <h3>Order Event Webhook</h3>
 <p>By configuring a Webhook for Rappi orders, your operation can receive orders automatically
                 as soon as they are created on the platform.</p>
@@ -262,16 +285,14 @@
 </tbody>
 </table>
 </div>
-<h3>Which integration model to use?</h3>
-<p>The choice of the ideal method directly depends on the operational infrastructure and capabilities of the OMS
-                used by the retailer.</p>
-<p>However, Rappi's recommendation is to use:</p>
+<h3 id="h-receiving-model">Which combination to use in practice?</h3>
+<p>The choice depends on your OMS and observability maturity (logs, alerts, queues). The recommendation of
+                Rappi is objective:</p>
 <ul>
-<li><strong>Webhook</strong>as the main mechanism for receiving events</li>
-<li><strong>Polling</strong>as a complementary and contingency mechanism</li>
+<li><strong>Webhook</strong> as the main mechanism for receiving events</li>
+<li><strong>Polling</strong> as a complementary contingency mechanism</li>
 </ul>
-<p>This way, if an event is not received via Webhook, polling can be used to validate and
-                retrieve pending information.</p>
+<p>If an event does not arrive via webhook, polling helps <strong>detect gaps</strong> and recover state without relying only on blind retries.</p>
 </section>
 <section aria-labelledby="h-management" class="section-anchor" id="section-management">
 <h2 id="h-management">Order Management</h2>
@@ -303,6 +324,11 @@
 </section>
 <section aria-labelledby="h-full" class="section-anchor" id="section-full">
 <h2 id="h-full">Events at Open Orders FULL</h2>
+<p class="muted">This section applies to operations on the model<strong>Full</strong>: you confirm what you received from Rappi,
+                updates order status in the API and finishes with a <strong>handshake</strong> when the courier picks up at the store.</p>
+<div class="doc-note">
+<strong>Suggested reading order:</strong>event acknowledgment (ACK) → status update
+                (picking / NF / partial cancellations) → delivery person request → handshake.</div>
 <h3 id="h-full-lifecycle">Order Lifecycle — Orders FULL</h3>
 <p>The Orders FULL model was developed for operations that use their own picking solution
                 (picking). In this scenario, the store team manages orders directly in the retailer's system (OMS),
@@ -373,9 +399,8 @@
 </div>
 <div class="doc-note">📘 If an event has already been confirmed previously, the API will return the error <code>not_found_acknowledgements</code> with status<strong>406 Not Acceptable</strong>.</div>
 <h3>Event UUID</h3>
-<p>Each event generated by Rappi has a unique identifier called <code>event_uuid</code>. All
-                Events sent by the retailer must use the most recent UUID in the request header. This guarantees
-                that the order status is synchronized before any operational changes.</p>
+<p>Each event generated by Rappi has a unique identifier:<code>event_uuid</code>.</p>
+<p>For calls that <strong>change</strong> the order, always send the latest UUID in the header so Rappi knows you are reacting to the current state, not an older event.</p>
 <div class="table-wrap">
 <table class="api-doc-table">
 <thead>
@@ -451,9 +476,9 @@
 }</code></pre>
 </div>
 <p>The field <code>picking_time</code> represents the estimated separation time in minutes. If it does not exist
-                available estimate, it is recommended to use the standard value of<strong>15 minutes</strong>.</p>
+                available estimate, use the default of <strong>15 minutes</strong>.</p>
 <h4>Finalization of the Separation (<code>report_invoice</code>)</h4>
-<p>This event informs that the separation has been completed and that the invoice or proof of purchase has been issued.</p>
+<p>Indicates picking is complete and that the <strong>invoice or receipt</strong> is available according to your fiscal process.</p>
 <p><strong>Endpoint</strong></p>
 <div class="code-block-wrap">
 <div class="code-block__bar">
@@ -594,6 +619,8 @@
 <h2 id="h-handshake">Handshake Process</h2>
 <p>The handshake is the validation process used to confirm that the correct delivery person is picking up the
                 request.</p>
+<p class="muted">Applies to flow<strong>Full</strong>after picking, invoice and delivery driver assignment — it is the last barrier
+                before releasing the merchandise into the store.</p>
 <figure class="content-figure">
 <img alt="Sequence diagram: retailer requests start of handshake, Rappi returns three possible codes, retailer sends code for validation and Rappi returns result" src="../../assets/img/open-orders-handshake.png"/>
 <figcaption>Handshake flow between retailer and Rappi.</figcaption>
@@ -752,7 +779,7 @@
 <li>It is possible to consult orders via polling</li>
 <li>It is not allowed to update, cancel or modify orders via the API</li>
 </ul>
-<h3>Comparison — Orders FULL vs Orders LITE</h3>
+<h3 id="h-comparativo-lite-full">Comparison — Orders FULL vs Orders LITE</h3>
 <div class="table-wrap">
 <table class="api-doc-table">
 <thead>
@@ -822,6 +849,8 @@
 </table>
 </div>
 <h3>Order Event Webhook (LITE)</h3>
+<p>The contract is the same as in section<a href="#section-receiving">Order Receiving</a>. Below is a summary of the
+                that the team needs to remember in context<strong>Lite</strong>:</p>
 <p>When you set up a Webhook for Rappi orders, orders will be sent automatically as soon as they are
                 created on the platform. Creation occurs via <code>POST</code> for the configured URL:</p>
 <div class="code-block-wrap">
@@ -919,9 +948,8 @@
 </tbody>
 </table>
 </div>
-<h3>Which integration model to use? (LITE)</h3>
-<p>The choice depends on the infrastructure and the OMS. The recommendation remains: <strong>Webhook</strong> as
-                main and<strong>polling</strong>as complement and contingency.</p>
+<h3>Good receiving practices on Lite</h3>
+<p>The same guidance as in <a href="#h-receiving-model">Receiving — which combination to use</a> applies here: <strong>webhook</strong> as primary and <strong>polling</strong> as contingency.</p>
 </section>
 <section aria-labelledby="h-cancel-ref" class="section-anchor" id="section-cancel-ref">
 <h2 id="h-cancel-ref">Cancellation Reference</h2>
@@ -1208,7 +1236,7 @@
 </div>
 <div class="modal__field">
 <label for="field-merchant">merchant ID</label>
-<input autocomplete="off" id="field-merchant" name="merchantId" placeholder="merchant" type="text"/>
+<input autocomplete="off" id="field-merchant" name="merchantId" placeholder="Merchant" type="text"/>
 </div>
 <div class="modal__field">
 <label for="field-webhook">Webhook URL</label>
