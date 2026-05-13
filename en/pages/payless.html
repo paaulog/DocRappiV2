@@ -121,7 +121,7 @@
               </p>
               <figure class="content-figure">
                 <img src="../../assets/img/payless/flow-payless-v3.png" alt="Swimlane diagram PAYLESS V3: microservices, RT/shopper picking, cashier and POS lanes" width="1200" height="800" loading="lazy" />
-                <figcaption>Visão geral do fluxo Payless V3 (pedido, picking e continuação no caixa).</figcaption>
+                <figcaption>Overview of the Payless V3 flow (order, picking, and checkout continuation).</figcaption>
               </figure>
               <p>
                 Take some time to analyze and understand all the possible scenarios the POS system will have to implement
@@ -176,11 +176,11 @@
                   accumulate points for the customer. Payment code is scanned from the picker's device to retrieve order details.
                   <figure class="content-figure">
                     <img src="../../assets/img/payless/price-match-rappi-pos.png" alt="Table comparing RAPPI vs POS line items and resolved totals" loading="lazy" />
-                    <figcaption>Exemplo de comparação de linhas Rappi × POS (price match).</figcaption>
+                    <figcaption>Example comparison of Rappi × POS line items (price match).</figcaption>
                   </figure>
                   <figure class="content-figure">
                     <img src="../../assets/img/payless/price-match-mixed-lines.png" alt="Price match when EAN differs between Rappi and POS" loading="lazy" />
-                    <figcaption>Caso com itens mistos: correspondência parcial e priorização de preço onde aplicável.</figcaption>
+                    <figcaption>Mixed-line case: partial matching and price prioritization where applicable.</figcaption>
                   </figure>
                 </li>
                 <li>
@@ -194,7 +194,7 @@
                   Rappi order previously.
                   <figure class="content-figure">
                     <img src="../../assets/img/payless/price-match-overwrite.png" alt="Final basket after overwriting unit price from Rappi" loading="lazy" />
-                    <figcaption>Sobrescrita de preço unitário conforme pedido Rappi.</figcaption>
+                    <figcaption>Unit price overwritten to match the Rappi order.</figcaption>
                   </figure>
                 </li>
                 <li>
@@ -214,7 +214,7 @@
               <p class="muted"><strong>Shopper Pays with Payless (VIDEO):</strong> use the training video provided by your Rappi integration contact.</p>
               <figure class="content-figure">
                 <img src="../../assets/img/payless/price-match-weighable.png" alt="Weighable product: POS quantity with Rappi unit price and recalculated total" loading="lazy" />
-                <figcaption>Produto pesável: quantidade do POS × preço unitário Rappi.</figcaption>
+                <figcaption>Weighable product: POS quantity × Rappi unit price.</figcaption>
               </figure>
             </section>
 
@@ -801,7 +801,7 @@
               </p>
               <figure class="content-figure">
                 <img src="../../assets/img/payless/conciliation-report-sample.png" alt="Sample Rappi partner sales reconciliation report" loading="lazy" />
-                <figcaption>Exemplo visual de relatório de vendas / conciliação (referência para campos de totais e ajustes).</figcaption>
+                <figcaption>Sample sales / conciliation report (totals and adjustments reference).</figcaption>
               </figure>
               <article class="endpoint-block" id="endpoint-payment-list" aria-labelledby="h-payment-list">
                 <h3 id="h-payment-list"><span class="method-badge">GET</span> /api/cpgops-integrations/pos/v3/payments</h3>

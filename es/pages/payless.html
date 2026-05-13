@@ -33,22 +33,22 @@
                 Modo oscuro
               </button>
               <nav class="sidebar__nav" aria-label="En esta página">
-                <a href="#section-integration-guide">Rappi Payless Integration Guide</a>
-                <a href="#section-servers">Sandbox Servers &amp; Authentication</a>
-                <a href="#section-sandbox">Sandbox Setup and Usage</a>
-                <a href="#section-authorize">Authorization Payments with Payless (DEV - PROD)</a>
-                <a href="#section-price-match">[PRICE MATCH VERSION] Authorization Payments with Payless (DEV - PROD)</a>
-                <a href="#section-validate">Validation Payment Endpoint</a>
-                <a href="#section-cancel">Cancellation Transactions (DEV - PROD)</a>
-                <a href="#section-refund">Refunds Transactions (DEV - PROD)</a>
-                <a href="#section-conciliation">Payment List &amp; Conciliation (DEV - PROD)</a>
-                <a href="#section-heartbeat">Heartbeat System</a>
-                <a href="#section-smart-prices">Smart Prices - Get List of Active orders</a>
+                <a href="#section-integration-guide">Guía de integración Rappi Payless</a>
+                <a href="#section-servers">Sandbox: servidores y autenticación</a>
+                <a href="#section-sandbox">Sandbox: configuración y uso</a>
+                <a href="#section-authorize">Autorización de pagos Payless (DEV - PROD)</a>
+                <a href="#section-price-match">[PRICE MATCH] Autorización de pagos Payless (DEV - PROD)</a>
+                <a href="#section-validate">Endpoint de validación de pago</a>
+                <a href="#section-cancel">Cancelación de transacciones (DEV - PROD)</a>
+                <a href="#section-refund">Reembolsos (DEV - PROD)</a>
+                <a href="#section-conciliation">Lista de pagos y conciliación (DEV - PROD)</a>
+                <a href="#section-heartbeat">Sistema heartbeat</a>
+                <a href="#section-smart-prices">Smart Prices — lista de pedidos activos</a>
               </nav>
             </div>
             <div class="sidebar__bottom">
               <div class="sidebar__cred-wrap">
-                <span class="credentials-badge" data-credentials-badge hidden>Conjunto de credenciales</span>
+                <span class="credentials-badge" data-credentials-badge hidden>Credenciales definidas</span>
               </div>
               <a href="../index.html" class="btn btn--ghost" data-page-link style="text-align: center">← Todas las APIs</a>
             </div>
@@ -57,368 +57,342 @@
         <main class="api-main" id="main">
           <div id="api-content-root">
             <header class="api-main__header">
-              <h1>Rappi Payless — Integration Guide</h1>
+              <h1>Rappi Payless — Guía de integración</h1>
               <p class="lead">
-                Documentación técnica del flujo Payless para POS y integradores. El contenido sigue el manual oficial en
-                <strong>inglés</strong> para alinear contratos y mensajes de API.
+                Documentación técnica de Payless para sistemas punto de venta (POS) e integradores: flujos operativos,
+                APIs de sandbox y producción, autenticación, autorización, conciliación y buenas prácticas de integración con Rappi.
               </p>
             </header>
 
             <section class="section-anchor" id="section-integration-guide" aria-labelledby="h-integration-guide">
-              <h2 id="h-integration-guide">Rappi Payless Integration Guide</h2>
+              <h2 id="h-integration-guide">Guía de integración Rappi Payless</h2>
 
-            <div class="doc-page-outline" role="navigation" aria-label="Guía de la página">
+            <div class="doc-page-outline" role="navigation" aria-label="Índice de la página">
               <span class="doc-page-outline__title">Cómo navegar</span>
               <ol>
-                <li>Lee la <strong>política</strong>, qué es Payless y las <strong>consideraciones técnicas</strong>.</li>
-                <li>Revisa el <strong>flujo</strong>, el PDF y el <strong>checklist</strong> de integración.</li>
-                <li>Sigue el <strong>recorrido del pedido</strong> (pasos 1–9) y las reglas del <strong>código de barras</strong>.</li>
-                <li>Implementa <strong>sandbox</strong>, <strong>JWT</strong>, <strong>order details</strong> y <strong>authorize</strong>.</li>
-                <li>Si aplica, implementa <strong>Price Match</strong>; consulta tablas de <strong>errores</strong>, <strong>cancel</strong>, <strong>refund</strong> y <strong>conciliación</strong>.</li>
+                <li>Lea la <strong>política</strong>, qué es Payless y las <strong>consideraciones técnicas</strong>.</li>
+                <li>Revise el <strong>flujo</strong>, el PDF y la <strong>lista de verificación</strong> de integración.</li>
+                <li>Siga la <strong>trayectoria del pedido</strong> (pasos 1–9) y las reglas del <strong>código de barras</strong>.</li>
+                <li>Implemente <strong>sandbox</strong>, <strong>JWT</strong>, <strong>detalles del pedido</strong> y <strong>authorize</strong>.</li>
+                <li>Si aplica, implemente <strong>Price Match</strong>; use las tablas de <strong>errores</strong>, <strong>cancelación</strong>, <strong>reembolso</strong> y <strong>conciliación</strong>.</li>
               </ol>
             </div>
 
             <section class="section-anchor" id="section-policy" aria-labelledby="h-policy">
-              <h2 id="h-policy">Policy and restrictions</h2>
+              <h2 id="h-policy">Política y restricciones</h2>
               <div class="doc-note doc-note--warn">
-                <strong>Important:</strong> To ensure an excellent experience for both end users and RT/Shoppers, it is
-                not allowed for partners to implement any internal validation that prevents the authorization request from
-                being sent or any development not mentioned in this documentation. If a case arises with this despite
-                this recommendation, no stores will be migrated to Payless unless the partner eliminates said validations
-                and extra developments from its code.
+                <strong>Importante:</strong> para garantizar una excelente experiencia a usuarios finales y a RTs/personal
+                shoppers, los socios <strong>no pueden</strong> implementar validaciones internas que impidan el envío de la
+                solicitud de autorización ni desarrollos no descritos en esta documentación. Si ocurre ese caso, a pesar
+                de esta recomendación, las tiendas <strong>no</strong> migrarán a Payless hasta que el socio
+                elimine esas validaciones y desarrollos extra del código.
               </div>
             </section>
 
             <section class="section-anchor" id="section-what-is" aria-labelledby="h-what">
-              <h2 id="h-what">What is Rappi Payless?</h2>
+              <h2 id="h-what">¿Qué es Rappi Payless?</h2>
               <p>
-                Rappi Payless is a card/cash free payment method exclusive for our pickers (personal shoppers and couriers).
+                Rappi Payless es un método de pago sin tarjeta y sin efectivo en tienda, exclusivo para nuestros
+                pickers (personal shoppers y repartidores RT).
               </p>
               <p>
-                It enables point of sales systems (POSs) to process Rappi orders using payment codes generated from our
-                pickers' mobile apps. Those payment codes are presented in the form of barcodes or QR codes.
+                Permite que los sistemas punto de venta (POS) procesen pedidos Rappi con códigos de pago generados en las
+                apps móviles de los pickers. Esos códigos se muestran como código de barras o QR.
               </p>
               <p>
-                Rappi Payless eliminates card transaction fees. It also simplifies conciliation and reporting, reduces
-                checkout time, and eliminates operational issues related to releasing funds to debit cards.
+                Payless elimina comisiones por transacción con tarjeta, simplifica la conciliación y los informes, reduce el tiempo de
+                checkout y evita problemas operativos ligados a la liberación de fondos en tarjetas de débito.
               </p>
             </section>
 
             <section class="section-anchor" id="section-technical" aria-labelledby="h-technical">
-              <h2 id="h-technical">Payless technical considerations</h2>
+              <h2 id="h-technical">Consideraciones técnicas de Payless</h2>
               <ul>
-                <li>Payless operates under a public API with a root for each country in Latin America, although the same integration can be used in all countries.</li>
-                <li>It operates under HTTPS TLS 1.2+ and use of JWTokens. Through procedural rules, Payless can continue payment processes in case there are communication interruptions.</li>
-                <li>The approval code can be QR code, barcode and numeric. All three options are always available.</li>
-                <li>Daily queries of sales information can be made to cross with the reports generated in the POS through an API.</li>
+                <li>Payless expone una API pública con raíz por país en Latinoamérica; la misma integración puede usarse en todos los países.</li>
+                <li>Funciona en HTTPS TLS 1.2+ con tokens JWT. Por reglas de proceso, Payless puede continuar flujos de pago aun con interrupciones de comunicación.</li>
+                <li>El código de aprobación puede ser QR, código de barras o numérico; las tres opciones están siempre disponibles.</li>
+                <li>Es posible consultar a diario información de ventas para cruzarla con informes generados en el POS mediante una API.</li>
               </ul>
             </section>
 
             <section class="section-anchor" id="section-flow" aria-labelledby="h-flow">
-              <h2 id="h-flow">Payless flow</h2>
+              <h2 id="h-flow">Flujo Payless</h2>
               <p>
-                <a href="https://drive.google.com/drive/u/0/folders/1SMRX9n2fANweXQl_6f0r3YgKtXVJjeuf" rel="noopener noreferrer">Download the Payless flow PDF (Google Drive)</a>.
+                <a href="https://drive.google.com/drive/u/0/folders/1SMRX9n2fANweXQl_6f0r3YgKtXVJjeuf" rel="noopener noreferrer">Descargar el PDF del flujo Payless (Google Drive)</a>.
               </p>
               <figure class="content-figure">
-                <img src="../../assets/img/payless/flow-payless-v3.png" alt="Swimlane diagram PAYLESS V3: microservices, RT/shopper picking, cashier and POS lanes" width="1200" height="800" loading="lazy" />
-                <figcaption>Visão geral do fluxo Payless V3 (pedido, picking e continuação no caixa).</figcaption>
+                <img src="../../assets/img/payless/flow-payless-v3.png" alt="Diagrama en franjas PAYLESS V3: microservicios, picking RT/shopper, caja y POS" width="1200" height="800" loading="lazy" />
+                <figcaption>Vista general del flujo Payless V3 (pedido, picking y continuación en caja).</figcaption>
               </figure>
               <p>
-                Take some time to analyze and understand all the possible scenarios the POS system will have to implement
-                for a successful integration.
+                Reserve tiempo para analizar y comprender todos los escenarios que el POS deberá implementar para una integración exitosa.
               </p>
             </section>
 
             <section class="section-anchor" id="section-checklist" aria-labelledby="h-checklist">
-              <h2 id="h-checklist">Integration checklist</h2>
-              <p>Upon successfully implementing Rappi Payless, your solution is expected to achieve the following:</p>
+              <h2 id="h-checklist">Lista de verificación de integración</h2>
+              <p>Tras implementar con éxito Rappi Payless, se espera que su solución:</p>
               <ul>
-                <li>Ingest and process Rappi Payless payment codes either in the form of barcodes, QR-codes, or manually keyed-in.</li>
-                <li>Send payment authorization requests to Rappi including all required details.</li>
-                <li>Properly handle successful and declined transactions.</li>
-                <li>Handle request timeouts with automatic retries.</li>
-                <li>On any given situation where the payment cannot be performed through Payless (cellphone network, internet failures, etc.), allow to pay the order via card/cash.</li>
-                <li>Daily payment list of your transactions authorized by Rappi.</li>
+                <li>Ingeste y procese códigos Payless en código de barras, QR o entrada manual.</li>
+                <li>Envíe solicitudes de autorización de pago a Rappi con todos los detalles obligatorios.</li>
+                <li>Maneje correctamente transacciones aprobadas y rechazadas.</li>
+                <li>Maneje timeouts con reintentos automáticos.</li>
+                <li>Cuando el pago no sea posible vía Payless (red móvil, fallas de internet, etc.), permita pagar el pedido con tarjeta o efectivo.</li>
+                <li>Disponer de un listado diario de las transacciones autorizadas por Rappi.</li>
               </ul>
             </section>
 
             <section class="section-anchor" id="section-intro" aria-labelledby="h-intro">
-              <h2 id="h-intro">Introduction</h2>
-              <p>This article provides an overview of Rappi Payless. Expect to learn more about:</p>
+              <h2 id="h-intro">Introducción</h2>
+              <p>Esta guía presenta una visión general de Rappi Payless. Encontrará información sobre:</p>
               <ul>
-                <li>Our picker's experience with Rappi Payless</li>
-                <li>The regular and fallback payment flows</li>
-                <li>How to retrieve information to feed your conciliation process</li>
-                <li>How to consume our sandbox methods to setup your test environment and run manual and automated tests on your integration.</li>
+                <li>La experiencia del picker con Payless</li>
+                <li>El flujo normal de pago y el flujo alternativo (fallback)</li>
+                <li>Cómo obtener datos para alimentar el proceso de conciliación</li>
+                <li>Cómo usar los métodos de sandbox para configurar pruebas manuales y automatizadas</li>
               </ul>
             </section>
 
             <section class="section-anchor" id="section-journey" aria-labelledby="h-journey">
-              <h2 id="h-journey">Customer places a new order — operational steps</h2>
+              <h2 id="h-journey">El cliente hace un nuevo pedido — pasos operativos</h2>
               <ol>
                 <li>
-                  <strong>Customer places a new order.</strong> Depending on the store configuration, an algorithm decides
-                  whether the order will be fulfilled by a personal shopper or a courier.
+                  <strong>El cliente hace un nuevo pedido.</strong> Según la configuración de la tienda, un algoritmo decide si el
+                  pedido lo cumple un personal shopper o un repartidor (RT).
                 </li>
                 <li>
-                  <strong>Picking of the products in the order.</strong> From the product list, the picker must mark each
-                  product as &quot;found&quot;, &quot;not found&quot;, or &quot;replaced&quot;. Pickers can't advance to
-                  payment with pending products on the shopping list.
+                  <strong>Picking de productos.</strong> En la lista de productos, el picker debe marcar cada artículo como
+                  «encontrado», «no encontrado» o «sustituido». No puede avanzar al pago con productos pendientes en la lista.
                 </li>
                 <li>
-                  <strong>Payment method selection.</strong> At this point, the picker app is in payment mode, generating
-                  new codes every 10 minutes.
+                  <strong>Elección del método de pago.</strong> En esta fase la app del picker está en modo pago, generando nuevos códigos cada 10 minutos.
                 </li>
                 <li>
-                  <strong>(If Price Match flow will be implemented) POS retrieve the Rappi's basket and the customer information.</strong>
-                  It's necessary to take the order details and then compare the prices of Rappi VS POS, and if necessary
-                  overwrite those that are different. Additionally, it is useful when POS need user identification to
-                  accumulate points for the customer. Payment code is scanned from the picker's device to retrieve order details.
+                  <strong>(Si existe flujo Price Match) El POS obtiene el carrito Rappi y los datos del cliente.</strong>
+                  Es necesario obtener los detalles del pedido, comparar precios Rappi vs POS y, si hace falta, sobrescribir los que
+                  difieran. También sirve cuando el POS necesita identificación del usuario para puntos de fidelidad.
+                  El código de pago se lee en el dispositivo del picker para obtener los detalles del pedido.
                   <figure class="content-figure">
-                    <img src="../../assets/img/payless/price-match-rappi-pos.png" alt="Table comparing RAPPI vs POS line items and resolved totals" loading="lazy" />
-                    <figcaption>Exemplo de comparação de linhas Rappi × POS (price match).</figcaption>
+                    <img src="../../assets/img/payless/price-match-rappi-pos.png" alt="Tabla comparando líneas RAPPI vs POS y totales resueltos" loading="lazy" />
+                    <figcaption>Ejemplo de comparación de líneas Rappi × POS (price match).</figcaption>
                   </figure>
                   <figure class="content-figure">
-                    <img src="../../assets/img/payless/price-match-mixed-lines.png" alt="Price match when EAN differs between Rappi and POS" loading="lazy" />
-                    <figcaption>Caso com itens mistos: correspondência parcial e priorização de preço onde aplicável.</figcaption>
+                    <img src="../../assets/img/payless/price-match-mixed-lines.png" alt="Price match cuando el EAN difiere entre Rappi y POS" loading="lazy" />
+                    <figcaption>Caso con ítems mixtos: coincidencia parcial y priorización de precio donde aplique.</figcaption>
                   </figure>
                 </li>
                 <li>
-                  <strong>Cashier scans all products.</strong> The POS must record the user's document number for the
-                  respective accumulation of points. In the meantime, the cashier must check out all the products as they
-                  do on a regular basis.
+                  <strong>La caja registra todos los productos.</strong> El POS debe registrar el documento del usuario para
+                  acumulación de puntos. Mientras tanto la caja registra todos los productos como en el flujo habitual.
                 </li>
                 <li>
-                  <strong>(If Price Match flow will be implemented) POS overwrite the prices.</strong> The POS must
-                  overwrite the prices of the scanned products if they are different compared to those obtained from the
-                  Rappi order previously.
+                  <strong>(Si existe Price Match) El POS sobrescribe los precios.</strong> El POS debe alinear los precios de los
+                  artículos registrados con los obtenidos previamente del pedido Rappi, cuando sean diferentes.
                   <figure class="content-figure">
-                    <img src="../../assets/img/payless/price-match-overwrite.png" alt="Final basket after overwriting unit price from Rappi" loading="lazy" />
-                    <figcaption>Sobrescrita de preço unitário conforme pedido Rappi.</figcaption>
+                    <img src="../../assets/img/payless/price-match-overwrite.png" alt="Carrito final tras sobrescribir precio unitario con el de Rappi" loading="lazy" />
+                    <figcaption>Sobrescritura de precio unitario según pedido Rappi.</figcaption>
                   </figure>
                 </li>
                 <li>
-                  <strong>Payment code is scanned from the picker's device.</strong> The cashier has the option to scan a
-                  QR code, a barcode, or manually key-in the code. If the POS already scanned the barcode when retrieving
-                  customer's identification before scanning the products, it's necessary to scan the code again because it
-                  has a lifetime and it may have already changed.
+                  <strong>Lectura del código de pago en el dispositivo del picker.</strong> La caja puede leer QR,
+                  código de barras o introducir el código manualmente. Si el POS ya leyó el código al obtener la
+                  identificación del cliente antes de registrar los productos, debe volver a leer el código: tiene tiempo de vida y puede haberse renovado.
                 </li>
                 <li>
-                  <strong>POS sends the purchase details to Rappi.</strong> This is an HTTP request to our Payment
-                  Authorization endpoint. If successful, the POS will receive a transaction authorization token in response.
+                  <strong>El POS envía los detalles de la compra a Rappi.</strong> Se trata de una solicitud HTTP al endpoint de
+                  autorización de pago. En caso de éxito, el POS recibe un token de autorización de transacción en la respuesta.
                 </li>
                 <li>
-                  <strong>Picker takes a snapshot of the receipt.</strong> The order is ready for delivery.
+                  <strong>El picker fotografía el ticket.</strong> El pedido queda listo para entrega.
                 </li>
               </ol>
-              <p class="muted"><strong>Shopper Pays with Payless (VIDEO):</strong> use the training video provided by your Rappi integration contact.</p>
+              <p class="muted"><strong>Shopper paga con Payless (video):</strong> use el video de capacitación proporcionado por su contacto de integración Rappi.</p>
               <figure class="content-figure">
-                <img src="../../assets/img/payless/price-match-weighable.png" alt="Weighable product: POS quantity with Rappi unit price and recalculated total" loading="lazy" />
-                <figcaption>Produto pesável: quantidade do POS × preço unitário Rappi.</figcaption>
+                <img src="../../assets/img/payless/price-match-weighable.png" alt="Producto pesable: cantidad en el POS con precio unitario Rappi y total recalculado" loading="lazy" />
+                <figcaption>Producto pesable: cantidad del POS × precio unitario Rappi.</figcaption>
               </figure>
             </section>
 
             <section class="section-anchor" id="section-barcode" aria-labelledby="h-barcode">
-              <h2 id="h-barcode">The Rappi Payless barcode</h2>
+              <h2 id="h-barcode">El código de barras Payless de Rappi</h2>
               <p>
-                The Rappi Payless barcode (also referred to as payment code) is a random number associated with a unique
-                order identifier in our database. The line barcode is CODE-128.
+                El código de barras Payless (también llamado código de pago) es un número aleatorio asociado a un
+                identificador único de pedido en nuestra base de datos. El formato lineal es CODE-128.
               </p>
-              <p>Barcodes have a total time live (TTL) of 10 minutes; every 10 minutes the barcode is refreshed in our pickers' apps payment views.</p>
+              <p>El tiempo de vida (TTL) total del código de barras es de 10 minutos; en las apps de los pickers el código se renueva cada 10 minutos en la vista de pago.</p>
               <div class="doc-note doc-note--warn">
-                <strong>AUTO RETRIES ON TIMEOUTS:</strong> The barcode's TTL is 10 minutes. It's important to consider this
-                information when implementing automatic retries in response to communication failures or timeouts between
-                your POS and Rappi's backend.
+                <strong>Reintentos automáticos en timeouts:</strong> el TTL es de 10 minutos. Téngalo en cuenta al
+                implementar reintentos automáticos por fallas de comunicación o timeouts entre el POS y el backend de Rappi.
               </div>
-              <h3>Barcode uses</h3>
-              <p>Besides being used in the payment authorization request, the barcode can be used to retrieve the order details, cancelations and refunds.</p>
+              <h3>Usos del código de barras</h3>
+              <p>Además de la solicitud de autorización de pago, el código sirve para obtener detalles del pedido, cancelaciones y reembolsos.</p>
             </section>
 
             <section class="section-anchor" id="section-process" aria-labelledby="h-process">
-              <h2 id="h-process">Payless process — payment authorization</h2>
+              <h2 id="h-process">Proceso Payless — autorización de pago</h2>
               <p>
-                A successful transaction will always return an HTTP status code <strong>200</strong> and includes an
-                authorization token in the response body. Both the barcode and the authorization token (or authorization
-                code) for each successful transaction <strong>MUST</strong> be stored on the retailer's side for
-                reconciliation purposes.
+                Una transacción exitosa siempre devuelve HTTP <strong>200</strong> e incluye un token de autorización en el
+                cuerpo de la respuesta. El código de barras y el token (o código de autorización) de cada transacción exitosa
+                <strong>deben</strong> guardarse del lado del retailer para conciliación.
               </p>
-              <h3>Declined authorizations</h3>
+              <h3>Autorizaciones rechazadas</h3>
               <p>
-                Although there are few reasons that lead a transaction to be declined by Rappi, those aren't yet defined
-                by reason codes, and we don't expect the POS to expose this information. On each declined transaction, the
-                picker receives a push notification with instructions to adjust the order before retrying the payment.
+                Hay pocas causas de rechazo, aún sin códigos de motivo estables, y no se espera que el POS exponga
+                esa información al cliente. En cada rechazo, el picker recibe notificación push con instrucciones para ajustar el pedido antes de volver a intentar.
               </p>
-              <h3>Malformed payment authorization request</h3>
-              <p>There might be missing required properties or inconsistent property types in your payment authorization.</p>
-              <h3>The requested amount exceeds the authorized threshold</h3>
+              <h3>Solicitud de autorización mal formada</h3>
+              <p>Pueden faltar propiedades obligatorias o existir tipos inconsistentes en la solicitud de autorización.</p>
+              <h3>El monto solicitado supera el umbral autorizado</h3>
               <p>
-                This scenario may be caused by unreported price differences pushing the requested amount past the order
-                authorization threshold or products requested by the customer via chat were not properly included in the
-                order by the picker. With each declined transaction, the pickers receive push notifications on their apps,
-                advising them about inconsistencies in the order and asking them to make the necessary adjustments before
-                retrying. Once adjusted, the order shouldn't be rejected a second time.
+                Puede deberse a diferencias de precio no comunicadas que elevan el monto por encima del umbral, o a productos
+                pedidos vía chat que el picker no incluyó correctamente. En cada rechazo, los pickers reciben push indicando
+                inconsistencias; tras el ajuste, el pedido no debería volver a rechazarse por el mismo motivo.
               </p>
-              <h3>Unacceptable orders</h3>
+              <h3>Pedidos inaceptables</h3>
               <p>
-                Orders that receive the error message <code>unacceptable_order</code> may have been canceled by the
-                customer (and due to a momentary connectivity issue, the picker app wasn't synced), they may have already
-                been paid for, or the courier is trying to purchase the products at a different retail partner.
+                Pedidos con error <code>unacceptable_order</code> pueden haber sido cancelados por el cliente (app del picker sin
+                sincronizar), ya estar pagados, o el repartidor intentar pagar en otro socio retailer.
               </p>
-              <h3>Invalid barcodes</h3>
+              <h3>Códigos inválidos</h3>
               <p>
-                Most of the time, invalid barcode scenarios are associated with fraud attempts. A screenshot of the barcode
-                screen is taken and the payment is declined; either because that barcode is expired or it has already been
-                applied to another payment.
+                A menudo asociados a intentos de fraude. Se captura pantalla del código; el pago se rechaza por
+                código expirado o ya aplicado a otro pago.
               </p>
-              <h3>Wrong store</h3>
+              <h3>Tienda incorrecta</h3>
               <p>
-                When a courier attempts to pay for an order in a store that doesn't correspond to the store that was
-                originally ordered in the Rappi App, it will not be authorized until it goes to the correct store or is
-                released for another courier to go to the correct store.
+                Si el repartidor intenta pagar en una tienda distinta de la pedida en la app Rappi, la autorización falla hasta ir a la
+                tienda correcta o hasta que el pedido se libere para otro repartidor.
               </p>
-              <h3>Invalid products</h3>
+              <h3>Productos inválidos</h3>
               <p>
-                When a courier attempts to pay for products different from the original order, it will not be authorized
-                until the courier gives the correct products of the order to the cashier.
+                Si el repartidor intenta pagar productos distintos del pedido original, no se autorizará hasta entregar en caja los productos correctos del pedido.
               </p>
             </section>
 
             <section class="section-anchor" id="section-retries" aria-labelledby="h-retries">
-              <h2 id="h-retries">Handling communication failures</h2>
+              <h2 id="h-retries">Fallas de comunicación</h2>
               <p>
-                Best practice on Rappi Payless implementations mandates having an automatic retry at the POS whenever a
-                communication failure occurs i.e., when the POS doesn't receive a response to its payment authorization
-                request.
+                Buenas prácticas Payless: implementar reintento automático en el POS cuando no haya respuesta a la solicitud de
+                autorización de pago.
               </p>
               <div class="doc-note">
-                <strong>Example:</strong> The cashier enters a command on the POS to send out a payment authorization
-                request to Rappi. We recommend that the requests timeout should be configured after <strong>20 seconds</strong>,
-                and also you may safely have up to <strong>5</strong> automatic authorization attempts within the barcode TTL.
-                The timeout setting is configurable at the discretion of each retailer, taking into account the latency of
-                their private networks.
+                <strong>Ejemplo:</strong> la caja dispara la solicitud de autorización en el POS. Se recomienda timeout de unos
+                <strong>20 segundos</strong> y hasta <strong>5</strong> intentos automáticos dentro del TTL del código de
+                barras. El timeout es configurable según la latencia de red del retailer.
               </div>
-              <h3>Best practices — double authorization risk</h3>
+              <h3>Buenas prácticas — riesgo de doble autorización</h3>
               <p>
-                There is a possibility that at the moment of requesting the authorization, it arrives to Rappi's services,
-                but at the moment of replying that it was successfully authorized, this message doesn't arrive to the POS
-                of the partner, causing the RT App to show that the order was successfully paid, while the cashier will not
-                print the invoice. In this scenario, the partner must implement a <strong>cancellation</strong> to the
-                authorization using the right endpoint, because we need to avoid paying twice (debit/cash and Payless), as
-                the RT will end up paying using debit/cash.
+                La solicitud puede llegar a los servicios de Rappi y la autorización ser exitosa, pero la respuesta no llegar al POS:
+                la app RT muestra pagado y la caja no imprime. El socio debe implementar <strong>cancelación</strong> de la
+                autorización en el endpoint adecuado para evitar doble pago (débito/efectivo y Payless), pues el RT puede acabar pagando por otro medio.
               </p>
             </section>
 
             <section class="section-anchor" id="section-fallback" aria-labelledby="h-fallback">
-              <h2 id="h-fallback">Falling back to debit cards / cash</h2>
+              <h2 id="h-fallback">Alternativa: tarjeta de débito / efectivo</h2>
               <div class="doc-note">
-                <strong>It should be a rare exception.</strong> The alternative flow allowing card payments is a must
-                have, but should be a rare exception. Our main KPI in Rappi Payless is having 99.9% of transactions processed
-                by our authorization engine. It means the fallback flow should only kick-in once in every 1000 orders processed.
+                <strong>Debe ser una excepción rara.</strong> El flujo alternativo con tarjeta es obligatorio, pero debe ser raro. El
+                KPI principal de Payless es procesar ~99,9% de las transacciones en el motor de autorización — el fallback debe ocurrir cerca de 1 en 1000 pedidos.
               </div>
               <p>
-                The fallback system has been redesigned so that it works based on rules and retries; as soon as the payment
-                fails, after certain retries the RT/Shopper App will change to pay using card or cash. This process is
-                automatic and does not require the intervention of the partner within the payment process.
+                El sistema de fallback se rediseñó con reglas y reintentos: tras fallas, la app RT/Shopper cambia
+                automáticamente a pago con tarjeta o efectivo, sin intervención del socio en medio del pago.
               </p>
-              <p class="muted"><strong>Note:</strong> The version of using pincode is deprecated.</p>
+              <p class="muted"><strong>Nota:</strong> la versión con PIN está discontinuada.</p>
             </section>
 
             </section>
 
             <section class="section-anchor" id="section-servers" aria-labelledby="h-servers">
-              <h2 id="h-servers">Sandbox Servers &amp; Authentication</h2>
+              <h2 id="h-servers">Sandbox: servidores y autenticación</h2>
               <p>
-                Our sandbox operations were created to accelerate our partners' development and testing. This is a six-step
-                process. You will have one or more dummy <code>store_id</code> that can be used on the methods listed in our
-                sandbox documentation.
+                Las operaciones de sandbox aceleran el desarrollo y las pruebas de los socios. Es un proceso en varios
+                pasos. Recibirá uno o más <code>store_id</code> de prueba para usar en los métodos descritos en la documentación de sandbox.
               </p>
-              <h3>Servers</h3>
-              <p>Each country where Rappi operates utilizes a distinct base URL:</p>
+              <h3>Servidores</h3>
+              <p>Cada país donde opera Rappi tiene una URL base distinta:</p>
               <div class="table-wrap">
                 <table class="api-doc-table">
                   <thead>
-                    <tr><th>Environment</th><th>Country / scope</th><th>Base URL</th></tr>
+                    <tr><th>Ambiente</th><th>País / alcance</th><th>URL base</th></tr>
                   </thead>
                   <tbody>
-                    <tr><td>Development</td><td>All countries</td><td><code>https://microservices.dev.rappi.com</code></td></tr>
-                    <tr><td>Production</td><td>ARG</td><td><code>https://services.rappi.com.ar</code></td></tr>
-                    <tr><td>Production</td><td>BRA</td><td><code>https://services.rappi.com.br</code></td></tr>
-                    <tr><td>Production</td><td>CHL</td><td><code>https://services.rappi.cl</code></td></tr>
-                    <tr><td>Production</td><td>COL</td><td><code>https://services.rappi.com</code></td></tr>
-                    <tr><td>Production</td><td>CRI</td><td><code>https://services.rappi.co.cr</code></td></tr>
-                    <tr><td>Production</td><td>ECU</td><td><code>https://services.rappi.com.ec</code></td></tr>
-                    <tr><td>Production</td><td>MEX</td><td><code>https://services.mxgrability.rappi.com</code></td></tr>
-                    <tr><td>Production</td><td>PER</td><td><code>https://services.rappi.pe</code></td></tr>
-                    <tr><td>Production</td><td>URY</td><td><code>https://services.rappi.com.uy</code></td></tr>
+                    <tr><td>Desarrollo</td><td>Todos los países</td><td><code>https://microservices.dev.rappi.com</code></td></tr>
+                    <tr><td>Producción</td><td>ARG</td><td><code>https://services.rappi.com.ar</code></td></tr>
+                    <tr><td>Producción</td><td>BRA</td><td><code>https://services.rappi.com.br</code></td></tr>
+                    <tr><td>Producción</td><td>CHL</td><td><code>https://services.rappi.cl</code></td></tr>
+                    <tr><td>Producción</td><td>COL</td><td><code>https://services.rappi.com</code></td></tr>
+                    <tr><td>Producción</td><td>CRI</td><td><code>https://services.rappi.co.cr</code></td></tr>
+                    <tr><td>Producción</td><td>ECU</td><td><code>https://services.rappi.com.ec</code></td></tr>
+                    <tr><td>Producción</td><td>MEX</td><td><code>https://services.mxgrability.rappi.com</code></td></tr>
+                    <tr><td>Producción</td><td>PER</td><td><code>https://services.rappi.pe</code></td></tr>
+                    <tr><td>Producción</td><td>URY</td><td><code>https://services.rappi.com.uy</code></td></tr>
                   </tbody>
                 </table>
               </div>
-              <h3>Authentication (DEV — PROD)</h3>
+              <h3>Autenticación (DEV — PROD)</h3>
               <p>
-                Rappi CPG APIs implement JWT-based authentication. You must exchange the credentials provided by Rappi for
-                a JWT access token to authenticate API requests. This token expires after <strong>12 hours</strong>. Each
-                time your token expires you must request a new one from the sign-in endpoint.
+                Las APIs CPG de Rappi usan autenticación JWT. Intercambie las credenciales proporcionadas por Rappi por un token de acceso
+                para autenticar las solicitudes. El token expira a las <strong>12 horas</strong>; cuando expire, solicite uno nuevo en el endpoint de sign-in.
               </p>
               <ul>
-                <li>All API requests <strong>MUST</strong> be made over HTTPS. Calls made over plain HTTP <strong>WILL FAIL</strong>.</li>
-                <li>API requests without a valid access token <strong>WILL FAIL</strong>.</li>
+                <li>Todas las solicitudes a la API <strong>deben</strong> usar HTTPS. Las llamadas en HTTP plano <strong>fallan</strong>.</li>
+                <li>Las solicitudes sin token de acceso válido <strong>fallan</strong>.</li>
               </ul>
               <div class="doc-note">
-                <strong>Note:</strong> Your integration credentials carry many privileges, so be sure to keep them secure!
-                Do not share them in publicly-accessible areas such as GitHub, client-side code, chat apps, etc. If a
-                security breach is suspected, contact Rappi ASAP to retire compromised passwords (secrets) and generate new
-                credentials. Any suspected misuse of the API <strong>MAY</strong> result in the retailer's access to Rappi's
-                service being suspended pending investigation.
+                <strong>Nota:</strong> las credenciales de integración son sensibles — manténgalas seguras. No las comparta en
+                repositorios públicos, código de cliente, chats, etc. En caso de sospecha de filtración, contacte a Rappi de
+                inmediato para revocar secretos y emitir nuevas credenciales. Un abuso sospechoso de la API puede llevar a la suspensión del acceso hasta aclararlo.
               </div>
-              <h4>Considerations</h4>
+              <h4>Consideraciones</h4>
               <ul>
-                <li>The token will only be valid for 12 hours.</li>
-                <li>An order can change token during the process at Payless.</li>
-                <li>Keep in mind that the token that you create is only valid in your own environment.</li>
+                <li>El token solo es válido 12 horas.</li>
+                <li>Una solicitud puede cambiar de token durante el flujo Payless.</li>
+                <li>El token creado en su ambiente solo es válido en ese ambiente.</li>
               </ul>
 
               <article class="endpoint-block section-anchor" id="endpoint-sign-in" aria-labelledby="h-sign-in">
                 <h3 id="h-sign-in"><span class="method-badge">POST</span> /api/cpgops-integrations/retailers/sign-in</h3>
-                <p>Generate your JWT access tokens. Returns an access token to authenticate your requests for the next 12 hours.</p>
+                <p>Genera tokens JWT de acceso. Devuelve un token para autenticar sus solicitudes durante las próximas 12 horas.</p>
                 <div class="code-block-wrap">
-                  <div class="code-block__bar"><span>Request (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
+                  <div class="code-block__bar"><span>Solicitud (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
                   <pre><code class="language-bash">curl -X POST https://microservices.dev.rappi.com/api/cpgops-integrations/retailers/sign-in \
   -H 'Content-Type: application/json' \
   -H 'Accept: application/json' \
   -d '{"retailer":"demo-retailer","secret":"IGJBNPYzIecPm1JKqkjnZjaf94ybGnOt"}'</code></pre>
                 </div>
-                <h4>Request body</h4>
+                <h4>Cuerpo de la solicitud</h4>
                 <div class="table-wrap">
                   <table class="api-doc-table">
-                    <thead><tr><th>Field</th><th>Required</th><th>Type</th><th>Definition</th></tr></thead>
+                    <thead><tr><th>Campo</th><th>Obligatorio</th><th>Tipo</th><th>Descripción</th></tr></thead>
                     <tbody>
-                      <tr><td><code>retailer</code></td><td>Yes</td><td>string</td><td>Your unique username provided by Rappi</td></tr>
-                      <tr><td><code>secret</code></td><td>Yes</td><td>string</td><td>Your secret passcode provided by Rappi</td></tr>
+                      <tr><td><code>retailer</code></td><td>Sí</td><td>string</td><td>Nombre de usuario único proporcionado por Rappi</td></tr>
+                      <tr><td><code>secret</code></td><td>Sí</td><td>string</td><td>Secreto proporcionado por Rappi</td></tr>
                     </tbody>
                   </table>
                 </div>
-                <h4>Responses</h4>
+                <h4>Respuestas</h4>
                 <div class="table-wrap">
                   <table class="api-doc-table">
-                    <thead><tr><th>Code</th><th>Response</th><th>Definition</th></tr></thead>
+                    <thead><tr><th>Código</th><th>Respuesta</th><th>Descripción</th></tr></thead>
                     <tbody>
-                      <tr><td>200</td><td>OK</td><td>Success — access token returned by Rappi</td></tr>
-                      <tr><td>401</td><td>Unauthorized</td><td>Request was submitted without proper credentials</td></tr>
+                      <tr><td>200</td><td>OK</td><td>Éxito — token devuelto por Rappi</td></tr>
+                      <tr><td>401</td><td>Unauthorized</td><td>Solicitud sin credenciales válidas</td></tr>
                     </tbody>
                   </table>
                 </div>
-                <h4>Status 200 — body fields</h4>
+                <h4>HTTP 200 — campos del cuerpo</h4>
                 <div class="table-wrap">
                   <table class="api-doc-table">
-                    <thead><tr><th>Field</th><th>Type</th><th>Definition</th></tr></thead>
+                    <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
                     <tbody>
-                      <tr><td><code>accessToken</code></td><td>string</td><td>JWT access token for every request to Rappi APIs</td></tr>
-                      <tr><td><code>expiresIn</code></td><td>string</td><td>Time in seconds before your token expires</td></tr>
+                      <tr><td><code>accessToken</code></td><td>string</td><td>JWT a incluir en todas las solicitudes a las APIs de Rappi</td></tr>
+                      <tr><td><code>expiresIn</code></td><td>string</td><td>Segundos hasta la expiración del token</td></tr>
                     </tbody>
                   </table>
                 </div>
                 <div class="code-block-wrap">
-                  <div class="code-block__bar"><span>Response example (JSON)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
+                  <div class="code-block__bar"><span>Ejemplo de respuesta (JSON)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
                   <pre><code class="language-json">{
   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZXRhaWxlciI6IlJldGFpbGVyIE5hbWUiLCJvd25lciI6InJldGFpbGVyIiwiaWF0IjoxNTkxNzQxODMxLCJleHAiOjE1OTE3ODUwMzEsImlzcyI6IlJhcHBpIn0.BJpDsDeFzpGCUrvnHO1XJ4CDD99mVE7_NbZA-vIuXgk",
   "expiresIn": 43200
@@ -428,27 +402,25 @@
             </section>
 
             <section class="section-anchor" id="section-sandbox" aria-labelledby="h-sandbox">
-              <h2 id="h-sandbox">Sandbox Setup and Usage</h2>
+              <h2 id="h-sandbox">Sandbox: configuración y uso</h2>
 
               <article class="endpoint-block section-anchor" id="endpoint-testing-products" aria-labelledby="h-testing-products">
                 <h3 id="h-testing-products"><span class="method-badge">PUT</span> /api/cpgops-integrations/testing/products</h3>
                 <div class="doc-note doc-note--warn">
-                  This endpoint should <strong>ONLY</strong> be developed for the sandbox environment.
+                  Este endpoint debe desarrollarse <strong>solo</strong> para el ambiente de sandbox.
                 </div>
                 <p>
-                  Uploads a catalog of products to your Sandbox environment. Required to allow the creation of orders for
-                  development, testing automation, and QA. The upload performs an <strong>upsert</strong> on SKU
-                  (<code>retail_id</code>).
+                  Carga un catálogo de productos en su sandbox. Es necesario para crear pedidos de prueba en
+                  desarrollo, automatización y QA. La carga hace <strong>upsert</strong> por SKU (<code>retail_id</code>).
                 </p>
                 <div class="doc-note">
-                  <strong>Product catalog in Excel format:</strong> use the template provided by Rappi. The
-                  <code>.xlsx</code> must contain columns in this order: <strong>Name, Price, EAN, SKU, Description</strong>.
-                  The file must be smaller than <strong>2 MB</strong>, only <strong>one sheet</strong>. Uploaded data are
-                  added (they do not replace all previous data and cannot be deleted). An ID in the response message is
-                  your <code>{resultId}</code> for follow-up validation.
+                  <strong>Catálogo en Excel:</strong> use la plantilla proporcionada por Rappi. El <code>.xlsx</code> debe tener las
+                  columnas en este orden: <strong>Name, Price, EAN, SKU, Description</strong>. Tamaño máximo
+                  <strong>2 MB</strong>, solo <strong>una hoja</strong>. Los datos se acumulan (no borran el catálogo
+                  anterior). El ID en el mensaje de respuesta es el <code>{resultId}</code> para consultar el procesamiento.
                 </div>
                 <div class="code-block-wrap">
-                  <div class="code-block__bar"><span>Request (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
+                  <div class="code-block__bar"><span>Solicitud (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
                   <pre><code class="language-bash">curl --location --request PUT 'https://microservices.dev.rappi.com/api/cpgops-integrations/testing/products' \
 --header 'Authorization: {access-token}' \
 --header 'Accept: application/json' \
@@ -456,17 +428,17 @@
                 </div>
                 <div class="table-wrap">
                   <table class="api-doc-table">
-                    <thead><tr><th>Code</th><th>Response</th><th>Definition</th></tr></thead>
+                    <thead><tr><th>Código</th><th>Respuesta</th><th>Descripción</th></tr></thead>
                     <tbody>
-                      <tr><td>200</td><td>OK</td><td>Success — file uploaded</td></tr>
-                      <tr><td>400</td><td>Bad Request</td><td>Problem with the file (e.g. max file size is 2MB)</td></tr>
-                      <tr><td>401</td><td>Unauthorized</td><td>Invalid or expired token</td></tr>
-                      <tr><td>500</td><td>Internal Server Error</td><td>Server issue</td></tr>
+                      <tr><td>200</td><td>OK</td><td>Archivo recibido correctamente</td></tr>
+                      <tr><td>400</td><td>Bad Request</td><td>Problema en el archivo (p. ej. tamaño máximo 2 MB)</td></tr>
+                      <tr><td>401</td><td>Unauthorized</td><td>Token inválido o expirado</td></tr>
+                      <tr><td>500</td><td>Internal Server Error</td><td>Error en el servidor</td></tr>
                     </tbody>
                   </table>
                 </div>
                 <div class="code-block-wrap">
-                  <div class="code-block__bar"><span>Response example</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
+                  <div class="code-block__bar"><span>Ejemplo de respuesta</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
                   <pre><code class="language-json">{
   "code": 200,
   "message": "The file is being processed. Please check the results using the id 32"
@@ -476,22 +448,22 @@
 
               <article class="endpoint-block section-anchor" id="endpoint-upload-results" aria-labelledby="h-upload-results">
                 <h3 id="h-upload-results"><span class="method-badge">GET</span> /api/cpgops-integrations/testing/products/upload-results/{resultId}</h3>
-                <div class="doc-note doc-note--warn">Sandbox only.</div>
-                <p>Consult products uploaded to sandbox. <code>{resultId}</code> is returned when uploading the catalog.</p>
+                <div class="doc-note doc-note--warn">Solo sandbox.</div>
+                <p>Consulta los productos cargados en el sandbox. El <code>{resultId}</code> se devuelve en la subida del catálogo.</p>
                 <div class="code-block-wrap">
-                  <div class="code-block__bar"><span>Request (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
+                  <div class="code-block__bar"><span>Solicitud (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
                   <pre><code class="language-bash">curl --location 'https://microservices.dev.rappi.com/api/cpgops-integrations/testing/products/upload-results/{result_id}' \
 --header 'Authorization: {access_token}' \
 --header 'Accept: application/json'</code></pre>
                 </div>
-                <p class="muted">Response includes <code>finished</code>, <code>results.products</code>, and per-product details (see full sample in Rappi sandbox docs).</p>
+                <p class="muted">La respuesta incluye <code>finished</code>, <code>results.products</code> y detalle por producto (vea el ejemplo completo en la documentación de sandbox de Rappi).</p>
               </article>
 
               <article class="endpoint-block section-anchor" id="endpoint-testing-orders" aria-labelledby="h-testing-orders">
                 <h3 id="h-testing-orders"><span class="method-badge">POST</span> /api/cpgops-integrations/testing/orders</h3>
-                <div class="doc-note doc-note--warn">Sandbox only — create test orders for payment authorization tests.</div>
+                <div class="doc-note doc-note--warn">Solo sandbox — crea pedidos de prueba para flujos de autorización.</div>
                 <div class="code-block-wrap">
-                  <div class="code-block__bar"><span>Request (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
+                  <div class="code-block__bar"><span>Solicitud (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
                   <pre><code class="language-bash">curl --location 'https://microservices.dev.rappi.com/api/cpgops-integrations/testing/orders' \
 --header 'Content-Type: application/json' \
 --header 'X-Rappi-Channel: B2B' \
@@ -499,28 +471,28 @@
 --data '{"store_id": "{store_id}"}'</code></pre>
                 </div>
                 <p>
-                  The response body includes multiple scenarios (e.g. <code>valid</code>, <code>invalid_state</code>,
+                  El cuerpo de respuesta incluye varios escenarios (p. ej. <code>valid</code>, <code>invalid_state</code>,
                   <code>invalid_storekeeper</code>, <code>different_retailer</code>, <code>invalid_high_price</code>,
-                  <code>invalid_low_price</code>) each with <code>basket</code>, <code>order_id</code>, and
-                  <code>shopper_id</code>. Use the scenario your integration engineer indicates.
+                  <code>invalid_low_price</code>), cada uno con <code>basket</code>, <code>order_id</code> y
+                  <code>shopper_id</code>. Use el escenario indicado por el ingeniero de integración.
                 </p>
               </article>
 
               <article class="endpoint-block section-anchor" id="endpoint-test-barcode" aria-labelledby="h-test-barcode">
                 <h3 id="h-test-barcode"><span class="method-badge">GET</span> /api/cpgops-integrations/pos/orders/{order_id}/barcode</h3>
-                <div class="doc-note doc-note--warn">Sandbox only.</div>
+                <div class="doc-note doc-note--warn">Solo sandbox.</div>
                 <p>
-                  Returns the barcode generated for Payless tests. Code length is configurable between 6 and 13 digits per
-                  partner. If using an online barcode generator, use <strong>CODE-128</strong>.
+                  Devuelve el código de barras generado para pruebas Payless. La longitud del código es configurable entre 6 y
+                  13 dígitos por socio. Si usa un generador en línea, utilice <strong>CODE-128</strong>.
                 </p>
                 <div class="code-block-wrap">
-                  <div class="code-block__bar"><span>Request (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
+                  <div class="code-block__bar"><span>Solicitud (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
                   <pre><code class="language-bash">curl --location 'https://microservices.dev.rappi.com/api/cpgops-integrations/pos/orders/{order_id}/barcode' \
 --header 'authorization: {access-token}' \
 --header 'auth_user: {user}'</code></pre>
                 </div>
                 <div class="code-block-wrap">
-                  <div class="code-block__bar"><span>Response example</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
+                  <div class="code-block__bar"><span>Ejemplo de respuesta</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
                   <pre><code class="language-json">{
   "id": "21440220",
   "order_id": "317101",
@@ -538,58 +510,58 @@
                 </div>
               </article>
 
-              <h3 id="section-order-details">Get order details (DEV — PROD)</h3>
+              <h3 id="section-order-details">Obtener detalles del pedido (DEV — PROD)</h3>
               <div class="doc-note doc-note--warn">
-                Keep in mind that there's a possibility in each order that <strong>all fields</strong> in the response body
-                can return as <code>null</code>. This endpoint <strong>can't be used after authorization</strong>.
+                En cualquier pedido, <strong>todos los campos</strong> del cuerpo de respuesta pueden llegar a <code>null</code>. Este
+                endpoint <strong>no puede usarse después de la autorización</strong> de pago.
               </div>
-              <p>Must be used before requesting payment authorization. Contains basket (SKU, price, units, etc.), <code>order_id</code>, <code>store_id</code>, and customer when required by POS.</p>
+              <p>Debe llamarse antes de la solicitud de autorización. Incluye carrito (SKU, precio, unidades, etc.), <code>order_id</code>, <code>store_id</code> y cliente cuando el POS lo necesite.</p>
               <div class="doc-note doc-note--warn">
-                <strong>Loyalty / simple discounts:</strong> Rappi provides <code>customer.identification</code> as the
-                validated user's loyalty id when non-null — load it into the POS so loyalty discounts apply correctly.
+                <strong>Fidelidad / descuentos simples:</strong> Rappi envía en <code>customer.identification</code> el
+                identificador de fidelidad del usuario validado cuando no es nulo — cárguelo en el POS para aplicar descuentos de fidelidad correctamente.
               </div>
               <article class="endpoint-block" id="endpoint-order-by-barcode" aria-labelledby="h-order-by-barcode">
                 <h3 id="h-order-by-barcode"><span class="method-badge">GET</span> /api/cpgops-integrations/pos/v3/payments/{barcode}/order</h3>
                 <div class="code-block-wrap">
-                  <div class="code-block__bar"><span>Request (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
+                  <div class="code-block__bar"><span>Solicitud (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
                   <pre><code class="language-bash">curl --location 'https://microservices.dev.rappi.com/api/cpgops-integrations/pos/v3/payments/{barcode}/order' \
 --header 'Authorization: {access-token}'</code></pre>
                 </div>
-                <p class="muted">Headers may include <code>AUTH_USER</code> / <code>user</code> as required by your integration contract.</p>
-                <p>Example response shape: <code>order_id</code>, <code>currency</code>, <code>amount</code>, <code>store_id</code>, <code>customer</code>, <code>delivery_address</code>, <code>basket[]</code> with unit prices and totals.</p>
+                <p class="muted">Los encabezados pueden incluir <code>AUTH_USER</code> / <code>user</code> según el contrato de integración.</p>
+                <p>Forma típica de la respuesta: <code>order_id</code>, <code>currency</code>, <code>amount</code>, <code>store_id</code>, <code>customer</code>, <code>delivery_address</code>, <code>basket[]</code> con precios unitarios y totales.</p>
               </article>
 
-              <h3>User invoice information (PROD only)</h3>
+              <h3>Información de factura del usuario (solo PROD)</h3>
               <div class="doc-note doc-note--warn">
-                Invoice fields may be null — Rappi does not force users to input this data. If null or empty, invoice as
-                &quot;final consumer&quot; / &quot;anonymous&quot;. Electronic invoice data may appear on
-                <code>customer.electroninc_invoice_*</code> fields (spelling per API).
+                Los campos de factura pueden ser nulos — Rappi no obliga al usuario a completar estos datos. Si son nulos
+                o vacíos, emita factura a «consumidor final» / «anónimo». Los datos de factura electrónica pueden venir en
+                <code>customer.electroninc_invoice_*</code> (ortografía según la API).
               </div>
             </section>
 
             <section class="section-anchor" id="section-authorize" aria-labelledby="h-authorize">
-              <h2 id="h-authorize">Authorization Payments with Payless (DEV - PROD)</h2>
+              <h2 id="h-authorize">Autorización de pagos con Payless (DEV - PROD)</h2>
               <p>
-                Request payment authorization using the barcode from the RT/Shopper. On success, a transaction code
-                confirms authorization. <code>store_id</code> must match Rappi inventory integration.
-                <code>terminal_id</code> and <code>terminal_transaction_id</code> are partner-unique identifiers.
+                Solicita la autorización de pago con el código de barras del RT/picker. En caso de éxito, un código de
+                transacción confirma la autorización. El <code>store_id</code> debe coincidir con la integración de inventario
+                Rappi. <code>terminal_id</code> y <code>terminal_transaction_id</code> son identificadores únicos del socio.
               </p>
               <p>
-                <strong>Basket</strong> is mandatory: all products scanned at the register. <strong>Metadata</strong> is
-                free-form. <strong>Amount</strong> is the final total after discounts aligned with inventory integration.
+                El <strong>carrito (basket)</strong> es obligatorio: todos los productos registrados en caja. <strong>Metadata</strong>
+                es libre. El <strong>amount</strong> es el total final tras descuentos, alineado con la integración de inventario.
               </p>
-              <h3>What is basket?</h3>
+              <h3>¿Qué es el basket?</h3>
               <ul>
-                <li><code>sku</code> must match Rappi inventory integration.</li>
-                <li><code>quantity</code>: units count, or <strong>weight in KG</strong> for weighables.</li>
-                <li><code>unit_type</code>: same as inventory — <code>U</code> (unit), <code>WW</code> (loose weighable), <code>WB</code> (packaged weighable).</li>
-                <li><code>taxes</code>: description per line (e.g. IVA 19%) for financial conciliation.</li>
-                <li>Group identical lines; tax amounts must reflect grouped lines.</li>
+                <li><code>sku</code> debe coincidir con el inventario Rappi.</li>
+                <li><code>quantity</code>: número de unidades o <strong>peso en KG</strong> para pesables.</li>
+                <li><code>unit_type</code>: igual al inventario — <code>U</code> (unidad), <code>WW</code> (pesable suelto), <code>WB</code> (pesable empaquetado).</li>
+                <li><code>taxes</code>: descripción por línea (p. ej. IVA 19%) para conciliación financiera.</li>
+                <li>Agrupe líneas idénticas; los impuestos deben reflejar el agrupamiento.</li>
               </ul>
               <article class="endpoint-block" id="endpoint-authorize" aria-labelledby="h-endpoint-authorize">
                 <h3 id="h-endpoint-authorize"><span class="method-badge">POST</span> /api/cpgops-integrations/pos/v3/payments/{barcode}/authorize</h3>
                 <div class="code-block-wrap">
-                  <div class="code-block__bar"><span>Authorization request (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
+                  <div class="code-block__bar"><span>Solicitud de autorización (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
                   <pre><code class="language-bash">curl --location 'https://microservices.dev.rappi.com/api/cpgops-integrations/pos/v3/payments/{barcode}/authorize' \
 --header 'Content-Type: application/json' \
 --header 'X-Rappi-Channel: B2B' \
@@ -620,146 +592,146 @@
                 </div>
               </article>
 
-              <h3 id="h-errors">HTTP responses and troubleshooting</h3>
+              <h3 id="h-errors">Respuestas HTTP y resolución de problemas</h3>
               <div class="table-wrap">
                 <table class="api-doc-table">
-                  <thead><tr><th>Code</th><th>Meaning</th></tr></thead>
+                  <thead><tr><th>Código</th><th>Significado</th></tr></thead>
                   <tbody>
-                    <tr><td>200</td><td>Authorization successful</td></tr>
-                    <tr><td>400</td><td>Body error</td></tr>
-                    <tr><td>401</td><td>Invalid or expired token</td></tr>
-                    <tr><td>403</td><td>Store does not belong to the partner</td></tr>
-                    <tr><td>404</td><td>Barcode missing, expired, or used for another order</td></tr>
-                    <tr><td>406</td><td>Price difference vs Rappi order vs ally authorization amount</td></tr>
-                    <tr><td>409</td><td>Duplicate transaction</td></tr>
-                    <tr><td>410</td><td>Wrong store</td></tr>
-                    <tr><td>412</td><td>Already authorized with another payment method</td></tr>
-                    <tr><td>413</td><td>POS basket vs Rappi app products mismatch</td></tr>
-                    <tr><td>500</td><td>Server error</td></tr>
+                    <tr><td>200</td><td>Autorización exitosa</td></tr>
+                    <tr><td>400</td><td>Error en el cuerpo de la solicitud</td></tr>
+                    <tr><td>401</td><td>Token inválido o expirado</td></tr>
+                    <tr><td>403</td><td>La tienda no pertenece al socio</td></tr>
+                    <tr><td>404</td><td>Código de barras inexistente, expirado o ya usado</td></tr>
+                    <tr><td>406</td><td>Diferencia de precio entre pedido Rappi y monto de autorización</td></tr>
+                    <tr><td>409</td><td>Transacción duplicada</td></tr>
+                    <tr><td>410</td><td>Tienda incorrecta</td></tr>
+                    <tr><td>412</td><td>Ya autorizado con otro método de pago</td></tr>
+                    <tr><td>413</td><td>El carrito en el POS no coincide con el pedido en la app</td></tr>
+                    <tr><td>500</td><td>Error en el servidor</td></tr>
                   </tbody>
                 </table>
               </div>
-              <h4>I got an error, what should I do?</h4>
+              <h4>Recibí un error — ¿qué hacer?</h4>
               <div class="table-wrap">
                 <table class="api-doc-table">
-                  <thead><tr><th>Code</th><th>Action</th></tr></thead>
+                  <thead><tr><th>Código</th><th>Acción</th></tr></thead>
                   <tbody>
-                    <tr><td>400</td><td>Contact Rappi Tech Team</td></tr>
-                    <tr><td>401</td><td>Check token or generate a new one</td></tr>
-                    <tr><td>403</td><td>RT must go to the correct partner</td></tr>
-                    <tr><td>404</td><td>RT must show a new barcode</td></tr>
-                    <tr><td>406</td><td>Verify amount/products with RT or rescan</td></tr>
-                    <tr><td>409</td><td><code>terminal_id</code> / <code>terminal_transaction_id</code> / <code>store_id</code> already used on another order</td></tr>
-                    <tr><td>410</td><td>RT must go to the correct store</td></tr>
-                    <tr><td>412</td><td>Order already paid another way — RT should proceed with delivery per instructions</td></tr>
-                    <tr><td>413</td><td>Scanned products must match Rappi order list</td></tr>
-                    <tr><td>500</td><td>Contact Rappi Tech Team</td></tr>
+                    <tr><td>400</td><td>Contacte al equipo técnico de Rappi</td></tr>
+                    <tr><td>401</td><td>Verifique el token o genere uno nuevo</td></tr>
+                    <tr><td>403</td><td>El RT debe dirigirse al socio correcto</td></tr>
+                    <tr><td>404</td><td>El RT debe mostrar un código de barras nuevo</td></tr>
+                    <tr><td>406</td><td>Confirme monto/productos con el RT o vuelva a registrar</td></tr>
+                    <tr><td>409</td><td><code>terminal_id</code> / <code>terminal_transaction_id</code> / <code>store_id</code> ya usados en otro pedido</td></tr>
+                    <tr><td>410</td><td>El RT debe ir a la tienda correcta</td></tr>
+                    <tr><td>412</td><td>Pedido ya pagado por otro medio — el RT sigue la entrega según instrucciones</td></tr>
+                    <tr><td>413</td><td>Los productos registrados deben coincidir con la lista en la app</td></tr>
+                    <tr><td>500</td><td>Contacte al equipo técnico de Rappi</td></tr>
                   </tbody>
                 </table>
               </div>
-              <p class="muted">Successful responses return status such as <code>payment_authorization_request_succeeded</code> with <code>transactions[]</code> including <code>authorization_code</code> and <code>payment_code</code>.</p>
+              <p class="muted">Las respuestas de éxito incluyen estado como <code>payment_authorization_request_succeeded</code> con <code>transactions[]</code> que contienen <code>authorization_code</code> y <code>payment_code</code>.</p>
             </section>
 
             <section class="section-anchor" id="section-price-match" aria-labelledby="h-price-match">
-              <h2 id="h-price-match">[PRICE MATCH VERSION] Authorization Payments with Payless (DEV - PROD)</h2>
+              <h2 id="h-price-match">[VERSIÓN PRICE MATCH] Autorización de pagos con Payless (DEV - PROD)</h2>
               <div class="doc-note doc-note--warn">
-                Develop this flow <strong>only</strong> if your Integration Engineer instructs you. If you were told to
-                implement the legacy flow, follow the separate legacy documentation link provided by Rappi.
+                Desarrolle este flujo <strong>solo</strong> si el ingeniero de integración lo indica. Si le indicaron el
+                flujo legado, siga la documentación legada proporcionada por Rappi.
               </div>
-              <p>Same authorize endpoint; additional rules apply for basket and pricing alignment with Rappi order details.</p>
+              <p>Es el mismo endpoint de autorización; aplican reglas extra de carrito y precios alineados a los detalles del pedido Rappi.</p>
               <h3>Price Match</h3>
               <p>
-                The partner must retrieve prices from Rappi (order details), overwrite POS-scanned prices during payment,
-                and print the fiscal receipt using overwritten prices.
+                El socio debe obtener los precios de la app Rappi (detalles del pedido), sobrescribirlos en el POS durante el pago e
+                imprimir el documento fiscal con los precios alineados.
               </p>
-              <h4>Considerations</h4>
+              <h4>Consideraciones</h4>
               <ul>
-                <li>Do not process Payless sales without this feature when Price Match is in scope.</li>
-                <li>Replacement is not always possible (e.g. approximate weighable packs) — store price may remain.</li>
-                <li>Items only on POS and not on the Rappi order: scan with store price and include in authorization basket.</li>
-                <li>Items only on Rappi and not scanned: do not process; do not include in authorization basket.</li>
+                <li>Con Price Match en alcance, no procese ventas Payless sin esta capacidad.</li>
+                <li>No siempre es posible alinear (p. ej. pesables con empaque aproximado) — puede mantener el precio de tienda.</li>
+                <li>Ítems solo en el POS y fuera del pedido Rappi: regístrelos con precio de tienda e inclúyalos en el carrito de autorización.</li>
+                <li>Ítems solo en el pedido Rappi y no registrados: no procese; no los incluya en el carrito de autorización.</li>
               </ul>
-              <h4>Price Match logic</h4>
+              <h4>Lógica de Price Match</h4>
               <ul>
-                <li>If SKU (or EAN) <strong>does not</strong> match: use POS price and POS unit price.</li>
-                <li>If they <strong>do</strong> match — unit product: use Rappi's price and unit price.</li>
-                <li>If they match — weighable: use Rappi's price per kg; calculated line = Rappi price (kg) × quantity scanned at POS.</li>
+                <li>Si SKU (o EAN) <strong>no</strong> coincide: use precio y precio unitario del POS.</li>
+                <li>Si <strong>coincide</strong> — producto unitario: use precio y precio unitario Rappi.</li>
+                <li>Si coincide — pesable: use precio por kg Rappi; línea = precio (kg) Rappi × cantidad registrada en el POS.</li>
               </ul>
               <div class="doc-note">
-                <strong>Note:</strong> Calculated price = Rappi price (kg) × quantity scanned at POS (see weighable figure in journey section).
+                <strong>Nota:</strong> precio calculado = precio Rappi (kg) × cantidad en el POS (vea la figura de pesable en la trayectoria).
               </div>
-              <h4>Example cases (summary)</h4>
+              <h4>Ejemplos (resumen)</h4>
               <ol>
-                <li><strong>Case 1:</strong> Two products, both match, Rappi higher — take both prices from Rappi.</li>
-                <li><strong>Case 2:</strong> One line doesn't match — only matching SKUs use Rappi price.</li>
-                <li><strong>Case 3:</strong> One Rappi line, two POS lines, match where applicable — Rappi wins on matching EAN/SKU; others use POS.</li>
-                <li><strong>Case 4:</strong> Different unit counts (chat/fraud risk) — use POS units and adjust total; authorization may block until picker adjusts.</li>
-                <li><strong>Case 5:</strong> Weighable differences — final = Rappi kg price × POS weight.</li>
+                <li><strong>Caso 1:</strong> dos productos, ambos hacen match, Rappi más caro — use precios Rappi en ambos.</li>
+                <li><strong>Caso 2:</strong> una línea no hace match — solo SKUs coincidentes usan precio Rappi.</li>
+                <li><strong>Caso 3:</strong> una línea Rappi, dos en el POS — Rappi gana donde hay match; resto POS.</li>
+                <li><strong>Caso 4:</strong> conteos de unidades distintos (riesgo chat/fraude) — use unidades POS y ajuste el total; puede bloquear hasta que el picker corrija.</li>
+                <li><strong>Caso 5:</strong> diferencias en pesables — final = precio kg Rappi × peso en el POS.</li>
               </ol>
-              <p>Use the same <code>POST .../authorize</code> request shape as the standard flow.</p>
+              <p>Use la misma forma de solicitud <code>POST .../authorize</code> del flujo estándar.</p>
             </section>
 
             <section class="section-anchor" id="section-validate" aria-labelledby="h-validate">
-              <h2 id="h-validate">Validation Payment Endpoint</h2>
-              <p>When communication breaks and the POS is unsure if authorization succeeded, validate payment status for the order.</p>
+              <h2 id="h-validate">Endpoint de validación de pago</h2>
+              <p>Cuando falla la comunicación y el POS no sabe si la autorización tuvo éxito, valide el estado del pago del pedido.</p>
               <article class="endpoint-block" id="endpoint-validate-status" aria-labelledby="h-validate-status">
                 <h3 id="h-validate-status"><span class="method-badge">GET</span> /api/cpgops-integrations/pos/v3/payments/orders/{order_id}/status</h3>
-                <p>Must be used <strong>after</strong> requesting authorization (errors if used before).</p>
+                <p>Debe usarse <strong>después</strong> de la solicitud de autorización (error si se usa antes).</p>
                 <div class="code-block-wrap">
-                  <div class="code-block__bar"><span>Request (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
+                  <div class="code-block__bar"><span>Solicitud (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
                   <pre><code class="language-bash">curl --location 'https://microservices.dev.rappi.com/api/cpgops-integrations/pos/v3/payments/orders/{order_id}/status' \
 --header 'Authorization: {access-token}'</code></pre>
                 </div>
-                <p class="muted">Response includes payment status, basket snapshot, authorization code, store and terminal identifiers, etc.</p>
+                <p class="muted">La respuesta incluye estado del pago, carrito, código de autorización, identificadores de tienda y terminal, etc.</p>
               </article>
             </section>
 
             <section class="section-anchor" id="section-cancel" aria-labelledby="h-cancel">
-              <h2 id="h-cancel">Cancellation Transactions (DEV - PROD)</h2>
+              <h2 id="h-cancel">Cancelación de transacciones (DEV - PROD)</h2>
               <div class="doc-note">
-                <strong>Important:</strong> After calling cancel, support paying again via Payless or another method. The
-                cancellation endpoint cancels the <strong>authorization</strong>, not the Rappi order.
+                <strong>Importante:</strong> tras cancelar, mantenga flujo para volver a pagar con Payless u otro método. La
+                cancelación revierte la <strong>autorización</strong>, no el pedido Rappi.
               </div>
               <p>
-                Use when Rappi authorized Payless but the success response never reached the POS (risk of double payment
-                with dispersion/card). Do not print nor hand over products until status is clear. Recommended:
-                <strong>at least 5 retries</strong> after <strong>20 seconds</strong> without response before deciding.
+                Úselo cuando Rappi autorizó Payless pero la respuesta de éxito no llegó al POS (riesgo de doble pago
+                con dispersión/tarjeta). No imprima ni entregue productos hasta que el estado quede claro. Se recomienda
+                <strong>al menos 5 reintentos</strong> tras <strong>20 segundos</strong> sin respuesta antes de decidir.
               </p>
               <div class="doc-note doc-note--warn">
-                Store <code>order_id</code> and barcode on successful authorization. JSON body must match the authorization
-                request. Same-day only (until 23:59:59 GMT 0).
+                Guarde <code>order_id</code> y código de barras tras autorización exitosa. El JSON debe coincidir con la
+                solicitud de autorización. Solo el mismo día (hasta 23:59:59 GMT 0).
               </div>
               <article class="endpoint-block" id="endpoint-cancel" aria-labelledby="h-endpoint-cancel">
                 <h3 id="h-endpoint-cancel"><span class="method-badge">POST</span> /api/cpgops-integrations/pos/v3/payments/{barcode}/cancel</h3>
-                <p>Same body shape as authorize (plus <code>order_id</code> where required by your contract — confirm with Rappi).</p>
+                <p>Misma estructura de cuerpo que authorize (más <code>order_id</code> si el contrato lo exige — confirme con Rappi).</p>
                 <div class="code-block-wrap">
-                  <div class="code-block__bar"><span>Request (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
+                  <div class="code-block__bar"><span>Solicitud (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
                   <pre><code class="language-bash">curl --location 'https://microservices.dev.rappi.com/api/cpgops-integrations/pos/v3/payments/{barcode}/cancel' \
 --header 'Content-Type: application/json' \
 --header 'X-Rappi-Channel: B2B' \
 --header 'Authorization: {access-token}' \
---data '{ ... same fields as authorize ... }'</code></pre>
+--data '{ ... mismos campos que authorize ... }'</code></pre>
                 </div>
-                <p class="muted">On success, status may progress through cancellation transaction types documented in Rappi specs.</p>
+                <p class="muted">En éxito, el estado puede evolucionar por tipos de transacción de cancelación descritos en las especificaciones de Rappi.</p>
               </article>
             </section>
 
             <section class="section-anchor" id="section-refund" aria-labelledby="h-refund">
-              <h2 id="h-refund">Refunds Transactions (DEV - PROD)</h2>
+              <h2 id="h-refund">Reembolsos (DEV - PROD)</h2>
               <div class="doc-note">
-                Order must be previously authorized; follow cancellation rules for the operational journey. Returns process
-                supports <strong>full returns</strong> only at this time.
+                El pedido debe estar previamente autorizado; siga las reglas de cancelación en el recorrido operativo. En este
+                momento solo se admiten <strong>reembolsos totales</strong>.
               </div>
               <ul>
-                <li>Use same <code>store_id</code>, <code>terminal_id</code>, <code>terminal_transaction_id</code> as authorization.</li>
-                <li>Body must match authorization; full refund uses empty basket <code>[]</code> per spec.</li>
-                <li>Same day as authorization; same barcode as successful authorization.</li>
-                <li>Full refund when order is canceled and RT returns product to store — not for end-customer returns.</li>
+                <li>Use los mismos <code>store_id</code>, <code>terminal_id</code>, <code>terminal_transaction_id</code> de la autorización.</li>
+                <li>El cuerpo debe coincidir con la autorización; el reembolso total usa carrito vacío <code>[]</code> según la especificación.</li>
+                <li>El mismo día de la autorización; mismo código de barras de la autorización exitosa.</li>
+                <li>Reembolso total cuando el pedido se cancela y el RT devuelve productos a la tienda — no para devoluciones del consumidor final.</li>
               </ul>
               <article class="endpoint-block" id="endpoint-refund" aria-labelledby="h-endpoint-refund">
                 <h3 id="h-endpoint-refund"><span class="method-badge">POST</span> /api/cpgops-integrations/pos/v3/payments/{barcode}/refund</h3>
                 <div class="code-block-wrap">
-                  <div class="code-block__bar"><span>Request (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
+                  <div class="code-block__bar"><span>Solicitud (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
                   <pre><code class="language-bash">curl --location 'https://microservices.dev.rappi.com/api/cpgops-integrations/pos/v3/payments/{barcode}/refund' \
 --header 'Content-Type: application/json' \
 --header 'X-Rappi-Channel: B2B' \
@@ -779,14 +751,14 @@
                 </div>
                 <div class="table-wrap">
                   <table class="api-doc-table">
-                    <thead><tr><th>Code</th><th>Meaning (summary)</th></tr></thead>
+                    <thead><tr><th>Código</th><th>Significado (resumen)</th></tr></thead>
                     <tbody>
-                      <tr><td>200</td><td>Refund processed</td></tr>
-                      <tr><td>400</td><td>Barcode mismatch, missing prior authorization, body mismatch, or missing order_id</td></tr>
-                      <tr><td>401</td><td>Unauthorized</td></tr>
-                      <tr><td>403</td><td>Forbidden</td></tr>
-                      <tr><td>406 / 409 / 410 / 412 / 413</td><td>Same family as authorization errors</td></tr>
-                      <tr><td>500</td><td>Server error</td></tr>
+                      <tr><td>200</td><td>Reembolso procesado</td></tr>
+                      <tr><td>400</td><td>Código de barras incorrecto, falta de autorización previa, cuerpo distinto o falta <code>order_id</code></td></tr>
+                      <tr><td>401</td><td>No autorizado</td></tr>
+                      <tr><td>403</td><td>Prohibido</td></tr>
+                      <tr><td>406 / 409 / 410 / 412 / 413</td><td>Familia de errores similar a la autorización</td></tr>
+                      <tr><td>500</td><td>Error en el servidor</td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -794,63 +766,63 @@
             </section>
 
             <section class="section-anchor" id="section-conciliation" aria-labelledby="h-conciliation">
-              <h2 id="h-conciliation">Payment List &amp; Conciliation (DEV - PROD)</h2>
+              <h2 id="h-conciliation">Lista de pagos y conciliación (DEV - PROD)</h2>
               <p>
-                Two sources: <strong>Payment List</strong> API and per-order <strong>order details</strong> / stored fields.
-                The transactions list is informational; the <strong>Conciliation Report</strong> is the source of truth.
+                Dos fuentes: API de <strong>lista de pagos</strong> y <strong>detalles del pedido</strong> / campos
+                guardados por transacción. La lista informativa no sustituye el <strong>informe de conciliación</strong>, que es la fuente de verdad.
               </p>
               <figure class="content-figure">
-                <img src="../../assets/img/payless/conciliation-report-sample.png" alt="Sample Rappi partner sales reconciliation report" loading="lazy" />
-                <figcaption>Exemplo visual de relatório de vendas / conciliação (referência para campos de totais e ajustes).</figcaption>
+                <img src="../../assets/img/payless/conciliation-report-sample.png" alt="Ejemplo de informe de ventas y conciliación para socios Rappi" loading="lazy" />
+                <figcaption>Ejemplo visual de informe de ventas / conciliación (totales y ajustes).</figcaption>
               </figure>
               <article class="endpoint-block" id="endpoint-payment-list" aria-labelledby="h-payment-list">
                 <h3 id="h-payment-list"><span class="method-badge">GET</span> /api/cpgops-integrations/pos/v3/payments</h3>
                 <p>
-                  Returns payments from the last 24 hours by default, up to <strong>500</strong> per request. Same-day
-                  transactions may appear on <strong>T+1</strong>. Use <code>start_date</code> and <code>end_date</code>
-                  (YYYY-MM-DD) with <code>limit</code> (1–500) and <code>skip</code> for paging.
+                  Por defecto devuelve pagos de las últimas 24 horas, hasta <strong>500</strong> por solicitud. Las transacciones del
+                  mismo día pueden aparecer en <strong>D+1</strong>. Use <code>start_date</code> y <code>end_date</code>
+                  (AAAA-MM-DD) con <code>limit</code> (1–500) y <code>skip</code> para paginación.
                 </p>
                 <div class="code-block-wrap">
-                  <div class="code-block__bar"><span>Request (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
+                  <div class="code-block__bar"><span>Solicitud (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
                   <pre><code class="language-bash">curl --location 'https://microservices.dev.rappi.com/api/cpgops-integrations/pos/v3/payments?start_date=2024-02-16&amp;end_date=2024-02-17&amp;limit=500&amp;skip=0' \
 --header 'Authorization: {access_token}' \
 --header 'Accept: application/json' \
 --header 'x-rappi-channel: B2B'</code></pre>
                 </div>
-                <p>Store for conciliation: <code>order_id</code>, <code>amount</code>, <code>store_id</code>, barcode / payment code, authorization code, status, <code>created_at</code> / <code>updated_at</code> (GMT 0).</p>
+                <p>Guarde para conciliación: <code>order_id</code>, <code>amount</code>, <code>store_id</code>, código de barras / código de pago, código de autorización, estado, <code>created_at</code> / <code>updated_at</code> (GMT 0).</p>
               </article>
               <p>
-                <a href="https://docs.google.com/spreadsheets/d/1ZR4h3ey5HwP0Mvk1a0jvhJVrZuetHax_/edit?usp=sharing&amp;ouid=110445571986835893108&amp;rtpof=true&amp;sd=true" rel="noopener noreferrer">Download the conciliation template (Google Sheets)</a>.
+                <a href="https://docs.google.com/spreadsheets/d/1ZR4h3ey5HwP0Mvk1a0jvhJVrZuetHax_/edit?usp=sharing&amp;ouid=110445571986835893108&amp;rtpof=true&amp;sd=true" rel="noopener noreferrer">Descargar plantilla de conciliación (Google Sheets)</a>.
               </p>
-              <h3>Per-order storage</h3>
-              <p>After successful authorize, persist amount, barcode, authorization code, status, and timestamps (GMT 0) for clean conciliation.</p>
+              <h3>Almacenamiento por pedido</h3>
+              <p>Tras autorización exitosa, persista monto, código de barras, código de autorización, estado y marcas de tiempo (GMT 0) para una conciliación limpia.</p>
             </section>
 
             <section class="section-anchor" id="section-heartbeat" aria-labelledby="h-heartbeat">
-              <h2 id="h-heartbeat">Heartbeat System</h2>
-              <p>Lightweight monitoring to verify store connectivity and Payless availability, and to apply on/off rules between calls.</p>
+              <h2 id="h-heartbeat">Sistema heartbeat</h2>
+              <p>Monitorización ligera para confirmar conectividad de la tienda y disponibilidad Payless, y aplicar reglas de encendido/apagado entre llamadas.</p>
               <article class="endpoint-block" id="endpoint-heartbeat" aria-labelledby="h-heartbeat-auth">
                 <h3 id="h-heartbeat-auth"><span class="method-badge">POST</span> /api/cpgops-integrations/pos/v3/heartbeat/authorize</h3>
                 <div class="code-block-wrap">
-                  <div class="code-block__bar"><span>Request (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
+                  <div class="code-block__bar"><span>Solicitud (curl)</span><button type="button" class="btn btn--ghost copy-btn">Copiar</button></div>
                   <pre><code class="language-bash">curl --location 'https://microservices.dev.rappi.com/api/cpgops-integrations/pos/v3/heartbeat/authorize' \
 --header 'Content-Type: application/json' \
 --header 'X-Rappi-Channel: B2B' \
 --header 'Authorization: {access-token}' \
 --data '{"store_id":"{store_id}","terminal_id":"{terminal_id}"}'</code></pre>
                 </div>
-                <p class="muted">200 returns <code>status: successful</code> with store and terminal echo; 404/500 indicate service issues.</p>
+                <p class="muted">HTTP 200 con <code>status: successful</code> y eco de tienda/terminal; 404/500 indican problemas de servicio.</p>
               </article>
             </section>
 
             <section class="section-anchor" id="section-smart-prices" aria-labelledby="h-smart-prices">
-              <h2 id="h-smart-prices">Smart Prices - Get List of Active orders</h2>
+              <h2 id="h-smart-prices">Smart Prices — lista de pedidos activos</h2>
               <div class="doc-note doc-note--warn">
-                Active orders: courier is at the store and finished picking — allows building the authorization with extra
-                time vs the regular Payless flow. Confirm <code>partner_store_id</code> format with Rappi. Respect rate
-                limits; barcodes expire — consider a dedicated register for Rappi orders.
+                Pedidos activos: el repartidor ya está en la tienda y terminó el picking — permite armar la autorización con más
+                margen de tiempo frente al flujo Payless habitual. Confirme el formato de <code>partner_store_id</code> con
+                Rappi. Respete límites de tasa; los códigos expiran — considere una caja dedicada a pedidos Rappi.
               </div>
-              <p>Documented patterns include <code>GET /api/cpgops-integrations/pos/v3/payments/{partner_store_id}/orders</code> and internal gateway variants — <strong>confirm the exact URL and credentials</strong> enabled for your account with Rappi.</p>
+              <p>Hay patrones documentados como <code>GET /api/cpgops-integrations/pos/v3/payments/{partner_store_id}/orders</code> y variantes en gateway interno — <strong>confirme URL y credenciales</strong> activas en su cuenta con Rappi.</p>
             </section>
 
           </div>
@@ -872,7 +844,7 @@
       <form id="credentials-form">
         <div class="modal__field">
           <label for="field-api-key">Clave de API</label>
-          <input type="password" id="field-api-key" name="apiKey" autocomplete="off" spellcheck="false" placeholder="Tu clave" />
+          <input type="password" id="field-api-key" name="apiKey" autocomplete="off" spellcheck="false" placeholder="Su clave" />
         </div>
         <div class="modal__field">
           <label for="field-store-id">ID de tienda</label>
@@ -893,7 +865,7 @@
         </div>
       </form>
       <p class="modal__note">
-        Solo se guarda en sessionStorage en esta pestaña. Este sitio no envía datos a servidores externos.
+        Almacenado solo en sessionStorage en esta pestaña. Nada se envía a servidores externos desde este sitio.
       </p>
     </div>
 
