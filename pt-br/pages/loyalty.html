@@ -8,7 +8,7 @@
         document.documentElement.setAttribute('data-theme', localStorage.getItem('docs-theme') || 'light');
       } catch (e) {}
     </script>
-    <title>Loyalty — Documentação</title>
+    <title>Guia de integração Loyalty — Documentação</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
@@ -33,15 +33,15 @@
                 Modo escuro
               </button>
               <nav class="sidebar__nav" aria-label="Nesta página">
-                <a href="#section-loyalty-requirements">Requisitos para programa de fidelidade</a>
-                <a href="#section-endpoints">Endpoints</a>
-                <a href="#section-relevant-flows">Fluxos relevantes</a>
-                <a href="#section-guide">Guia</a>
+                <a href="#section-integration-guide">Guia de integração Loyalty</a>
+                <a href="#section-differentiated-discounts">Descontos diferenciados</a>
+                <a href="#section-user-validation">Validação de usuário</a>
+                <a href="#section-new-user-registration">Cadastro de novo usuário</a>
               </nav>
             </div>
             <div class="sidebar__bottom">
               <div class="sidebar__cred-wrap">
-                <span class="credentials-badge" data-credentials-badge hidden>Credentials set</span>
+                <span class="credentials-badge" data-credentials-badge hidden>Credenciais definidas</span>
               </div>
               <a href="../index.html" class="btn btn--ghost" data-page-link style="text-align: center">← Todas as APIs</a>
             </div>
@@ -50,54 +50,517 @@
         <main class="api-main" id="main">
           <div id="api-content-root">
             <header class="api-main__header">
-              <h1>Loyalty</h1>
-              <p class="lead">Programa de fidelidade vinculado às compras feitas via Rappi.</p>
+              <h1>Guia de integração Loyalty</h1>
+              <p class="lead">
+                Descontos diferenciados, banner de fidelidade, mapeamento no inventário (Payless / Open Orders), validação
+                de usuário e fluxos de cadastro de novos usuários para parceiros Rappi.
+              </p>
             </header>
 
-            <section class="section-anchor" id="section-loyalty-requirements" aria-labelledby="h-loyalty-requirements">
-              <h2 id="h-loyalty-requirements">Requisitos para programa de fidelidade</h2>
-              <p>Para integrar o programa de fidelidade na Rappi, existem alguns pontos importantes:</p>
+            <section class="section-anchor" id="section-integration-guide" aria-labelledby="h-integration-guide">
+              <h2 id="h-integration-guide">Guia de integração Loyalty</h2>
+
+              <h3>O que é uma integração Loyalty?</h3>
+              <p>
+                Para oferecer uma experiência personalizada e omnicanal aos usuários Rappi que compram em um parceiro,
+                temos programas de fidelidade como opção para que percebam todos os benefícios oferecidos pelo parceiro.
+                Assim, um usuário frequente de um parceiro específico encontra na app Rappi os benefícios disponíveis, toma
+                decisões de compra com base neles e aumenta o valor dos pedidos e a frequência de compra nos parceiros que
+                disponibilizam descontos do programa de fidelidade na Rappi.
+              </p>
+
+              <div class="doc-note doc-note--warn">
+                <strong>Atenção:</strong> atualmente esta integração só pode ser implementada em parceiros que já possuam
+                uma das seguintes integrações: <strong>Connect</strong>, <strong>Payless</strong> ou
+                <strong>Open Orders</strong>.
+              </div>
+
+              <h3>Checklist</h3>
               <ul>
-                <li>Open Orders ou Payless já em produção.</li>
-                <li>Credenciais Bearer válidas.</li>
-                <li>Regras de pontuação e resgate definidas com o time comercial.</li>
+                <li>
+                  Compreensão completa do <strong>CRM (Customer Relationship Management)</strong> que, entre outras coisas,
+                  contém dados de usuário e descontos disponíveis.
+                </li>
+                <li>Fazer os ajustes necessários nos sistemas para expor as informações obrigatórias para validação.</li>
+                <li>Compartilhar com a Rappi os campos obrigatórios para criar novos usuários a partir da app Rappi.</li>
               </ul>
+
+              <div class="doc-note">
+                <strong>Lembrete:</strong> fidelidade refere-se a programas de fidelidade e associação que oferecem
+                descontos diferenciados. Os descontos de fidelidade que a Rappi trata hoje são apenas
+                <strong>descontos simples</strong> (ex.: 20% de desconto). O novo esquema de integração permite automatizar
+                todas as etapas do processo.
+              </div>
+
+              <h3>Componentes da integração</h3>
+              <ul>
+                <li>Criação de descontos diferenciados</li>
+                <li>Validação de usuário</li>
+                <li>Cadastro de novo usuário</li>
+              </ul>
+
+              <h3>Fluxo de fidelidade</h3>
+              <figure class="content-figure">
+                <img
+                  src="../../assets/img/loyalty/flow-loyalty-integration.png"
+                  alt="Diagrama: usuário entra na loja, banner de fidelidade, fluxo novo ou recorrente, validação no servidor do varejista, preços normais versus descontos diferenciados, adicionar ao carrinho"
+                  loading="lazy"
+                />
+                <figcaption>Fluxo de alto nível entre a app Rappi e o servidor do varejista.</figcaption>
+              </figure>
             </section>
 
-            <section class="section-anchor" id="section-endpoints" aria-labelledby="h-endpoints">
-              <h2 id="h-endpoints">Endpoints</h2>
+            <section class="section-anchor" id="section-differentiated-discounts" aria-labelledby="h-differentiated">
+              <h2 id="h-differentiated">Descontos diferenciados</h2>
 
-              <article class="endpoint-block section-anchor" id="endpoint-example">
-                <h3>
-                  <span class="method-badge">GET</span>
-                  /v1/loyalty/example
-                </h3>
-                <p>Endpoint de exemplo. Substitua pelo contrato real assim que disponível.</p>
-                <p class="muted">Sem corpo de requisição.</p>
+              <h3>Banner de fidelidade</h3>
+              <p>Para gerar o banner, são necessários:</p>
+              <ul>
+                <li>
+                  Uma imagem <strong>PNG</strong> com <strong>176×132 px</strong>, até <strong>1 MB</strong>, para o logo
+                  do programa.
+                </li>
+                <li><strong>Título do banner</strong> e <strong>corpo do banner</strong>.</li>
+                <li>Um endereço web (<strong>URL</strong>) dos <strong>termos e condições</strong> do programa de fidelidade do parceiro.</li>
+              </ul>
+              <figure class="content-figure">
+                <img
+                  src="../../assets/img/loyalty/banner-configuration.png"
+                  alt="Formulário no portal do parceiro: título do banner, idioma, imagem 176x132px 1MB, texto do corpo"
+                  loading="lazy"
+                />
+                <figcaption>Exemplo de configuração do banner (título, idioma, restrições de imagem, corpo).</figcaption>
+              </figure>
+
+              <h3>Mapeamento de desconto de fidelidade no PDV</h3>
+              <h4>Payless</h4>
+              <p>
+                No endpoint de <strong>detalhes do pedido</strong>, dentro do objeto <code>customer</code>, existe o campo
+                <code>identification</code>. Nele aparece o <strong>ID de fidelidade</strong> do usuário. O parceiro deve
+                extrair esse ID para aplicar corretamente os descontos de fidelidade no checkout. Se o valor for
+                <code>null</code>, <strong>não</strong> deve aplicar descontos de fidelidade.
+              </p>
+              <figure class="content-figure">
+                <img
+                  src="../../assets/img/loyalty/payless-customer-identification.png"
+                  alt="JSON do pedido com destaque em customer.identification para ID de fidelidade"
+                  loading="lazy"
+                />
+                <figcaption>Exemplo: <code>customer.identification</code> transporta o identificador de fidelidade (detalhes do pedido Payless).</figcaption>
+              </figure>
+
+              <h4>Open Orders</h4>
+              <p>
+                No evento de <strong>criação de pedido</strong>, o parceiro recebe o <code>fidelity_id</code> do usuário no
+                payload do evento. Se <code>fidelity_id</code> estiver vazio (<code>""</code>), <strong>não</strong> deve
+                aplicar descontos de fidelidade.
+              </p>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Exemplo de payload (JSON)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-json">{
+  "id": 1234567,
+  "store": {
+    "id": 10,
+    "name": "Sample Store",
+    "physical_store_id": 10
+  },
+  "client": {
+    "email": "example@rappi.com",
+    "phone": "18001112222",
+    "last_name": "Smith",
+    "first_name": "Jacob",
+    "fidelity_id": "1234567890",
+    "identification": {
+      "type": "",
+      "number": "100000000"
+    }
+  },
+  "status": "created",
+  "address": {
+    "city": "Metropolis",
+    "number": "101",
+    "region": "",
+    "zip_code": "110110",
+    "street_address": "1st street"
+  },
+  "courier": {
+    "phone": "18003334444",
+    "last_name": "Johnson",
+    "first_name": "Jane",
+    "vehicle_type": "motorbike"
+  },
+  "place_at": "",
+  "products": [
+    {
+      "id": 1000001,
+      "ean": "220000000000",
+      "sku": "101",
+      "name": "TastyPop",
+      "price": 30,
+      "category": "Beverages",
+      "quantity": {
+        "type": "units",
+        "units": 3
+      },
+      "sale_type": "U",
+      "volumetry": null,
+      "unit_price": 10,
+      "description": "TastyPop - The tastiest of 'em all",
+      "order_product_id": 90001,
+      "price_with_discount": 25,
+      "medical_prescription": {
+        "value": "",
+        "string": "",
+        "provider": ""
+      }
+    }
+  ],
+  "combos": [
+    {
+      "id": 20000001,
+      "name": "TastyPop and TastyChips",
+      "description": "Combo containing a 250mL TastyPop and a 200g TastyChips",
+      "units": 1,
+      "price": 15,
+      "products": [
+        {
+          "id": "1000001",
+          "ean": "220000000000",
+          "quantity": { "type": "units", "units": 1 },
+          "name": "TastyPop",
+          "description": "TastyPop - The tastiest of 'em all",
+          "sku": "101"
+        },
+        {
+          "id": "1000002",
+          "ean": "230000000000",
+          "quantity": { "type": "units", "units": 1 },
+          "name": "TastyChips",
+          "description": "TastyChips - The tastiest of 'em all",
+          "sku": "102"
+        }
+      ],
+      "price_with_discount": 15
+    }
+  ],
+  "created_at": "2023-01-01T00:00:00Z",
+  "total_price": 40,
+  "delivered_at": "",
+  "payment_method": "cash",
+  "cancelation_info": {
+    "canceled_by": "",
+    "description": ""
+  },
+  "event_uuid": "00000000-0000-0000-0000-000000000000"
+}</code></pre>
+              </div>
+              <p class="muted">
+                Os dados do entregador podem chegar vazios até haver atribuição; o exemplo destaca
+                <code>client.fidelity_id</code>.
+              </p>
+
+              <h3>Descontos diferenciados no inventário</h3>
+              <p>
+                Os descontos de fidelidade podem vir na integração de inventário convencional (<strong>API</strong> ou
+                <strong>SFTP</strong>, <strong>FULL</strong> ou <strong>DELTA</strong>).
+              </p>
+              <div class="doc-note doc-note--warn">
+                <strong>Importante:</strong> é obrigatório ter integração de inventário já configurada e funcionando. O
+                campo <code>discount_price</code> leva descontos <strong>não diferenciados</strong>. Embora a Rappi tenha
+                salvaguardas, esses descontos devem chegar <strong>apenas uma vez no início do dia</strong>.
+              </div>
+
+              <h4>Se você usa integração de inventário SFTP</h4>
+              <p>
+                Envie um novo campo <code>loyalty_discount</code> com o <strong>desconto diferenciado</strong> do
+                produto (percentual). O campo só é lido se <code>loyalty_discount</code> for maior ou igual a
+                <strong>0</strong> e menor ou igual a <strong>100</strong>. O desconto aplica-se apenas a usuários
+                inscritos no programa de fidelidade.
+              </p>
+
+              <h4>Se você usa integração de inventário API</h4>
+              <p>
+                Envie um novo campo <code>loyalty_discount</code> com o <strong>preço diferenciado</strong> do produto. O
+                campo só é lido se for <strong>menor</strong> que o campo <code>price</code>. O desconto aplica-se apenas
+                a usuários inscritos no programa de fidelidade.
+              </p>
+
+              <figure class="content-figure">
+                <img
+                  src="../../assets/img/loyalty/inventory-loyalty-discount-column.png"
+                  alt="Planilha de exemplo com colunas store_id, ean, price, discount_price, loyalty_discount, stock"
+                  loading="lazy"
+                />
+                <figcaption>Exemplo de layout de inventário incluindo a coluna <code>loyalty_discount</code> (estilo planilha SFTP).</figcaption>
+              </figure>
+
+              <h4>Exemplo de requisição (API datasets)</h4>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Requisição (curl)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                </div>
+                <pre><code class="language-bash">curl --location 'https://services.grability.rappi.com/api/cpgs-integration/datasets' \
+--header 'Content-Type: application/json' \
+--header 'api_key: 8d0bf7c9-e837-4357-8df0-SAMPLE' \
+--data '{
+  "records": [
+    {
+      "id": "50407043mam",
+      "store_id": "FRES004",
+      "ean": "700XXXXXXX",
+      "name": "XXXXXXXXX",
+      "trademark": "X Brand",
+      "description": "XXXXXXX",
+      "price": 163,
+      "discount_price": 0,
+      "loyalty_discount": 15,
+      "stock": 2,
+      "sale_type": "U",
+      "is_available": null,
+      "image_url": "web-page"
+    }
+  ]
+}'</code></pre>
+              </div>
+            </section>
+
+            <section class="section-anchor" id="section-user-validation" aria-labelledby="h-user-validation">
+              <h2 id="h-user-validation">Validação de usuário</h2>
+              <p>
+                O parceiro deve validar o status de um determinado ID de fidelidade e o tipo correspondente no programa
+                (se necessário).
+              </p>
+
+              <h3>O que precisamos?</h3>
+              <ul>
+                <li><code>base_url</code>: um webhook (<strong>HTTPS</strong>) onde a Rappi possa validar as informações.</li>
+                <li>
+                  <code>headers</code>: uma chave do parceiro para que apenas a Rappi acesse o sistema do parceiro (token
+                  fixo).
+                </li>
+              </ul>
+
+              <div class="doc-note">
+                <strong>Aviso:</strong> se a requisição de validação de usuário for bem-sucedida, a Rappi interpreta de
+                imediato para exibir descontos diferenciados quando o parceiro os tiver enviado corretamente.
+              </div>
+
+              <article class="endpoint-block section-anchor" id="endpoint-validate-membership" aria-labelledby="h-validate-membership">
+                <h3 id="h-validate-membership">Endpoint de validação</h3>
+                <p><span class="method-badge">GET</span> <code>{base_url}/loyalty/membership/{user_id}</code></p>
+                <div class="doc-note doc-note--warn">
+                  <strong>Formato obrigatório:</strong> o endpoint deve ser implementado exatamente nesta estrutura de
+                  caminho para a integração funcionar. Valida o status de fidelidade com os dados informados na app Rappi.
+                </div>
+                <h4>Considerações</h4>
+                <ul>
+                  <li>
+                    É necessário um header com <strong>token fixo</strong> para autenticação (você define o formato do token
+                    e o nome do header).
+                  </li>
+                  <li>O caminho deve seguir o padrão com identificador do varejista e do membership conforme acima.</li>
+                  <li>
+                    <code>user_id</code> pode ser número de ID, código de fidelidade, e-mail ou telefone — o índice que o
+                    seu sistema precisar.
+                  </li>
+                  <li>
+                    Tempo máximo de espera: <strong>5 segundos</strong>. Se excedido, a Rappi assume problema de conexão e
+                    cancela a requisição.
+                  </li>
+                  <li><code>base_url</code> deve usar <strong>HTTPS</strong>.</li>
+                  <li>Este fluxo não gera access tokens; usa apenas token fixo.</li>
+                </ul>
+                <div class="doc-note doc-note--warn">
+                  A resposta <strong>deve</strong> ser <code>200 OK</code> com corpo conforme um dos exemplos abaixo quando
+                  a associação for válida.
+                </div>
+                <div class="doc-note doc-note--warn">
+                  Para boa UX, a latência média deve ficar entre <strong>200 ms</strong> e <strong>1 s</strong>.
+                </div>
                 <div class="code-block-wrap">
                   <div class="code-block__bar">
-                    <span>Exemplo de resposta (JSON)</span>
+                    <span>Requisição (curl)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-bash">curl --location --request GET '{base_url}/loyalty/membership/{user_id}' \
+--header 'X-Api-Key: {{x-api-key}}'</code></pre>
+                </div>
+                <p class="muted">
+                  O <code>user_id</code> usado aqui é o ID armazenado do usuário e é enviado pelas outras integrações,
+                  como Open Orders e Payless.
+                </p>
+                <h4>Códigos de resposta</h4>
+                <div class="table-wrap">
+                  <table class="api-doc-table">
+                    <thead>
+                      <tr>
+                        <th>Código</th>
+                        <th>Resposta</th>
+                        <th>Definição</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>200</td>
+                        <td>OK</td>
+                        <td>Tipo de associação (ex.: Gold, Diamond, Platinum) ou o mesmo <code>user_id</code> usado na validação</td>
+                      </tr>
+                      <tr>
+                        <td>404</td>
+                        <td>NOT FOUND</td>
+                        <td>ID de fidelidade não cadastrado</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <h4>Corpo da resposta — 200 (níveis de associação)</h4>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>JSON</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{
+  "type": "membership_type"
+}</code></pre>
+                </div>
+                <h4>Corpo da resposta — 200 (sem níveis)</h4>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>JSON</span>
                     <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
                   </div>
                   <pre><code class="language-json">{}</code></pre>
                 </div>
-                <div class="try-soon">
-                  <button type="button" class="btn btn--ghost" disabled title="Em breve">Experimentar (em breve)</button>
-                </div>
               </article>
             </section>
 
-            <section class="section-anchor" id="section-relevant-flows" aria-labelledby="h-flows">
-              <h2 id="h-flows">Fluxos relevantes</h2>
-              <p>Fluxo de pontuação: a cada compra elegível, registre os pontos atribuídos ao cliente.</p>
-              <p>Fluxo de resgate: valide saldo, debite pontos e confirme o benefício liberado.</p>
-            </section>
+            <section class="section-anchor" id="section-new-user-registration" aria-labelledby="h-new-user">
+              <h2 id="h-new-user">Cadastro de novo usuário</h2>
+              <p>
+                Para o cadastro no programa de fidelidade, o parceiro deve compartilhar os dados necessários ao onboarding
+                para que o usuário conclua o cadastro diretamente na app Rappi.
+              </p>
+              <div class="doc-note">
+                <strong>Aviso:</strong> se a requisição de inscrição de novo usuário for bem-sucedida, a Rappi interpreta de
+                imediato para exibir descontos diferenciados quando o parceiro os tiver enviado corretamente.
+              </div>
+              <div class="doc-note">
+                <strong>ID vs telefone:</strong> se o parceiro exigir ID e telefone, o <strong>ID</strong> é o que aparece
+                no endpoint de detalhes do pedido Payless.
+              </div>
 
-            <section class="section-anchor" id="section-guide" aria-labelledby="h-guide">
-              <h2 id="h-guide">Guia</h2>
-              <p>Fidelidade depende de um histórico de pedidos confiável — por isso pressupõe Open Orders ou Payless.</p>
-              <p>Comunique claramente as regras (validade, taxas, exclusões) ao cliente final.</p>
-              <p>Monitore taxas de resgate para ajustar a economia do programa.</p>
+              <article class="endpoint-block section-anchor" id="endpoint-inscription-membership" aria-labelledby="h-inscription">
+                <h3 id="h-inscription">Endpoint de inscrição</h3>
+                <p><span class="method-badge">POST</span> <code>{base_url}/loyalty/membership</code></p>
+                <div class="doc-note doc-note--warn">
+                  <strong>Formato obrigatório:</strong> implemente o endpoint exatamente nesta estrutura de caminho.
+                </div>
+                <div class="doc-note doc-note--warn">
+                  Latência média alvo entre <strong>200 ms</strong> e <strong>1 s</strong> para boa UX.
+                </div>
+                <p>Envia os campos necessários para inscrever um novo usuário no programa de fidelidade.</p>
+                <h4>Considerações</h4>
+                <ul>
+                  <li>Token fixo em header (você define formato e nome do header).</li>
+                  <li>Sem geração de access token; apenas token fixo.</li>
+                  <li>Especifique quais campos precisa para o novo usuário.</li>
+                  <li>Tempo máximo de espera: <strong>5 segundos</strong>.</li>
+                  <li><code>base_url</code> deve usar <strong>HTTPS</strong>.</li>
+                </ul>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>Requisição (curl)</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-bash">curl --location --request POST '{base_url}/loyalty/membership' \
+--header 'X-Api-Key: {{x-api-key}}' \
+--header 'Content-Type: application/json' \
+--data '{
+  "id": 1002485634,
+  "name": "Pablo Lopez",
+  "phone": "3185534870",
+  "email": "pablol@gmail.com"
+}'</code></pre>
+                </div>
+                <p class="muted">
+                  O <code>membership_id</code> retornado no onboarding com sucesso é armazenado e enviado pelo Open Orders e
+                  Payless.
+                </p>
+                <h4>Respostas</h4>
+                <div class="table-wrap">
+                  <table class="api-doc-table">
+                    <thead>
+                      <tr>
+                        <th>Código</th>
+                        <th>Resposta</th>
+                        <th>Definição</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>201</td>
+                        <td>CREATED</td>
+                        <td>ID de associação (string)</td>
+                      </tr>
+                      <tr>
+                        <td>400</td>
+                        <td>Bad Request</td>
+                        <td>Erro no corpo da requisição</td>
+                      </tr>
+                      <tr>
+                        <td>406</td>
+                        <td>Not Acceptable</td>
+                        <td>Usuário já existe</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <h4>Exemplo de resposta — 201</h4>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>JSON</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{
+  "membership_id": "string"
+}</code></pre>
+                </div>
+                <h4>Exemplo de resposta — 400</h4>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>JSON</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{
+  "type": "invalid_path_params",
+  "message": "Invalid path params sent for request"
+}</code></pre>
+                </div>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>JSON</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{
+  "type": "invalid_body",
+  "message": "Invalid body sent for request"
+}</code></pre>
+                </div>
+                <h4>Exemplo de resposta — 406</h4>
+                <div class="code-block-wrap">
+                  <div class="code-block__bar">
+                    <span>JSON</span>
+                    <button type="button" class="btn btn--ghost copy-btn">Copiar</button>
+                  </div>
+                  <pre><code class="language-json">{
+  "message": "The user already exist"
+}</code></pre>
+                </div>
+              </article>
             </section>
           </div>
         </main>
@@ -146,6 +609,7 @@
     <script src="../../assets/js/credentials.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js" crossorigin="anonymous"></script>
     <script defer src="../../assets/js/lang-switcher.js"></script>
     <script src="../../assets/js/main.js"></script>
   </body>
