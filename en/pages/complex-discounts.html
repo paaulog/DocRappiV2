@@ -33,10 +33,17 @@
                 Dark mode
               </button>
               <nav class="sidebar__nav" aria-label="On this page">
-                <a href="#section-discount-requirements">Requirements for creating discounts</a>
-                <a href="#section-endpoints">Endpoints</a>
-                <a href="#section-relevant-flows">Relevant flows</a>
-                <a href="#section-guide">Guide</a>
+                <a href="#section-what-is">What is Complex Discounts?</a>
+                <a href="#section-why-integrate">Why integrate</a>
+                <a href="#section-types">Complex Discounts types</a>
+                <a href="#section-how-integrates">How integration works</a>
+                <a href="#section-file-naming">How files should be named</a>
+                <a href="#section-integration-fields">Integration fields</a>
+                <a href="#section-format-types">Format types</a>
+                <a href="#section-file-example">File example</a>
+                <a href="#section-to-consider">To consider</a>
+                <a href="#section-technical">Technical considerations</a>
+                <a href="#section-deactivation">Discount deactivation</a>
               </nav>
             </div>
             <div class="sidebar__bottom">
@@ -52,67 +59,275 @@
             <header class="api-main__header">
               <h1>Complex Discounts</h1>
               <p class="lead">
-                Create promotions and discounts with advanced rules (combos, tiered offers, by audience).
+                Integration guide for complex promotions over inventory: SFTP file layout, format types (L/P, X/Y, P/U),
+                pricing rules, and deactivation.
               </p>
             </header>
 
-            <section class="section-anchor" id="section-discount-requirements" aria-labelledby="h-discount-requirements">
-              <h2 id="h-discount-requirements">Requirements for creating discounts</h2>
-              <p>To create advanced promotions and discounts in Rappi, keep these key points in mind:</p>
+            <section class="section-anchor" id="section-what-is" aria-labelledby="h-what-is">
+              <h2 id="h-what-is">What is Complex Discounts Integration?</h2>
+              <p>
+                Complex is the integration option where discounts that are not simple are handled. So far, there are three
+                types of discounts or bundles that can broaden and improve the sales proposition of our partners.
+              </p>
+            </section>
+
+            <section class="section-anchor" id="section-why-integrate" aria-labelledby="h-why-integrate">
+              <h2 id="h-why-integrate">Why integrate with Complex Discounts?</h2>
               <ul>
-                <li>Inventory ativo e estável — descontos só fazem sentido sobre produtos com preço base atualizado.</li>
-                <li>Valid Bearer credentials.</li>
-                <li>Definition prévia das regras de negócio (vigência, segmento, limite por pedido).</li>
+                <li>Up to <strong>25%</strong> sales growth compared to those who do not apply discounts.</li>
+                <li>Increased user traffic, by making stores more attractive to users.</li>
+                <li>
+                  Greater visibility: more promos, more banners, push notifications, and social media.
+                </li>
+              </ul>
+              <div class="doc-note doc-note--warn">
+                <strong>Important:</strong> Rappi only supports the creation, insertion, and management of complex
+                promotions that consist of a <strong>single SKU (product)</strong>. The combination of different SKUs is
+                not supported.
+              </div>
+            </section>
+
+            <section class="section-anchor" id="section-types" aria-labelledby="h-types">
+              <h2 id="h-types">Complex Discounts types</h2>
+              <div class="table-wrap">
+                <table class="api-doc-table">
+                  <thead>
+                    <tr>
+                      <th>Buy (L) and pay (P)</th>
+                      <th>(X%) discount on the (Y) unit</th>
+                      <th>(P)% discount starting from (U) units</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Bundle logic expressed as L<sub>x</sub> / P<sub>y</sub> (e.g. buy 3, pay 2).</td>
+                      <td>Percentage off a specific unit position in the bundle (e.g. second unit).</td>
+                      <td>Percentage off unit price from a minimum quantity threshold onward.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="section-anchor" id="section-how-integrates" aria-labelledby="h-how-integrates">
+              <h2 id="h-how-integrates">How Complex Discounts integrates</h2>
+              <p>
+                The Complex Discount integration works <strong>only via SFTP</strong>. If your inventory integration is
+                through SFTP, a subfolder called <code>discounts</code> will be created. If it is through API, the folder
+                will be shared, and the files will be left in the same location.
+              </p>
+              <p>
+                The file format must be <strong>.csv</strong>. You can send the discounts for all stores in a single file
+                or in different files per store.
+              </p>
+            </section>
+
+            <section class="section-anchor" id="section-file-naming" aria-labelledby="h-file-naming">
+              <h2 id="h-file-naming">How files should be named</h2>
+              <ul>
+                <li><strong>Date + time:</strong> <code>STOREID_YYYY-MM-DD_HHmm.csv</code></li>
+                <li><strong>Date only:</strong> <code>STOREID_YYYY-MM-DD.csv</code></li>
+                <li><strong>Partner scope:</strong> <code>PARTNERNAME_YYYY-MM-DD.csv</code></li>
+              </ul>
+              <div class="doc-note">
+                <strong>Example:</strong> Store <code>123</code> could be <code>123_2022-01-31_1537.csv</code> or
+                <code>123_2022-01-31.csv</code>.
+              </div>
+            </section>
+
+            <section class="section-anchor" id="section-integration-fields" aria-labelledby="h-integration-fields">
+              <h2 id="h-integration-fields">Integration fields</h2>
+              <div class="table-wrap">
+                <table class="api-doc-table">
+                  <thead>
+                    <tr>
+                      <th>Column name</th>
+                      <th>Type</th>
+                      <th>Required</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>store_id</code></td>
+                      <td>string</td>
+                      <td>TRUE</td>
+                      <td>Partner store identification number</td>
+                    </tr>
+                    <tr>
+                      <td><code>start_date</code></td>
+                      <td>string</td>
+                      <td>TRUE</td>
+                      <td>Promotion starts <code>YYYY/MM/DD</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>end_date</code></td>
+                      <td>string</td>
+                      <td>TRUE</td>
+                      <td>Promotion ends <code>YYYY/MM/DD</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>description</code></td>
+                      <td>string</td>
+                      <td>TRUE</td>
+                      <td>Promotion description. Example: &quot;Buy 3, Pay 2&quot;</td>
+                    </tr>
+                    <tr>
+                      <td><code>type_format</code></td>
+                      <td>string</td>
+                      <td>TRUE</td>
+                      <td>Promotion format. Example: <code>B3_P2</code></td>
+                    </tr>
+                    <tr>
+                      <td><code>name</code></td>
+                      <td>string</td>
+                      <td>TRUE</td>
+                      <td>Product name</td>
+                    </tr>
+                    <tr>
+                      <td><code>id</code></td>
+                      <td>string</td>
+                      <td>TRUE</td>
+                      <td>SKU used for general integration</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="doc-note doc-note--warn">
+                <strong>Date format:</strong> review the date format in the file. Any other format will prevent the
+                integration from being processed correctly. Use <strong>YYYY/MM/DD</strong> as documented above.
+              </div>
+            </section>
+
+            <section class="section-anchor" id="section-format-types" aria-labelledby="h-format-types">
+              <h2 id="h-format-types">Format types</h2>
+              <div class="table-wrap">
+                <table class="api-doc-table">
+                  <thead>
+                    <tr>
+                      <th>Type format</th>
+                      <th>Example</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code>LX_PY</code></td>
+                      <td><code>L3_P2</code> — buy 3, pay for 2 units.</td>
+                    </tr>
+                    <tr>
+                      <td><code>XP_YU</code></td>
+                      <td><code>X25_Y2</code> — 25% discount on the second unit.</td>
+                    </tr>
+                    <tr>
+                      <td><code>PP_UU</code></td>
+                      <td>
+                        <code>P20_U4</code> — from the 4th unit onward, the unit price has a 20% discount.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="section-anchor" id="section-file-example" aria-labelledby="h-file-example">
+              <h2 id="h-file-example">File example</h2>
+              <div class="code-block-wrap">
+                <div class="code-block__bar">
+                  <span>Sample CSV (header + one row)</span>
+                  <button type="button" class="btn btn--ghost copy-btn">Copy</button>
+                </div>
+                <pre><code>store_id,start_date,end_date,description,type_format,name,id
+123,2022/01/31,2022/02/28,"Buy 3, Pay 2",B3_P2,Example Product,SKU-001</code></pre>
+              </div>
+            </section>
+
+            <section class="section-anchor" id="section-to-consider" aria-labelledby="h-to-consider">
+              <h2 id="h-to-consider">To consider</h2>
+              <ul>
+                <li>Discounts start at <strong>12:00 a.m. GMT+0</strong> on the day specified in the file.</li>
+                <li>Discounts end at <strong>11:59:59 p.m. GMT+0</strong> on the day specified in the file.</li>
+                <li>The date format in the file must be <strong>YYYY/MM/DD</strong>.</li>
+                <li>All parameters are mandatory.</li>
               </ul>
             </section>
 
-            <section class="section-anchor" id="section-endpoints" aria-labelledby="h-endpoints">
-              <h2 id="h-endpoints">Endpoints</h2>
-
-              <article class="endpoint-block section-anchor" id="endpoint-example">
-                <h3>
-                  <span class="method-badge">POST</span>
-                  /v1/discounts/example
-                </h3>
-                <p>Example endpoint. Replace it with the actual contract as soon as it is available.</p>
-                <div class="code-block-wrap">
-                  <div class="code-block__bar">
-                    <span>Body da requisição (JSON)</span>
-                    <button type="button" class="btn btn--ghost copy-btn">Copy</button>
-                  </div>
-                  <pre><code class="language-json">{}</code></pre>
-                </div>
-                <div class="code-block-wrap">
-                  <div class="code-block__bar">
-                    <span>Response example (JSON)</span>
-                    <button type="button" class="btn btn--ghost copy-btn">Copy</button>
-                  </div>
-                  <pre><code class="language-json">{}</code></pre>
-                </div>
-                <div class="try-soon">
-                  <button type="button" class="btn btn--ghost" disabled title="Coming soon">Try it (coming soon)</button>
-                </div>
-              </article>
+            <section class="section-anchor" id="section-technical" aria-labelledby="h-technical">
+              <h2 id="h-technical">Technical considerations</h2>
+              <p>
+                To have a Complex Discount integration, you must already have an <strong>inventory integration</strong> that
+                is active and operating within the general parameters considered a healthy integration.
+              </p>
+              <p>
+                For availability control, Rappi uses the rule that the single-unit SKU in the inventory integration must
+                have at least <strong>three times (3×)</strong> the total units in the bundle for the product to be shown in
+                the application. For example, if the partner sends a promotion with format like <code>L5_P4</code>, the
+                original product must have <strong>more than 15 units</strong> in stock in the inventory file; otherwise the
+                bundle will be deactivated.
+              </p>
+              <p>Rappi calculates the bundle discount price from the format type as follows:</p>
+              <div class="table-wrap">
+                <table class="api-doc-table">
+                  <thead>
+                    <tr>
+                      <th scope="col"></th>
+                      <th scope="col"><code>LX_PY</code></th>
+                      <th scope="col"><code>XP_YU</code></th>
+                      <th scope="col"><code>PP_UU</code></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">Price</th>
+                      <td>Price per unit × <em>x</em></td>
+                      <td>Price per unit × <em>u</em></td>
+                      <td>Price per unit</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Discounted price</th>
+                      <td>Price per unit × <em>y</em></td>
+                      <td>Price per unit × ((<em>u</em> − 1) + (1 − <em>p</em>/100))</td>
+                      <td>
+                        <em>U</em> = unit from which the new price per unit applies (each row can represent a step in
+                        discount depth).
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="muted">
+                Each logical row can represent a discount increase (or a reduction in the unit price) depending on the
+                format.
+              </p>
+              <div class="doc-note">
+                <strong>For all cases:</strong> percentage discount =
+                <code>100 × (Full price − Discounted price) / Full price</code>
+                (round the result to <strong>two decimal places</strong>).
+              </div>
             </section>
 
-            <section class="section-anchor" id="section-relevant-flows" aria-labelledby="h-flows">
-              <h2 id="h-flows">Relevant flows</h2>
+            <section class="section-anchor" id="section-deactivation" aria-labelledby="h-deactivation">
+              <h2 id="h-deactivation">Discount deactivation</h2>
+              <h3>End date</h3>
               <p>
-                Fluxo de criação de promoção: defina regra → publique no escopo (loja/produto) → monitore ativações.
+                Based on the value sent in the <code>end_date</code> field, Rappi applies a daily routine to deactivate
+                promotions that have finished.
               </p>
+              <h3>Security stock</h3>
               <p>
-                Fluxo de encerramento: agende fim ou desative manualmente para evitar descontos fora de campanha.
+                The quantity for the product SKU must be at least <strong>3×</strong> the total units in the bundle for it
+                to appear as active in the app:
               </p>
-            </section>
-
-            <section class="section-anchor" id="section-guide" aria-labelledby="h-guide">
-              <h2 id="h-guide">Guide</h2>
-              <p>
-                Descontos complexos rodam sobre o preço já carregado no inventário; se o preço base estiver
-                desatualizado, o desconto também ficará.
-              </p>
-              <p>Always test the promotion in staging before enabling it in production.</p>
-              <p>Document validity windows and rules with the KAM — this makes audits and partner support easier.</p>
+              <ul>
+                <li>
+                  Example: a &quot;Buy 5, Pay 4&quot; bundle needs at least <strong>15 units</strong> (single-unit SKU) in
+                  stock.
+                </li>
+                <li>
+                  Example: a &quot;50% discount on the 2nd unit&quot; bundle needs at least <strong>6 units</strong>
+                  (single-unit SKU) in stock or inventory.
+                </li>
+              </ul>
             </section>
           </div>
         </main>
@@ -140,7 +355,7 @@
           <input type="text" id="field-store-id" name="storeId" autocomplete="off" placeholder="Store identifier" />
         </div>
         <div class="modal__field">
-          <label for="field-merchant">ID do merchant</label>
+          <label for="field-merchant">Merchant ID</label>
           <input type="text" id="field-merchant" name="merchantId" autocomplete="off" placeholder="Merchant" />
         </div>
         <div class="modal__field">
