@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="light">
   <head>
     <meta charset="utf-8" />
@@ -33,28 +33,17 @@
                 Dark mode
               </button>
               <nav class="sidebar__nav" aria-label="On this page">
-                <a href="#section-policy">Policy and alerts</a>
-                <a href="#section-what-is">What is Payless</a>
-                <a href="#section-technical">Technical notes</a>
-                <a href="#section-flow">Flow and PDF</a>
-                <a href="#section-checklist">Checklist</a>
-                <a href="#section-intro">Introduction</a>
-                <a href="#section-journey">Order journey</a>
-                <a href="#section-barcode">Barcode</a>
-                <a href="#section-process">Process and authorization</a>
-                <a href="#section-retries">Retries and best practices</a>
-                <a href="#section-fallback">Card / cash fallback</a>
-                <a href="#section-servers">Servers and authentication</a>
-                <a href="#section-sandbox">Sandbox (catalog and orders)</a>
-                <a href="#section-order-details">Order details</a>
-                <a href="#section-authorize">Payment authorization</a>
-                <a href="#section-price-match">Price Match</a>
-                <a href="#section-errors">HTTP errors</a>
-                <a href="#section-validate">Payment validation</a>
-                <a href="#section-cancel">Cancellation</a>
-                <a href="#section-refund">Refunds</a>
-                <a href="#section-conciliation">Payment list and conciliation</a>
-                <a href="#section-heartbeat">Heartbeat and Smart Prices</a>
+                <a href="#section-integration-guide">Rappi Payless Integration Guide</a>
+                <a href="#section-servers">Sandbox Servers &amp; Authentication</a>
+                <a href="#section-sandbox">Sandbox Setup and Usage</a>
+                <a href="#section-authorize">Authorization Payments with Payless (DEV - PROD)</a>
+                <a href="#section-price-match">[PRICE MATCH VERSION] Authorization Payments with Payless (DEV - PROD)</a>
+                <a href="#section-validate">Validation Payment Endpoint</a>
+                <a href="#section-cancel">Cancellation Transactions (DEV - PROD)</a>
+                <a href="#section-refund">Refunds Transactions (DEV - PROD)</a>
+                <a href="#section-conciliation">Payment List &amp; Conciliation (DEV - PROD)</a>
+                <a href="#section-heartbeat">Heartbeat System</a>
+                <a href="#section-smart-prices">Smart Prices - Get List of Active orders</a>
               </nav>
             </div>
             <div class="sidebar__bottom">
@@ -69,8 +58,14 @@
           <div id="api-content-root">
             <header class="api-main__header">
               <h1>Rappi Payless — Integration Guide</h1>
-              <p class="lead">Technical Payless documentation for POS and integrators. Content follows the official manual in English for alignment with API contracts and messages.</p>
+              <p class="lead">
+                Technical Payless documentation for POS and integrators. Content follows the official manual in English for
+                alignment with API contracts and messages.
+              </p>
             </header>
+
+            <section class="section-anchor" id="section-integration-guide" aria-labelledby="h-integration-guide">
+              <h2 id="h-integration-guide">Rappi Payless Integration Guide</h2>
 
             <div class="doc-page-outline" role="navigation" aria-label="Page roadmap">
               <span class="doc-page-outline__title">How to use this page</span>
@@ -126,7 +121,7 @@
               </p>
               <figure class="content-figure">
                 <img src="../../assets/img/payless/flow-payless-v3.png" alt="Swimlane diagram PAYLESS V3: microservices, RT/shopper picking, cashier and POS lanes" width="1200" height="800" loading="lazy" />
-                <figcaption>Payless V3 flow overview (order, picking, checkout).</figcaption>
+                <figcaption>Visão geral do fluxo Payless V3 (pedido, picking e continuação no caixa).</figcaption>
               </figure>
               <p>
                 Take some time to analyze and understand all the possible scenarios the POS system will have to implement
@@ -181,11 +176,11 @@
                   accumulate points for the customer. Payment code is scanned from the picker's device to retrieve order details.
                   <figure class="content-figure">
                     <img src="../../assets/img/payless/price-match-rappi-pos.png" alt="Table comparing RAPPI vs POS line items and resolved totals" loading="lazy" />
-                    <figcaption>Example Rappi × POS line comparison (price match).</figcaption>
+                    <figcaption>Exemplo de comparação de linhas Rappi × POS (price match).</figcaption>
                   </figure>
                   <figure class="content-figure">
                     <img src="../../assets/img/payless/price-match-mixed-lines.png" alt="Price match when EAN differs between Rappi and POS" loading="lazy" />
-                    <figcaption>Mixed lines: partial match and price priority where applicable.</figcaption>
+                    <figcaption>Caso com itens mistos: correspondência parcial e priorização de preço onde aplicável.</figcaption>
                   </figure>
                 </li>
                 <li>
@@ -199,7 +194,7 @@
                   Rappi order previously.
                   <figure class="content-figure">
                     <img src="../../assets/img/payless/price-match-overwrite.png" alt="Final basket after overwriting unit price from Rappi" loading="lazy" />
-                    <figcaption>Unit price overwrite per Rappi order.</figcaption>
+                    <figcaption>Sobrescrita de preço unitário conforme pedido Rappi.</figcaption>
                   </figure>
                 </li>
                 <li>
@@ -219,7 +214,7 @@
               <p class="muted"><strong>Shopper Pays with Payless (VIDEO):</strong> use the training video provided by your Rappi integration contact.</p>
               <figure class="content-figure">
                 <img src="../../assets/img/payless/price-match-weighable.png" alt="Weighable product: POS quantity with Rappi unit price and recalculated total" loading="lazy" />
-                <figcaption>Weighable: POS quantity × Rappi unit price.</figcaption>
+                <figcaption>Produto pesável: quantidade do POS × preço unitário Rappi.</figcaption>
               </figure>
             </section>
 
@@ -328,8 +323,10 @@
               <p class="muted"><strong>Note:</strong> The version of using pincode is deprecated.</p>
             </section>
 
+            </section>
+
             <section class="section-anchor" id="section-servers" aria-labelledby="h-servers">
-              <h2 id="h-servers">Sandbox servers &amp; authentication</h2>
+              <h2 id="h-servers">Sandbox Servers &amp; Authentication</h2>
               <p>
                 Our sandbox operations were created to accelerate our partners' development and testing. This is a six-step
                 process. You will have one or more dummy <code>store_id</code> that can be used on the methods listed in our
@@ -431,7 +428,7 @@
             </section>
 
             <section class="section-anchor" id="section-sandbox" aria-labelledby="h-sandbox">
-              <h2 id="h-sandbox">Sandbox setup and usage</h2>
+              <h2 id="h-sandbox">Sandbox Setup and Usage</h2>
 
               <article class="endpoint-block section-anchor" id="endpoint-testing-products" aria-labelledby="h-testing-products">
                 <h3 id="h-testing-products"><span class="method-badge">PUT</span> /api/cpgops-integrations/testing/products</h3>
@@ -540,10 +537,8 @@
 }</code></pre>
                 </div>
               </article>
-            </section>
 
-            <section class="section-anchor" id="section-order-details" aria-labelledby="h-order-details">
-              <h2 id="h-order-details">Get order details (DEV — PROD)</h2>
+              <h3 id="section-order-details">Get order details (DEV — PROD)</h3>
               <div class="doc-note doc-note--warn">
                 Keep in mind that there's a possibility in each order that <strong>all fields</strong> in the response body
                 can return as <code>null</code>. This endpoint <strong>can't be used after authorization</strong>.
@@ -573,7 +568,7 @@
             </section>
 
             <section class="section-anchor" id="section-authorize" aria-labelledby="h-authorize">
-              <h2 id="h-authorize">Authorization payments with Payless (DEV — PROD)</h2>
+              <h2 id="h-authorize">Authorization Payments with Payless (DEV - PROD)</h2>
               <p>
                 Request payment authorization using the barcode from the RT/Shopper. On success, a transaction code
                 confirms authorization. <code>store_id</code> must match Rappi inventory integration.
@@ -624,10 +619,49 @@
 }'</code></pre>
                 </div>
               </article>
+
+              <h3 id="h-errors">HTTP responses and troubleshooting</h3>
+              <div class="table-wrap">
+                <table class="api-doc-table">
+                  <thead><tr><th>Code</th><th>Meaning</th></tr></thead>
+                  <tbody>
+                    <tr><td>200</td><td>Authorization successful</td></tr>
+                    <tr><td>400</td><td>Body error</td></tr>
+                    <tr><td>401</td><td>Invalid or expired token</td></tr>
+                    <tr><td>403</td><td>Store does not belong to the partner</td></tr>
+                    <tr><td>404</td><td>Barcode missing, expired, or used for another order</td></tr>
+                    <tr><td>406</td><td>Price difference vs Rappi order vs ally authorization amount</td></tr>
+                    <tr><td>409</td><td>Duplicate transaction</td></tr>
+                    <tr><td>410</td><td>Wrong store</td></tr>
+                    <tr><td>412</td><td>Already authorized with another payment method</td></tr>
+                    <tr><td>413</td><td>POS basket vs Rappi app products mismatch</td></tr>
+                    <tr><td>500</td><td>Server error</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <h4>I got an error, what should I do?</h4>
+              <div class="table-wrap">
+                <table class="api-doc-table">
+                  <thead><tr><th>Code</th><th>Action</th></tr></thead>
+                  <tbody>
+                    <tr><td>400</td><td>Contact Rappi Tech Team</td></tr>
+                    <tr><td>401</td><td>Check token or generate a new one</td></tr>
+                    <tr><td>403</td><td>RT must go to the correct partner</td></tr>
+                    <tr><td>404</td><td>RT must show a new barcode</td></tr>
+                    <tr><td>406</td><td>Verify amount/products with RT or rescan</td></tr>
+                    <tr><td>409</td><td><code>terminal_id</code> / <code>terminal_transaction_id</code> / <code>store_id</code> already used on another order</td></tr>
+                    <tr><td>410</td><td>RT must go to the correct store</td></tr>
+                    <tr><td>412</td><td>Order already paid another way — RT should proceed with delivery per instructions</td></tr>
+                    <tr><td>413</td><td>Scanned products must match Rappi order list</td></tr>
+                    <tr><td>500</td><td>Contact Rappi Tech Team</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="muted">Successful responses return status such as <code>payment_authorization_request_succeeded</code> with <code>transactions[]</code> including <code>authorization_code</code> and <code>payment_code</code>.</p>
             </section>
 
             <section class="section-anchor" id="section-price-match" aria-labelledby="h-price-match">
-              <h2 id="h-price-match">[PRICE MATCH VERSION] Authorization (DEV — PROD)</h2>
+              <h2 id="h-price-match">[PRICE MATCH VERSION] Authorization Payments with Payless (DEV - PROD)</h2>
               <div class="doc-note doc-note--warn">
                 Develop this flow <strong>only</strong> if your Integration Engineer instructs you. If you were told to
                 implement the legacy flow, follow the separate legacy documentation link provided by Rappi.
@@ -665,49 +699,8 @@
               <p>Use the same <code>POST .../authorize</code> request shape as the standard flow.</p>
             </section>
 
-            <section class="section-anchor" id="section-errors" aria-labelledby="h-errors">
-              <h2 id="h-errors">Authorize — HTTP responses and troubleshooting</h2>
-              <div class="table-wrap">
-                <table class="api-doc-table">
-                  <thead><tr><th>Code</th><th>Meaning</th></tr></thead>
-                  <tbody>
-                    <tr><td>200</td><td>Authorization successful</td></tr>
-                    <tr><td>400</td><td>Body error</td></tr>
-                    <tr><td>401</td><td>Invalid or expired token</td></tr>
-                    <tr><td>403</td><td>Store does not belong to the partner</td></tr>
-                    <tr><td>404</td><td>Barcode missing, expired, or used for another order</td></tr>
-                    <tr><td>406</td><td>Price difference vs Rappi order vs ally authorization amount</td></tr>
-                    <tr><td>409</td><td>Duplicate transaction</td></tr>
-                    <tr><td>410</td><td>Wrong store</td></tr>
-                    <tr><td>412</td><td>Already authorized with another payment method</td></tr>
-                    <tr><td>413</td><td>POS basket vs Rappi app products mismatch</td></tr>
-                    <tr><td>500</td><td>Server error</td></tr>
-                  </tbody>
-                </table>
-              </div>
-              <h3>I got an error, what should I do?</h3>
-              <div class="table-wrap">
-                <table class="api-doc-table">
-                  <thead><tr><th>Code</th><th>Action</th></tr></thead>
-                  <tbody>
-                    <tr><td>400</td><td>Contact Rappi Tech Team</td></tr>
-                    <tr><td>401</td><td>Check token or generate a new one</td></tr>
-                    <tr><td>403</td><td>RT must go to the correct partner</td></tr>
-                    <tr><td>404</td><td>RT must show a new barcode</td></tr>
-                    <tr><td>406</td><td>Verify amount/products with RT or rescan</td></tr>
-                    <tr><td>409</td><td><code>terminal_id</code> / <code>terminal_transaction_id</code> / <code>store_id</code> already used on another order</td></tr>
-                    <tr><td>410</td><td>RT must go to the correct store</td></tr>
-                    <tr><td>412</td><td>Order already paid another way — RT should proceed with delivery per instructions</td></tr>
-                    <tr><td>413</td><td>Scanned products must match Rappi order list</td></tr>
-                    <tr><td>500</td><td>Contact Rappi Tech Team</td></tr>
-                  </tbody>
-                </table>
-              </div>
-              <p class="muted">Successful responses return status such as <code>payment_authorization_request_succeeded</code> with <code>transactions[]</code> including <code>authorization_code</code> and <code>payment_code</code>.</p>
-            </section>
-
             <section class="section-anchor" id="section-validate" aria-labelledby="h-validate">
-              <h2 id="h-validate">Validation payment endpoint (DEV — PROD)</h2>
+              <h2 id="h-validate">Validation Payment Endpoint</h2>
               <p>When communication breaks and the POS is unsure if authorization succeeded, validate payment status for the order.</p>
               <article class="endpoint-block" id="endpoint-validate-status" aria-labelledby="h-validate-status">
                 <h3 id="h-validate-status"><span class="method-badge">GET</span> /api/cpgops-integrations/pos/v3/payments/orders/{order_id}/status</h3>
@@ -722,7 +715,7 @@
             </section>
 
             <section class="section-anchor" id="section-cancel" aria-labelledby="h-cancel">
-              <h2 id="h-cancel">Cancellation transactions (DEV — PROD)</h2>
+              <h2 id="h-cancel">Cancellation Transactions (DEV - PROD)</h2>
               <div class="doc-note">
                 <strong>Important:</strong> After calling cancel, support paying again via Payless or another method. The
                 cancellation endpoint cancels the <strong>authorization</strong>, not the Rappi order.
@@ -752,7 +745,7 @@
             </section>
 
             <section class="section-anchor" id="section-refund" aria-labelledby="h-refund">
-              <h2 id="h-refund">Refunds transactions (DEV — PROD)</h2>
+              <h2 id="h-refund">Refunds Transactions (DEV - PROD)</h2>
               <div class="doc-note">
                 Order must be previously authorized; follow cancellation rules for the operational journey. Returns process
                 supports <strong>full returns</strong> only at this time.
@@ -801,14 +794,14 @@
             </section>
 
             <section class="section-anchor" id="section-conciliation" aria-labelledby="h-conciliation">
-              <h2 id="h-conciliation">Payment list &amp; conciliation (DEV — PROD)</h2>
+              <h2 id="h-conciliation">Payment List &amp; Conciliation (DEV - PROD)</h2>
               <p>
                 Two sources: <strong>Payment List</strong> API and per-order <strong>order details</strong> / stored fields.
                 The transactions list is informational; the <strong>Conciliation Report</strong> is the source of truth.
               </p>
               <figure class="content-figure">
                 <img src="../../assets/img/payless/conciliation-report-sample.png" alt="Sample Rappi partner sales reconciliation report" loading="lazy" />
-                <figcaption>Sample sales / conciliation report (totals and adjustments).</figcaption>
+                <figcaption>Exemplo visual de relatório de vendas / conciliação (referência para campos de totais e ajustes).</figcaption>
               </figure>
               <article class="endpoint-block" id="endpoint-payment-list" aria-labelledby="h-payment-list">
                 <h3 id="h-payment-list"><span class="method-badge">GET</span> /api/cpgops-integrations/pos/v3/payments</h3>
@@ -834,7 +827,7 @@
             </section>
 
             <section class="section-anchor" id="section-heartbeat" aria-labelledby="h-heartbeat">
-              <h2 id="h-heartbeat">Heartbeat system</h2>
+              <h2 id="h-heartbeat">Heartbeat System</h2>
               <p>Lightweight monitoring to verify store connectivity and Payless availability, and to apply on/off rules between calls.</p>
               <article class="endpoint-block" id="endpoint-heartbeat" aria-labelledby="h-heartbeat-auth">
                 <h3 id="h-heartbeat-auth"><span class="method-badge">POST</span> /api/cpgops-integrations/pos/v3/heartbeat/authorize</h3>
@@ -848,8 +841,10 @@
                 </div>
                 <p class="muted">200 returns <code>status: successful</code> with store and terminal echo; 404/500 indicate service issues.</p>
               </article>
+            </section>
 
-              <h3>Smart Prices — list of active orders</h3>
+            <section class="section-anchor" id="section-smart-prices" aria-labelledby="h-smart-prices">
+              <h2 id="h-smart-prices">Smart Prices - Get List of Active orders</h2>
               <div class="doc-note doc-note--warn">
                 Active orders: courier is at the store and finished picking — allows building the authorization with extra
                 time vs the regular Payless flow. Confirm <code>partner_store_id</code> format with Rappi. Respect rate
